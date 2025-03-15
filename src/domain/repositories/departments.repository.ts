@@ -1,0 +1,12 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Department } from '../entities/department.entity';
+
+@Injectable()
+export class DepartmentsRepository {
+    constructor(
+        @InjectRepository(Department)
+        public readonly repository: Repository<Department>
+    ) { }
+}
