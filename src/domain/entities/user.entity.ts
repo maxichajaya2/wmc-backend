@@ -42,5 +42,7 @@ export class User {
   @Column({ type: 'int', nullable: true })
   categoryId?: number;
 
+  reviewedPapers?: Paper[];
+
   paperComentaries?: PaperComentary[];
 }

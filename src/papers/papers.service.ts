@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
-import { Paper, PaperState } from '../domain/entities/paper.entity';
+import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
 import { PapersRepository } from '../domain/repositories/papers.repository';
 import { UsersRepository } from '../domain/repositories/users.repository';
 import { TopicsRepository } from '../domain/repositories/topics.repository';
@@ -81,6 +81,7 @@ export class PapersService {
       state: PaperState.REGISTERED,
       createdAt: new Date(),
       topic,
+      process: Process.PRESELECCIONADO,
       webUser,
       category,
     }
@@ -169,64 +170,76 @@ export class PapersService {
   }
 
   async changeStatus(id: number, changeStateDto: ChangeStateDto) {
-    const paper = await this.findOne(id);
-    const { state, reviewerUserId } = changeStateDto;
-    const invalidStateCode = 'INVALID_STATE';
-    const reviewerCode = 'REVIEWER_REQUIRED';
-    switch (state) {
-      case PaperState.SENT:
-        if (paper.state !== PaperState.REGISTERED) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be registered to be sent',
-          });
-        }
-        paper.state = state;
-        paper.sentDate = new Date();
-        break;
-      case PaperState.REVIEWED:
-        if (paper.state !== PaperState.SENT) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be sent to be reviewed',
-          });
-        }
-        if (!reviewerUserId) {
-          throw new BadRequestException({
-            code: reviewerCode,
-            message: 'Reviewer user id is required',
-          });
-        }
-        const reviewerUser = await this.webUsersRepository.findById(reviewerUserId);
-        if (!reviewerUser) {
-          throw new NotFoundException('Reviewer user not found');
-        }
-        paper.state = state;
-        paper.reviewerUserId = reviewerUser.id;
-        paper.reviewerUser = reviewerUser;
-        paper.reviewedDate = new Date();
-        break;
-      case PaperState.APPROVED:
-        const { type } = changeStateDto;
-        if (!type) {
-          throw new BadRequestException('Type is required to approve a paper');
-        }
-        if (paper.state !== PaperState.REVIEWED) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be reviewed to be approved',
-          });
-        }
-        paper.type = type;
-        paper.state = state;
-        paper.approvedDate = new Date();
-        break;
-      default:
-        throw new NotFoundException('Invalid state');
-    }
-    paper.state = state;
-    await this.papersRepository.repository.save(paper);
-    return paper;
+    return 1;
+    // const paper = await this.findOne(id);
+    // const { state, reviewerUserId } = changeStateDto;
+    // const invalidStateCode = 'INVALID_STATE';
+    // const reviewerCode = 'REVIEWER_REQUIRED';
+    // switch (state) {
+    //   case PaperState.RECEIVED:
+    //     if (paper.state !== PaperState.REGISTERED) {
+    //       throw new BadRequestException({
+    //         code: invalidStateCode,
+    //         message: 'Paper must be registered to be received',
+    //       });
+    //     }
+    //     paper.state = state;
+    //     paper.receivedDate = new Date();
+    //     //TODO: send email to author
+    //     break;
+    //   case PaperState.SENT:
+    //     if (paper.state !== PaperState.REGISTERED) {
+    //       throw new BadRequestException({
+    //         code: invalidStateCode,
+    //         message: 'Paper must be registered to be sent',
+    //       });
+    //     }
+    //     paper.state = state;
+    //     paper.sentDate = new Date();
+    //     break;
+    //   case PaperState.REVIEWED:
+    //     if (paper.state !== PaperState.SENT) {
+    //       throw new BadRequestException({
+    //         code: invalidStateCode,
+    //         message: 'Paper must be sent to be reviewed',
+    //       });
+    //     }
+    //     if (!reviewerUserId) {
+    //       throw new BadRequestException({
+    //         code: reviewerCode,
+    //         message: 'Reviewer user id is required',
+    //       });
+    //     }
+    //     const reviewerUser = await this.usersRepository.findById(reviewerUserId);
+    //     if (!reviewerUser) {
+    //       throw new NotFoundException('Reviewer user not found');
+    //     }
+    //     paper.state = state;
+    //     paper.reviewerUserId = reviewerUser.id;
+    //     paper.reviewerUser = reviewerUser;
+    //     paper.reviewedDate = new Date();
+    //     break;
+    //   case PaperState.APPROVED:
+    //     const { type } = changeStateDto;
+    //     if (!type) {
+    //       throw new BadRequestException('Type is required to approve a paper');
+    //     }
+    //     if (paper.state !== PaperState.REVIEWED) {
+    //       throw new BadRequestException({
+    //         code: invalidStateCode,
+    //         message: 'Paper must be reviewed to be approved',
+    //       });
+    //     }
+    //     paper.type = type;
+    //     paper.state = state;
+    //     paper.approvedDate = new Date();
+    //     break;
+    //   default:
+    //     throw new NotFoundException('Invalid state');
+    // }
+    // paper.state = state;
+    // await this.papersRepository.repository.save(paper);
+    // return paper;
   }
 
   async findComments(id: number) {

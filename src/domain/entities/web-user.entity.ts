@@ -68,8 +68,6 @@ export class WebUser {
   // @OneToMany(() => Enrollment, enrollment => enrollment.user)
   // enrollments?: Enrollment[];
 
-  reviewedPapers?: Paper[];
-
   papers?: Paper[];
 
   topics?: Topic[];

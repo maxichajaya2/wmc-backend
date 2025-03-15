@@ -7,16 +7,24 @@ import { PaperAuthor } from "./paper-author.entity";
 import { Category } from "./category.entity";
 
 export enum PaperState {
-  APPROVED = 3,
-  SENT = 1,
-  REVIEWED = 2,
   REGISTERED = 0,
+  RECEIVED = 1,
+  SENT = 2,
+  ASSIGNED = 3,
+  UNDER_REVIEW = 4,
+  APPROVED = 5,
+  DISMISSED = 6,
 }
 
 export enum PaperType{
   ORAL = 'oral',
   POSTER = 'poster',
   LIBRO = 'libro',
+}
+
+export enum Process{
+  PRESELECCIONADO = 'P',
+  SELECCIONADO = 'S',
 }
 
 @Entity()
@@ -37,13 +45,22 @@ export class Paper {
   state: PaperState;
 
   @Column({ type: 'date', nullable: true })
-  approvedDate?: Date | null;
+  receivedDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
   sentDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
+  assignedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
   reviewedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  approvedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  dismissedDate?: Date | null;
 
   @Column({ type: 'int', nullable: true })
   webUserId?: number | null;
@@ -55,9 +72,9 @@ export class Paper {
   @Column({ type: 'int', nullable: true })
   reviewerUserId?: number | null;
 
-  @ManyToOne(() => WebUser, (user) => user.reviewedPapers, { nullable: true, onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => User, (user) => user.reviewedPapers, { nullable: true, onDelete: 'CASCADE', eager: true })
   @JoinColumn({ name: 'reviewerUserId' })
-  reviewerUser?: WebUser | null;
+  reviewerUser?: User | null;
 
   // @Column({ type: 'int' })
   // registeredById: number;
@@ -97,8 +114,8 @@ export class Paper {
   @Column({ type: 'date', nullable: true })
   eventDate?: Date;
 
-  @Column({ type: 'text', nullable: true })
-  process?: string;
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  process: Process;
 
   // @Column({ type: 'boolean', default: true })
   // isActive?: boolean;
