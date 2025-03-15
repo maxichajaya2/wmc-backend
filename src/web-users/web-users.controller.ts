@@ -32,8 +32,8 @@ export class WebUsersController {
     return this.webUsersService.remove(+id);
   }
 
-  @Get(':id/enrollments')
-  findEnrollments(@Param('id') id: string) {
-    return this.webUsersService.findEnrollments(+id);
-  }
+  // @Get(':id/enrollments')
+  // findEnrollments(@Param('id') id: string) {
+  //   return this.webUsersService.findEnrollments(+id);
+  // }
 }

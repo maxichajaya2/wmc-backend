@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { DocumentType } from "../../domain/entities/web-user.entity";
+import { PaperType } from "../../domain/entities/paper.entity";
+import { PaperAuthorType } from "../../domain/entities/paper-author.entity";
 
 export class CreateAuthorDto{
 
@@ -8,42 +9,44 @@ export class CreateAuthorDto{
     @IsOptional()
     id?: number;
 
+    @IsEnum(PaperAuthorType)
+    type: PaperAuthorType;
+
     @IsString()
     @IsNotEmpty()
     name: string;
 
     @IsString()
     @IsOptional()
-    middle: string;
+    middle?: string;
 
     @IsString()
     @IsNotEmpty()
-    last: string;
+    last?: string;
 
     @IsString()
     @IsOptional()
-    remissive: string | null;
+    remissive?: string | null;
 
     @IsString()
     @IsOptional()
-    institution: string | null;
+    institution?: string | null;
 
     @IsString()
     @IsOptional()
-    countryCode: string | null;
+    countryCode?: string | null;
 
     @IsString()
     @IsOptional()
-    city: string | null;
-
-    @IsBoolean()
-    flagpotential: boolean;
-
-    @IsBoolean()
-    flagcorrespon: boolean;
+    email?: string;
 
     @IsString()
-    email: string;
+    @IsOptional()
+    emailCorp?: string;
+
+    @IsString()
+    @IsOptional()
+    cellphone?: string;
 }
 
 export class CreatePaperDto {
@@ -59,37 +62,47 @@ export class CreatePaperDto {
     @IsOptional()
     file: string | null;
 
-    @IsString()
-    @IsOptional()
-    userName: string | null;
-
-    @IsString()
-    @IsOptional()
-    userLastName: string | null;
-
-    @IsString()
-    @IsOptional()
-    userEmail: string | null;
-
-    @IsEnum(DocumentType)
-    userDocumentType: DocumentType;
-
-    @IsString()
-    @IsOptional()
-    userDocumentNumber: string | null;
-
     @IsNumber()
     topicId: number;
-
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateAuthorDto)
     @IsOptional()
     authors: CreateAuthorDto[];
+
+    @IsNumber()
+    categoryId: number;
+
+    @IsString()
+    @IsOptional()
+    language?: string;
+
+    @IsArray()
+    keywords: string[];
+
+    @IsBoolean()
+    @IsOptional()
+    flagEvent?: boolean;
+
+    @IsString()
+    @IsOptional()
+    eventWhere?: string;
+
+    @IsString()
+    @IsOptional()
+    eventWhich?: string;
+
+    @IsString()
+    @IsOptional()
+    eventDate?: Date;
+
+    @IsString()
+    @IsOptional()
+    process?: string;
+
+    @IsEnum(PaperType)
+    type: PaperType;
 }
 
 

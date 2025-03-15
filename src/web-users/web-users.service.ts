@@ -51,23 +51,23 @@ export class WebUsersService {
     return this.webUsersRepository.delete(id);
   }
 
-  async findEnrollments(id: number) {
-    const webUser = await this.webUsersRepository.repository.findOne({
-      where: {
-        id
-      },
-      relations: [
-        'enrollments', 
-        'enrollments.department', 
-        'enrollments.district', 
-        'enrollments.province', 
-        'enrollments.fee', 
-        'enrollments.user'
-      ]
-    });
-    if (!webUser) {
-      throw new NotFoundException('User not found');
-    }
-    return webUser.enrollments;
-  }
+  // async findEnrollments(id: number) {
+  //   const webUser = await this.webUsersRepository.repository.findOne({
+  //     where: {
+  //       id
+  //     },
+  //     relations: [
+  //       'enrollments', 
+  //       'enrollments.department', 
+  //       'enrollments.district', 
+  //       'enrollments.province', 
+  //       'enrollments.fee', 
+  //       'enrollments.user'
+  //     ]
+  //   });
+  //   if (!webUser) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   return webUser.enrollments;
+  // }
 }

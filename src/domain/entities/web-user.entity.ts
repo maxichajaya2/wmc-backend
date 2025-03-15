@@ -65,12 +65,12 @@ export class WebUser {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  @OneToMany(() => Enrollment, enrollment => enrollment.user)
-  enrollments?: Enrollment[];
+  // @OneToMany(() => Enrollment, enrollment => enrollment.user)
+  // enrollments?: Enrollment[];
 
   reviewedPapers?: Paper[];
 
-  topics?: Topic[];
+  papers?: Paper[];
 
-  paperComentaries?: PaperComentary[];
+  topics?: Topic[];
 }

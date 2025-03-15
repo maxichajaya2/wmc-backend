@@ -3,9 +3,9 @@ import { IsNotEmpty, IsNumber, isNumber, IsString } from "class-validator";
 export class AddCommentDto {
     @IsString()
     @IsNotEmpty()
-    comentary: string;
+    comentary?: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    reviewerId: number;
+    fileUrl?: string;
 }

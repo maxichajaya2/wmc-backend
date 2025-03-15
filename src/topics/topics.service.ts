@@ -5,6 +5,7 @@ import { Topic } from '../domain/entities/topic.entity';
 import { UpdateTopicDto } from './dto/update-topic.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { WebUserType } from '../domain/entities/web-user.entity';
+import { CategoriesRepository } from '../domain/repositories/categories.repository';
 
 @Injectable()
 export class TopicsService {
@@ -12,6 +13,7 @@ export class TopicsService {
   constructor(
     private readonly topicsRepository: TopicsRepository,
     private readonly webUsersRepository: WebUsersRepository,
+    private readonly categoriesRepository: CategoriesRepository,
   ) { }
 
   findAll({ onlyActive } = { onlyActive: false }) {
@@ -38,20 +40,38 @@ export class TopicsService {
     return topic;
   }
 
-  create(createTopicDto: CreateTopicDto) {
+  async create(createTopicDto: CreateTopicDto) {
+    const { categoryId } = createTopicDto;
+    const category = await this.categoriesRepository.repository.findOne({
+      where: { id: categoryId }
+    });
+    if (!category) {
+      throw new NotFoundException(`Category #${categoryId} not found`);
+    }
     const topic: Topic = {
       ...createTopicDto,
+      category,
       createdAt: new Date()
     }
     return this.topicsRepository.repository.save(topic);
   }
 
   async update(id: number, updateTopicDto: UpdateTopicDto) {
+    const { categoryId } = updateTopicDto;
     const topic = await this.findOne(id);
-    const updatedTopic = {
+    const updatedTopic: Topic = {
       ...topic,
       ...updateTopicDto,
       updatedAt: new Date()
+    }
+    if (categoryId && categoryId !== topic.categoryId) {
+      const category = await this.categoriesRepository.repository.findOne({
+        where: { id: categoryId }
+      });
+      if (!category) {
+        throw new NotFoundException(`Category #${categoryId} not found`);
+      }
+      updatedTopic.category = category;
     }
     return this.topicsRepository.repository.save(updatedTopic);
   }
@@ -70,13 +90,13 @@ export class TopicsService {
       throw new NotFoundException(`Topic #${id} not found`);
     }
     const user = await this.webUsersRepository.findById(userId);
-    if(topic.users.some(u => u.id === user.id)){
+    if (topic.users.some(u => u.id === user.id)) {
       throw new BadRequestException({
         code: 'USER_ALREADY_ADDED',
         message: 'User is already added to the topic'
       });
     }
-    if(user.type !== WebUserType.REVIEWER){
+    if (user.type !== WebUserType.REVIEWER) {
       throw new BadRequestException({
         code: 'INVALID_USER_TYPE',
         message: 'Only reviewers can be added to topics'

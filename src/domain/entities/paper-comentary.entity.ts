@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { WebUser } from "./web-user.entity";
 import { Paper } from "./paper.entity";
+import { User } from "./user.entity";
 
 @Entity()
 export class PaperComentary{
@@ -8,14 +8,17 @@ export class PaperComentary{
     id?: number;
 
     @Column({ type: 'text', nullable: true })
-    comentary: string;
+    comentary?: string;
+
+    @Column({ type: 'text', nullable: true })
+    fileUrl?: string;
 
     @Column({ type: 'int' })
-    reviewerId?: number;
+    userId?: number;
 
-    @ManyToOne(() => WebUser, (webUser) => webUser.paperComentaries, { onDelete: 'CASCADE', nullable: false, eager: true })
+    @ManyToOne(() => User, (user) => user.paperComentaries, { onDelete: 'CASCADE', nullable: false, eager: true })
     @JoinColumn({ name: 'reviewerId' })
-    reviewer?: WebUser;
+    user?: User;
 
     @Column({ type: 'int' })
     paperId?: number;

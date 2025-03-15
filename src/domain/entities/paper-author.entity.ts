@@ -1,6 +1,11 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Paper } from "./paper.entity";
 
+export enum PaperAuthorType {
+  AUTOR = 'A',
+  COAUTOR = 'C',
+}
+
 @Entity()
 export class PaperAuthor {
   @PrimaryGeneratedColumn()
@@ -11,6 +16,9 @@ export class PaperAuthor {
   
   @ManyToOne(() => Paper, paper => paper.authors, { onDelete: 'CASCADE' })
   paper: Paper;
+
+  @Column({ type: 'varchar', length: 255 })
+  type: PaperAuthorType;
 
   @Column({ type: 'text', nullable: true })
   name?: string;
@@ -30,20 +38,14 @@ export class PaperAuthor {
   @Column({ type: 'text', nullable: true })
   countryCode?: string | null;
 
-  @Column({ type: 'text', nullable: true })
-  city?: string | null;
-
-  @Column({ type: 'boolean', default: false })
-  flagpotential?: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  flagcorrespon?: boolean;
-
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string;
 
-  @Column({ type: 'int', nullable: true })
-  orden?: number;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  emailCorp?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  cellphone?: string;
 
   @CreateDateColumn({nullable: true})
   createdAt?: Date;

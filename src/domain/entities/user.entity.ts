@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn, ManyToMany } from 'typeorm';
 import { Role } from './role.entity';
 import { Paper } from './paper.entity';
-import { Topic } from './topic.entity';
+import { Category } from './category.entity';
+import { PaperComentary } from './paper-comentary.entity';
 
 @Entity('users')
 export class User {
@@ -34,4 +35,12 @@ export class User {
   deletedAt?: Date;
 
   registeredPapers?: Paper[];
+
+  @ManyToMany(() => Category, (category) => category.topics)
+  category: Category;
+
+  @Column({ type: 'int', nullable: true })
+  categoryId?: number;
+
+  paperComentaries?: PaperComentary[];
 }

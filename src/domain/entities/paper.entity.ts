@@ -1,15 +1,16 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { DocumentType, WebUser } from "./web-user.entity";
 import { User } from "./user.entity";
 import { Topic } from "./topic.entity";
 import { PaperComentary } from "./paper-comentary.entity";
 import { PaperAuthor } from "./paper-author.entity";
+import { Category } from "./category.entity";
 
 export enum PaperState {
-  APPROVED = 'approved',
-  SENT = 'sent',
-  REVIEWED = 'reviewed',
-  REGISTERED = 'registered',
+  APPROVED = 3,
+  SENT = 1,
+  REVIEWED = 2,
+  REGISTERED = 0,
 }
 
 export enum PaperType{
@@ -32,12 +33,7 @@ export class Paper {
   @Column({ type: 'varchar', length: 255, nullable: true })
   file?: string | null;
 
-  @Column({
-    type: 'enum',
-    enum: PaperState,
-    default: PaperState.REGISTERED, // Opcional: establece un valor por defecto
-    nullable: false,
-  })
+  @Column({ type: 'int' })
   state: PaperState;
 
   @Column({ type: 'date', nullable: true })
@@ -49,15 +45,12 @@ export class Paper {
   @Column({ type: 'date', nullable: true })
   reviewedDate?: Date | null;
 
-  @Column({ type: 'date', nullable: true })
-  registeredDate?: Date | null;
+  @Column({ type: 'int', nullable: true })
+  webUserId?: number | null;
 
-  @Column({ type: 'int' })
-  registeredById: number;
-
-  @ManyToOne(() => User, (user) => user.registeredPapers, { onDelete: 'CASCADE', nullable: true, eager: true })
-  @JoinColumn({ name: 'registeredById'})
-  registeredBy?: User | null;
+  @ManyToOne(() => WebUser, (user) => user.papers, { nullable: true, onDelete: 'CASCADE', eager: true })
+  @JoinColumn({ name: 'webUserId' })
+  webUser: WebUser;
 
   @Column({ type: 'int', nullable: true })
   reviewerUserId?: number | null;
@@ -66,28 +59,12 @@ export class Paper {
   @JoinColumn({ name: 'reviewerUserId' })
   reviewerUser?: WebUser | null;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  userName?: string | null;
+  // @Column({ type: 'int' })
+  // registeredById: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  userLastName?: string | null;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  userEmail?: string | null;
-
-  @Column({
-    type: 'enum',
-    enum: DocumentType,
-    default: DocumentType.DNI, // Opcional: establece un valor por defecto
-    nullable: true,
-  })
-  userDocumentType: DocumentType;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  userDocumentNumber?: string | null;
-
-  @Column({ type: 'boolean', default: true })
-  isActive?: boolean;
+  // @ManyToOne(() => User, (user) => user.registeredPapers, { onDelete: 'CASCADE', nullable: true, eager: true })
+  // @JoinColumn({ name: 'registeredById'})
+  // registeredBy?: User | null;
 
   @Column({ type: 'int', nullable: true })
   topicId: number;
@@ -96,14 +73,40 @@ export class Paper {
   @JoinColumn({ name: 'topicId' })
   topic?: Topic;
 
+  @ManyToMany(() => Category, (category) => category.topics)
+  category: Category;
+
+  @Column({ type: 'int', nullable: true })
+  categoryId?: number;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  language?: string;
+
+  @Column("text", { array: true })
+  keywords?: string[];
+
+  @Column({ type: 'boolean', default: false })
+  flagEvent?: boolean;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  eventWhere?: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  eventWhich?: string;
+
+  @Column({ type: 'date', nullable: true })
+  eventDate?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  process?: string;
+
+  // @Column({ type: 'boolean', default: true })
+  // isActive?: boolean;
+
   @OneToMany(() => PaperComentary, (paperComentary) => paperComentary.paper, { onDelete: 'CASCADE' })
   comentaries?: PaperComentary[];
 
-  @Column({
-    type: 'enum',
-    enum: PaperType,
-    nullable: true,
-  })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   type?: PaperType;
 
   @OneToMany(() => PaperAuthor, (paperAuthor) => paperAuthor.paper, { onDelete: 'CASCADE' })

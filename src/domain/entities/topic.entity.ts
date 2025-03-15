@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Paper } from "./paper.entity";
 import { WebUser } from "./web-user.entity";
+import { Category } from "./category.entity";
 
 @Entity()
 export class Topic {
@@ -31,4 +32,10 @@ export class Topic {
     inverseJoinColumn: { name: 'webUserId', referencedColumnName: 'id' },
   })
   users?: WebUser[];
+
+  @Column({ type: 'int', nullable: true })
+  categoryId?: number;
+
+  @ManyToMany(() => Category, (category) => category.topics)
+  category: Category;
 }

@@ -17,6 +17,9 @@ export class CreateUserDto {
     @IsNumber()
     roleId: number;
 
+    @IsNumber()
+    cartegoryId: number;
+
     @IsBoolean()
     @IsOptional()
     isActive: boolean;
