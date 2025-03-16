@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
 import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
@@ -15,6 +15,8 @@ import { PaperAuthorsRepository } from '../domain/repositories/paper-authors.rep
 import { PaperAuthor } from '../domain/entities/paper-author.entity';
 import { CountriesService } from '../common/services/countries.service';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
+import { MailService } from '../common/services/mail.service';
+import { RoleCodes } from '../domain/entities/role.entity';
 
 @Injectable()
 export class PapersService {
@@ -29,6 +31,7 @@ export class PapersService {
     private readonly paperCommentsReposiitory: PaperCommentsRepository,
     private readonly paperAuthorsRepository: PaperAuthorsRepository,
     private readonly countriesService: CountriesService,
+    private readonly mailService: MailService,
   ) { }
 
   async findAll({ onlyActive } = { onlyActive: false }) {
@@ -48,7 +51,7 @@ export class PapersService {
     }
     const paper = await this.papersRepository.repository.findOne({
       where,
-      relations: ['registeredBy', 'reviewerUser', 'topic'],
+      relations: ['webUser', 'reviewerUser', 'topic'],
     });
     if (!paper) {
       throw new NotFoundException('Paper not found');
@@ -170,20 +173,36 @@ export class PapersService {
   }
 
   async changeStatus(id: number, changeStateDto: ChangeStateDto) {
+    const loggedUser = this.usersService.getLoggedUser();
     const paper = await this.findOne(id);
-    const { state, reviewerUserId } = changeStateDto;
+    const { process } = paper;
+    const isPreSelected = process === Process.PRESELECCIONADO;
+    const { state, reviewerUserId, leaderId } = changeStateDto;
     const invalidStateCode = 'INVALID_STATE';
     switch (state) {
       case PaperState.RECEIVED:
-        if (paper.state !== PaperState.REGISTERED) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be registered to be received',
-          });
+        if (isPreSelected) {
+          if (paper.state !== PaperState.REGISTERED) {
+            throw new BadRequestException({
+              code: invalidStateCode,
+              message: 'Paper must be registered to be received',
+            });
+          }
+          paper.receivedDate = new Date();
+        } else {
+          if (paper.state !== PaperState.APPROVED) {
+            throw new BadRequestException({
+              code: invalidStateCode,
+              message: 'Paper must be approved to be received',
+            });
+          }
+          paper.selectedReceivedDate = new Date();
         }
         paper.state = state;
-        paper.receivedDate = new Date();
-        //TODO: send email to author
+        await this.mailService.sendPaperUpdateStatusEmail({
+          paper,
+          to: paper.webUser.email
+        });
         break;
       case PaperState.SENT:
         if (paper.state !== PaperState.REGISTERED) {
@@ -193,9 +212,23 @@ export class PapersService {
           });
         }
         //TODO: validate that the action is done by the admin
+        if (loggedUser.id !== RoleCodes.ADMIN) {
+          throw new UnauthorizedException('Only admin can send a paper');
+        }
         paper.state = state;
-        paper.sentDate = new Date();
-        //TODO: set leader
+        if (isPreSelected) {
+          paper.sentDate = new Date();
+        } else {
+          paper.selectedSentDate = new Date();
+        }
+        if (!leaderId) {
+          throw new BadRequestException('Leader id is required to send a paper');
+        }
+        const leader = await this.usersRepository.findById(leaderId);
+        if (!leader) {
+          throw new NotFoundException('Leader not found');
+        }
+        paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
         if (paper.state !== PaperState.SENT) {
@@ -204,20 +237,23 @@ export class PapersService {
             message: 'Paper must be sent to be assigned',
           });
         }
-        //TODO: validate that the action is done by the leader
+        if (loggedUser.id !== paper.leaderId) {
+          throw new UnauthorizedException('Only leader can assign a paper');
+        }
         paper.state = state;
-        paper.assignedDate = new Date();
-        //TODO: set reviewer
-        // if (!reviewerUserId) {
-        //   throw new BadRequestException({
-        //     code: reviewerCode,
-        //     message: 'Reviewer user id is required',
-        //   });
-        // }
-        // const reviewerUser = await this.usersRepository.findById(reviewerUserId);
-        // if (!reviewerUser) {
-        //   throw new NotFoundException('Reviewer user not found');
-        // }
+        if (isPreSelected) {
+          paper.assignedDate = new Date();
+        } else {
+          paper.selectedAssignedDate = new Date();
+        }
+        if (!reviewerUserId) {
+          throw new BadRequestException('Reviewer user id is required');
+        }
+        const reviewerUser = await this.usersRepository.findById(reviewerUserId);
+        if (!reviewerUser) {
+          throw new NotFoundException('Reviewer user not found');
+        }
+        paper.reviewerUser = reviewerUser;
         break;
       case PaperState.UNDER_REVIEW:
         if (paper.state !== PaperState.ASSIGNED) {
@@ -226,9 +262,15 @@ export class PapersService {
             message: 'Paper must be assigned to be under review',
           });
         }
-        //TODO: validate that the action is done by the reviewer or leader
+        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
+          throw new UnauthorizedException('Only reviewer or leader can review a paper');
+        }
         paper.state = state;
-        paper.reviewedDate = new Date();
+        if (isPreSelected) {
+          paper.reviewedDate = new Date();
+        } else {
+          paper.selectedReviewedDate = new Date();
+        }
         break;
       case PaperState.APPROVED:
         const { type } = changeStateDto;
@@ -241,22 +283,36 @@ export class PapersService {
             message: 'Paper must be under review to be approved',
           });
         }
-        //TODO: validate that the action is done by the reviewer or leader
-        //TODO: send email to author
+        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
+          throw new UnauthorizedException('Only reviewer or leader can approve a paper');
+        }
         paper.type = type;
         paper.state = state;
-        paper.approvedDate = new Date();
+        if (isPreSelected) {
+          paper.approvedDate = new Date();
+        } else {
+          paper.selectedApprovedDate = new Date();
+        }
+        await this.mailService.sendPaperUpdateStatusEmail({
+          paper,
+          to: paper.webUser.email
+        });
+        paper.process = Process.SELECCIONADO;
         break;
-        case PaperState.APPROVED:
-        //TODO: validate that the action is done by the reviewer or leader
-        //TODO: send email to author
+      case PaperState.APPROVED:
+        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
+          throw new UnauthorizedException('Only reviewer or leader can approve a paper');
+        }
         paper.state = state;
         paper.dismissedDate = new Date();
+        await this.mailService.sendPaperUpdateStatusEmail({
+          paper,
+          to: paper.webUser.email
+        });
         break;
       default:
         throw new NotFoundException('Invalid state');
     }
-    paper.state = state;
     await this.papersRepository.repository.save(paper);
     return paper;
   }
@@ -306,7 +362,7 @@ export class PapersService {
     // }
     comment.comentary = updateCommentDto.comentary;
     comment.fileUrl = updateCommentDto.fileUrl;
-    
+
     await this.paperCommentsReposiitory.repository.save(comment);
     return comment;
   }

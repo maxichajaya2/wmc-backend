@@ -7,6 +7,12 @@ export enum RoleName {
     USER = 'User',
 }
 
+export enum RoleCodes {
+    ADMIN = 1,
+    REVISOR = 2,
+    LIDER = 3,
+}
+
 @Entity()
 export class Role {
     @PrimaryGeneratedColumn()

@@ -9,6 +9,10 @@ export class ChangeStateDto{
     @IsOptional()
     reviewerUserId?: number;
 
+    @IsNumber()
+    @IsOptional()
+    leaderId?: number;
+
     @IsEnum(PaperType)
     @IsOptional()
     type?: PaperType;

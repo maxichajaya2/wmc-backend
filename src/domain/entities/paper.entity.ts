@@ -48,19 +48,37 @@ export class Paper {
   receivedDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
+  selectedReceivedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
   sentDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  selectedSentDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
   assignedDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
+  selectedAssignedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
   reviewedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  selectedReviewedDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
   approvedDate?: Date | null;
 
   @Column({ type: 'date', nullable: true })
+  selectedApprovedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
   dismissedDate?: Date | null;
+
+  @Column({ type: 'date', nullable: true })
+  selectedDismissedDate?: Date | null;
 
   @Column({ type: 'int', nullable: true })
   webUserId?: number | null;
@@ -95,6 +113,12 @@ export class Paper {
 
   @Column({ type: 'int', nullable: true })
   categoryId?: number;
+
+  @ManyToMany(() => User, (user) => user.ledPapers)
+  leader?: User;
+
+  @Column({ type: 'int', nullable: true })
+  leaderId?: number;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   language?: string;

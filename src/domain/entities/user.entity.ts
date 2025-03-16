@@ -41,7 +41,7 @@ export class User {
   @DeleteDateColumn()
   deletedAt?: Date;
 
-  registeredPapers?: Paper[];
+  ledPapers?: Paper[];
 
   reviewedPapers?: Paper[];
 
