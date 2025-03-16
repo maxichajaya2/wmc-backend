@@ -173,7 +173,6 @@ export class PapersService {
     const paper = await this.findOne(id);
     const { state, reviewerUserId } = changeStateDto;
     const invalidStateCode = 'INVALID_STATE';
-    const reviewerCode = 'REVIEWER_REQUIRED';
     switch (state) {
       case PaperState.RECEIVED:
         if (paper.state !== PaperState.REGISTERED) {

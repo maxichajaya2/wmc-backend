@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { SendContactEmailDto } from '../dtos/send-contact-email.dto';
+import { Paper } from '../../domain/entities/paper.entity';
 
 @Injectable()
 export class MailService {
@@ -134,5 +135,29 @@ export class MailService {
             subject: 'Contacto',
             bcc: true,
         });
+    }
+
+    async sendPaperUpdateStatusEmail({ to, paper }: {
+        to: string;
+        paper: Paper
+    }) {
+        const { state, title } = paper;
+        const template = `
+            <h1>Actualización de estado de paper</h1>
+            <p>El estado de tu paper <b>${title}</b> ha sido actualizado a <b>${state}</b></p>
+        `;
+
+        return this.sendMail({
+            to,
+            template,
+            subject: 'Actualización de estado de paper',
+        })
+            .then(() => {
+                console.log(`Email de actualización de estado de paper enviado a ${to}`);
+            })
+            .catch((error) => {
+                console.error(`Error sending email de actualización de estado de paper to ${to}`);
+                console.error(error.message);
+            });
     }
 }
