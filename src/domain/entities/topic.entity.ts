@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Paper } from "./paper.entity";
 import { WebUser } from "./web-user.entity";
 import { Category } from "./category.entity";
@@ -36,6 +36,7 @@ export class Topic {
   @Column({ type: 'int', nullable: true })
   categoryId?: number;
 
-  @ManyToMany(() => Category, (category) => category.topics)
+  @ManyToOne(() => Category, (category) => category.users, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
   category: Category;
 }

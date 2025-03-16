@@ -64,7 +64,7 @@ export class PapersService {
     if (!webUser) {
       throw new NotFoundException('User not found');
     }
-    const category = await this.topicsRepository.repository.findOne({
+    const category = await this.categoriesRepository.repository.findOne({
       where: { id: categoryId },
     });
     if (!category) {
@@ -170,76 +170,96 @@ export class PapersService {
   }
 
   async changeStatus(id: number, changeStateDto: ChangeStateDto) {
-    return 1;
-    // const paper = await this.findOne(id);
-    // const { state, reviewerUserId } = changeStateDto;
-    // const invalidStateCode = 'INVALID_STATE';
-    // const reviewerCode = 'REVIEWER_REQUIRED';
-    // switch (state) {
-    //   case PaperState.RECEIVED:
-    //     if (paper.state !== PaperState.REGISTERED) {
-    //       throw new BadRequestException({
-    //         code: invalidStateCode,
-    //         message: 'Paper must be registered to be received',
-    //       });
-    //     }
-    //     paper.state = state;
-    //     paper.receivedDate = new Date();
-    //     //TODO: send email to author
-    //     break;
-    //   case PaperState.SENT:
-    //     if (paper.state !== PaperState.REGISTERED) {
-    //       throw new BadRequestException({
-    //         code: invalidStateCode,
-    //         message: 'Paper must be registered to be sent',
-    //       });
-    //     }
-    //     paper.state = state;
-    //     paper.sentDate = new Date();
-    //     break;
-    //   case PaperState.REVIEWED:
-    //     if (paper.state !== PaperState.SENT) {
-    //       throw new BadRequestException({
-    //         code: invalidStateCode,
-    //         message: 'Paper must be sent to be reviewed',
-    //       });
-    //     }
-    //     if (!reviewerUserId) {
-    //       throw new BadRequestException({
-    //         code: reviewerCode,
-    //         message: 'Reviewer user id is required',
-    //       });
-    //     }
-    //     const reviewerUser = await this.usersRepository.findById(reviewerUserId);
-    //     if (!reviewerUser) {
-    //       throw new NotFoundException('Reviewer user not found');
-    //     }
-    //     paper.state = state;
-    //     paper.reviewerUserId = reviewerUser.id;
-    //     paper.reviewerUser = reviewerUser;
-    //     paper.reviewedDate = new Date();
-    //     break;
-    //   case PaperState.APPROVED:
-    //     const { type } = changeStateDto;
-    //     if (!type) {
-    //       throw new BadRequestException('Type is required to approve a paper');
-    //     }
-    //     if (paper.state !== PaperState.REVIEWED) {
-    //       throw new BadRequestException({
-    //         code: invalidStateCode,
-    //         message: 'Paper must be reviewed to be approved',
-    //       });
-    //     }
-    //     paper.type = type;
-    //     paper.state = state;
-    //     paper.approvedDate = new Date();
-    //     break;
-    //   default:
-    //     throw new NotFoundException('Invalid state');
-    // }
-    // paper.state = state;
-    // await this.papersRepository.repository.save(paper);
-    // return paper;
+    const paper = await this.findOne(id);
+    const { state, reviewerUserId } = changeStateDto;
+    const invalidStateCode = 'INVALID_STATE';
+    const reviewerCode = 'REVIEWER_REQUIRED';
+    switch (state) {
+      case PaperState.RECEIVED:
+        if (paper.state !== PaperState.REGISTERED) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be registered to be received',
+          });
+        }
+        paper.state = state;
+        paper.receivedDate = new Date();
+        //TODO: send email to author
+        break;
+      case PaperState.SENT:
+        if (paper.state !== PaperState.REGISTERED) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be registered to be sent',
+          });
+        }
+        //TODO: validate that the action is done by the admin
+        paper.state = state;
+        paper.sentDate = new Date();
+        //TODO: set leader
+        break;
+      case PaperState.ASSIGNED:
+        if (paper.state !== PaperState.SENT) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be sent to be assigned',
+          });
+        }
+        //TODO: validate that the action is done by the leader
+        paper.state = state;
+        paper.assignedDate = new Date();
+        //TODO: set reviewer
+        // if (!reviewerUserId) {
+        //   throw new BadRequestException({
+        //     code: reviewerCode,
+        //     message: 'Reviewer user id is required',
+        //   });
+        // }
+        // const reviewerUser = await this.usersRepository.findById(reviewerUserId);
+        // if (!reviewerUser) {
+        //   throw new NotFoundException('Reviewer user not found');
+        // }
+        break;
+      case PaperState.UNDER_REVIEW:
+        if (paper.state !== PaperState.ASSIGNED) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be assigned to be under review',
+          });
+        }
+        //TODO: validate that the action is done by the reviewer or leader
+        paper.state = state;
+        paper.reviewedDate = new Date();
+        break;
+      case PaperState.APPROVED:
+        const { type } = changeStateDto;
+        if (!type) {
+          throw new BadRequestException('Type is required to approve a paper');
+        }
+        if (paper.state !== PaperState.UNDER_REVIEW) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be under review to be approved',
+          });
+        }
+        //TODO: validate that the action is done by the reviewer or leader
+        //TODO: send email to author
+        paper.type = type;
+        paper.state = state;
+        paper.approvedDate = new Date();
+        break;
+        case PaperState.APPROVED:
+        //TODO: validate that the action is done by the reviewer or leader
+        //TODO: send email to author
+        paper.state = state;
+        paper.dismissedDate = new Date();
+        break;
+      default:
+        throw new NotFoundException('Invalid state');
+    }
+    paper.state = state;
+    await this.papersRepository.repository.save(paper);
+    return paper;
   }
 
   async findComments(id: number) {

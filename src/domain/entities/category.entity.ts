@@ -1,5 +1,7 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Topic } from "./topic.entity";
+import { User } from "./user.entity";
+import { Paper } from "./paper.entity";
 
 @Entity()
 export class Category {
@@ -13,6 +15,11 @@ export class Category {
   isActive?: boolean;
 
   topics?: Topic[];
+
+  @OneToMany(() => User, (user) => user.category)
+  users?: User[];
+
+  papers?: Paper[];
 
   @CreateDateColumn()
   createdAt: Date;

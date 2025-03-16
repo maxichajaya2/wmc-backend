@@ -18,7 +18,7 @@ export class CreateUserDto {
     roleId: number;
 
     @IsNumber()
-    cartegoryId: number;
+    categoryId: number;
 
     @IsBoolean()
     @IsOptional()

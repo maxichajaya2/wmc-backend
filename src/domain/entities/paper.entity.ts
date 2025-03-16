@@ -17,9 +17,9 @@ export enum PaperState {
 }
 
 export enum PaperType{
-  ORAL = 'oral',
-  POSTER = 'poster',
-  LIBRO = 'libro',
+  ORAL = 'O',
+  POSTER = 'P',
+  PRESENTACION_INTERACTIVA = 'PI',
 }
 
 export enum Process{
@@ -90,7 +90,7 @@ export class Paper {
   @JoinColumn({ name: 'topicId' })
   topic?: Topic;
 
-  @ManyToMany(() => Category, (category) => category.topics)
+  @ManyToMany(() => Category, (category) => category.papers)
   category: Category;
 
   @Column({ type: 'int', nullable: true })
@@ -123,7 +123,7 @@ export class Paper {
   @OneToMany(() => PaperComentary, (paperComentary) => paperComentary.paper, { onDelete: 'CASCADE' })
   comentaries?: PaperComentary[];
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 5, nullable: true })
   type?: PaperType;
 
   @OneToMany(() => PaperAuthor, (paperAuthor) => paperAuthor.paper, { onDelete: 'CASCADE' })

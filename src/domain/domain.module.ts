@@ -28,6 +28,7 @@ import { Category } from './entities/category.entity';
 import { CategoriesRepository } from './repositories/categories.repository';
 
 export const APP_ENTITIES = [
+  Category,
   User,
   Role,
   Permission,
@@ -40,7 +41,6 @@ export const APP_ENTITIES = [
   Province,
   District,
   PaperAuthor,
-  Category
 ];
 
 @Global()

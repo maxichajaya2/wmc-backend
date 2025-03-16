@@ -22,6 +22,10 @@ export class User {
   @JoinColumn({ name: 'roleId' })
   role: Role;
 
+  @ManyToOne(() => Category, (category) => category.users, { eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
   @Column({ default: true })
   isActive: boolean;
 
@@ -35,12 +39,6 @@ export class User {
   deletedAt?: Date;
 
   registeredPapers?: Paper[];
-
-  @ManyToMany(() => Category, (category) => category.topics)
-  category: Category;
-
-  @Column({ type: 'int', nullable: true })
-  categoryId?: number;
 
   reviewedPapers?: Paper[];
 
