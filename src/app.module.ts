@@ -15,6 +15,7 @@ import { ProvincesModule } from './provinces/provinces.module';
 import { DistrictsModule } from './districts/districts.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { FilesModule } from './files/files.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -47,7 +48,8 @@ import { FilesModule } from './files/files.module';
     // ExhibitorsModule,
     // PavilionsModule,
     // StandsModule,
-    FilesModule
+    FilesModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],
