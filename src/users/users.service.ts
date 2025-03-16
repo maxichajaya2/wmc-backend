@@ -75,13 +75,21 @@ export class UsersService {
       }
     });
     console.log({ user });
-    const { email } = updateUserDto;
+    const { email, categoryId } = updateUserDto;
     if (email && email !== user.email) {
       const userWithSameEmail = await this.usersRepository.findByEmail(email);
       if (userWithSameEmail) {
         console.log('Email already in use');
         throw new BadRequestException('Email already in use');
       }
+    }
+    if( categoryId && categoryId !== user.categoryId) {
+      const category = await this.categoriesRepository.repository.findOneOrFail({
+        where: {
+          id: categoryId
+        }
+      });
+      user.category = category;
     }
     const role = await this.rolesRepository.repository.findOneOrFail({
       where: {
