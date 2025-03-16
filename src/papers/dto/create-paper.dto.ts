@@ -89,6 +89,10 @@ export class CreatePaperDto {
     @IsOptional()
     eventWhere?: string;
 
+    @IsNumber()
+    @IsOptional()
+    webUserId?: number;
+
     @IsString()
     @IsOptional()
     eventWhich?: string;

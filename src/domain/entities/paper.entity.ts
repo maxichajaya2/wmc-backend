@@ -153,6 +153,9 @@ export class Paper {
   @OneToMany(() => PaperAuthor, (paperAuthor) => paperAuthor.paper, { onDelete: 'CASCADE' })
   authors?: PaperAuthor[];
 
+  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
+  correlative: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

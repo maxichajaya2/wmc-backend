@@ -10,6 +10,11 @@ import { CategoriesRepository } from '../domain/repositories/categories.reposito
 // import { PASSWORD_SALT_ROUNDS } from './constants';
 // import { MailService } from '../common/services/mail.service';
 
+export enum LoggedUserType {
+  BACKOFFICE = 'BACKOFFICE',
+  FRONTEND = 'FRONTEND',
+}
+
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
 
@@ -119,6 +124,14 @@ export class UsersService {
 
   getLoggedUser(): User | null {
     return this.request['loggedUser'] ?? null;
+  }
+
+  getLoggedUserType(): LoggedUserType {
+    const loggedUserType = this.request['loggedUserType'];
+    if(!loggedUserType){
+      throw new BadRequestException('User type not found');
+    }
+    return loggedUserType;
   }
 
   async delete(id: number) {

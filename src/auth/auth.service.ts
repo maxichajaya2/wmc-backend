@@ -76,7 +76,7 @@ export class AuthService {
     try {
       console.debug(`Sign in attempt for ${email}`);
       const user = await this.usersRepository.findByEmail(email);
-      const role = await this.rolesRepository.findOne(user.role.id);
+      const role = await this.rolesRepository.findById(user.role.id);
       user.role = role;
       if (!user) {
         throw new UnauthorizedException({

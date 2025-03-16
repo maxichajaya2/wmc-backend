@@ -59,7 +59,7 @@ export class RolesService {
   async addPermission(id: number, addPermissionDto: AddPermissionDto) {
     const { id: permissionId, action, module } = addPermissionDto;
     console.log('Searching role ' + id);
-    const role = await this.rolesRepository.findOne(id);
+    const role = await this.rolesRepository.findById(id);
     if (!role) {
       throw new NotFoundException('Role not found');
     }
@@ -87,7 +87,7 @@ export class RolesService {
   }
 
   async update(id: number, updateRoleDto: UpdateRoleDto) {
-    const role = await this.rolesRepository.findOne(id);
+    const role = await this.rolesRepository.findById(id);
     if (!role) {
       throw new NotFoundException('Role not found');
     }
@@ -99,7 +99,7 @@ export class RolesService {
   }
 
   async removePermission(roleId: number, permissionId: number) {
-    const role = await this.rolesRepository.findOne(roleId);
+    const role = await this.rolesRepository.findById(roleId);
     if (!role) {
       throw new NotFoundException('Role not found');
     }

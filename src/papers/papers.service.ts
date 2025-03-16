@@ -5,7 +5,7 @@ import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
 import { PapersRepository } from '../domain/repositories/papers.repository';
 import { UsersRepository } from '../domain/repositories/users.repository';
 import { TopicsRepository } from '../domain/repositories/topics.repository';
-import { UsersService } from '../users/users.service';
+import { LoggedUserType, UsersService } from '../users/users.service';
 import { ChangeStateDto } from './dto/change-state.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { AddCommentDto } from './dto/add-comment.dto';
@@ -17,6 +17,7 @@ import { CountriesService } from '../common/services/countries.service';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
 import { MailService } from '../common/services/mail.service';
 import { RoleCodes } from '../domain/entities/role.entity';
+import { WebUser } from '../domain/entities/web-user.entity';
 
 @Injectable()
 export class PapersService {
@@ -60,12 +61,25 @@ export class PapersService {
   }
 
   async create(body: CreatePaperDto) {
-    const { authors, ...createPaperDto } = body;
+    const { authors, webUserId, ...createPaperDto } = body;
     const { topicId, categoryId } = createPaperDto;
     const loggedUser = this.usersService.getLoggedUser();
-    const webUser = await this.webUsersRepository.findById(loggedUser.id);
+    const loggedUserType = this.usersService.getLoggedUserType();
+    let webUser: WebUser;
+    if(loggedUserType === LoggedUserType.BACKOFFICE){
+      if(!webUserId){
+        throw new BadRequestException('Web User id is required');
+      }
+      webUser = await this.webUsersRepository.repository.findOne({
+        where: { id: webUserId },
+      });
+    } else {
+      webUser = await this.webUsersRepository.repository.findOne({
+        where: { id: loggedUser.id },
+      });
+    }
     if (!webUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Web User not found');
     }
     const category = await this.categoriesRepository.repository.findOne({
       where: { id: categoryId },
@@ -79,9 +93,19 @@ export class PapersService {
     if (!topic) {
       throw new NotFoundException('Topic not found');
     }
+    const lastRegister = await this.papersRepository.repository.findOne({
+      order: { correlative: 'DESC' },
+    });
+    let correlative = 'TT-1';
+    if(lastRegister?.correlative){
+      const parts = lastRegister.correlative.split('-');
+      const number = +parts[1];
+      correlative = `TT-${number + 1}`;
+    }
     const paper: Paper = {
       ...createPaperDto,
       state: PaperState.REGISTERED,
+      correlative,
       createdAt: new Date(),
       topic,
       process: Process.PRESELECCIONADO,

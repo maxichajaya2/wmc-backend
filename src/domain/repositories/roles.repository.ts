@@ -16,7 +16,7 @@ export class RolesRepository {
         return this.repository.find();
     }
 
-    async findOne(id: number){
+    async findById(id: number){
         return this.repository.findOne({
             where: { id },
             relations: ['permissions']
@@ -33,7 +33,7 @@ export class RolesRepository {
     }
 
     async delete(id: number){
-        const role = await this.findOne(id);
+        const role = await this.findById(id);
         if(!role){
             throw new NotFoundException('Role not found');
         }

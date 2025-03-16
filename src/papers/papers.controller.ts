@@ -10,7 +10,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 export class PapersController {
   constructor(private readonly papersService: PapersService) {}
 
-  @UseGuards(AuthGuard)
+  @UseGuards(DashboardAuthGuard)
   @Post()
   create(@Body() createPaperDto: CreatePaperDto) {
     return this.papersService.create(createPaperDto);
