@@ -243,7 +243,7 @@ export class PapersService {
           });
         }
         //TODO: validate that the action is done by the admin
-        if (loggedUser.id !== RoleCodes.ADMIN) {
+        if (loggedUser.role.id !== RoleCodes.ADMIN) {
           throw new UnauthorizedException('Only admin can send a paper');
         }
         paper.state = state;
