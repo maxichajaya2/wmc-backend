@@ -7,13 +7,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RolesRepository } from '../domain/repositories/roles.repository';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
+import { LoginOrigin } from '../auth/auth.service';
 // import { PASSWORD_SALT_ROUNDS } from './constants';
 // import { MailService } from '../common/services/mail.service';
-
-export enum LoggedUserType {
-  BACKOFFICE = 'BACKOFFICE',
-  FRONTEND = 'FRONTEND',
-}
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -126,12 +122,12 @@ export class UsersService {
     return this.request['loggedUser'] ?? null;
   }
 
-  getLoggedUserType(): LoggedUserType {
-    const loggedUserType = this.request['loggedUserType'];
-    if(!loggedUserType){
-      throw new BadRequestException('User type not found');
+  getLoginOrigin(): LoginOrigin {
+    const loginOrigin = this.request['loginOrigin'];
+    if(loginOrigin === undefined) {
+      throw new BadRequestException('LoginOrigin not found');
     }
-    return loggedUserType;
+    return loginOrigin;
   }
 
   async delete(id: number) {

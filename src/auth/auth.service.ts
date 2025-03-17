@@ -21,6 +21,11 @@ enum LoginErrors{
 export const VERIFICATION_USER_TTL = 1000 * 60 * 10; // 24 hours
 export const VERIFICATION_USER_CACHE = {};
 
+export enum LoginOrigin {
+  BACKOFFICE,
+  FRONTEND,
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,7 +37,7 @@ export class AuthService {
     private readonly rolesRepository: RolesRepository,
   ) { }
 
-  private generateJWT(payload: {sub: number, email: string}){
+  private generateJWT(payload: {sub: number, email: string, origin: LoginOrigin}) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
     })
@@ -55,7 +60,7 @@ export class AuthService {
           message: 'Invalid password',
         });
       }
-      const payload = { sub: user.id, email: user.email };
+      const payload = { sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND };
       try {
         const token = await this.generateJWT(payload);
         return {
@@ -91,7 +96,7 @@ export class AuthService {
           message: 'Invalid password',
         });
       }
-      const payload = { sub: user.id, email: user.email };
+      const payload = { sub: user.id, email: user.email, origin: LoginOrigin.BACKOFFICE };
       try {
         const token = await this.generateJWT(payload);
         return {
@@ -151,7 +156,7 @@ export class AuthService {
     }
     const user = await this.webUsersRepository.create(payload);
     delete VERIFICATION_USER_CACHE[token];
-    const jwt = await this.generateJWT({ sub: user.id, email: user.email });
+    const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
     return {
       user,
       token: jwt,
@@ -207,7 +212,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     const updatedUser = await this.webUsersRepository.update(user.id, { password });
-    const jwt = await this.generateJWT({ sub: user.id, email: user.email });
+    const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
     return {
       user: updatedUser,
       token: jwt,

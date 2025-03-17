@@ -5,12 +5,13 @@ import { DashboardAuthGuard } from '../auth/guards/dashboard-auth.guard';
 import { ChangeStateDto } from './dto/change-state.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { GlobalGuard } from '../auth/guards/global-guard';
 
 @Controller('papers')
 export class PapersController {
   constructor(private readonly papersService: PapersService) {}
 
-  @UseGuards(DashboardAuthGuard)
+  @UseGuards(GlobalGuard)
   @Post()
   create(@Body() createPaperDto: CreatePaperDto) {
     return this.papersService.create(createPaperDto);

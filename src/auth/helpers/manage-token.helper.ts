@@ -2,6 +2,8 @@ import { ExecutionContext } from "@nestjs/common";
 import { User } from "../../domain/entities/user.entity";
 import { Role } from "../../domain/entities/role.entity";
 import { WebUser } from "../../domain/entities/web-user.entity";
+import { extractTokenFromHeader } from "./extract-from-header.helper";
+import { LoginOrigin } from "../auth.service";
 
 enum AccessErrors {
     NO_TOKEN,
@@ -13,14 +15,14 @@ export async function manageAccessToken({
     context,
     jwtService,
     findUserById,
+    findWebUserById,
     findRoleById,
-    isBackOffice,
 }: {
     context: ExecutionContext,
     jwtService: any,
-    findUserById: (id: number) => Promise<User | WebUser | null>,
-    findRoleById: (id: number) => Promise<Role>,
-    isBackOffice: boolean,
+    findWebUserById?: (id: number) => Promise<WebUser | null>,
+    findUserById?: (id: number) => Promise<User | null>,
+    findRoleById?: (id: number) => Promise<Role>,
 }) {
     const request = context.switchToHttp().getRequest();
     const token = extractTokenFromHeader(request);
@@ -34,44 +36,62 @@ export async function manageAccessToken({
             code: AccessErrors.NO_TOKEN,
         }
     }
-    let user: User | WebUser;
     try {
         console.debug('Verifying token');
-        const { sub } = await jwtService.verifyAsync(token, {
+        console.log({ token });
+        const decoded = await jwtService.verifyAsync(token, {
             secret: process.env.JWT_SECRET,
         });
+        console.log({ decoded });
+        const { sub, origin, email } = decoded;
         console.debug(`Token verified for user ${sub}`);
-        const startDate = new Date().getTime();
-        console.debug('Getting user');
+        console.log({ sub, origin, email });
+
+        if (origin === LoginOrigin.FRONTEND) {
+            if (!findWebUserById) {
+                throw new Error('findWebUserById is required for frontend');
+            }
+            const user = await findWebUserById(sub);
+            if (!user) {
+                console.debug('Web User not found');
+                return {
+                    ok: false,
+                    code: AccessErrors.USER_NOT_FOUND,
+                    origin
+                }
+            }
+            return {
+                ok: true,
+                user,
+                origin
+            }
+        }
+
         const user = await findUserById(sub);
         if (!user) {
             console.debug('User not found');
             return {
                 ok: false,
                 code: AccessErrors.USER_NOT_FOUND,
+                origin
             }
         }
-        console.debug('User found');
-        const endDate = new Date().getTime();
-        console.log('Time taken to get user in seconds : ', (endDate - startDate) / 1000);
-        if (isBackOffice) {
-            const role = await findRoleById((user as User).role.id);
-            (user as User).role = role;
+
+        if (!findRoleById) {
+            throw new Error('findRoleById is required for backoffice');
         }
+        const role = await findRoleById((user as User).role.id);
+        user.role = role;
         return {
             ok: true,
-            user
+            user: user as User,
+            origin
         }
-    } catch {
+    } catch(e) {
+        console.log(e);
         return {
             ok: false,
             code: AccessErrors.TOKEN_NOT_VALID,
         }
     }
 } 
-
-function extractTokenFromHeader(request: Request): string | null {
-    //@ts-ignore
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : null;
-  }

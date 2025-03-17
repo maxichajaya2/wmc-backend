@@ -5,7 +5,7 @@ import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
 import { PapersRepository } from '../domain/repositories/papers.repository';
 import { UsersRepository } from '../domain/repositories/users.repository';
 import { TopicsRepository } from '../domain/repositories/topics.repository';
-import { LoggedUserType, UsersService } from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import { ChangeStateDto } from './dto/change-state.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { AddCommentDto } from './dto/add-comment.dto';
@@ -18,6 +18,7 @@ import { CategoriesRepository } from '../domain/repositories/categories.reposito
 import { MailService } from '../common/services/mail.service';
 import { RoleCodes } from '../domain/entities/role.entity';
 import { WebUser } from '../domain/entities/web-user.entity';
+import { LoginOrigin } from '../auth/auth.service';
 
 @Injectable()
 export class PapersService {
@@ -64,9 +65,9 @@ export class PapersService {
     const { authors, webUserId, ...createPaperDto } = body;
     const { topicId, categoryId } = createPaperDto;
     const loggedUser = this.usersService.getLoggedUser();
-    const loggedUserType = this.usersService.getLoggedUserType();
+    const loginOrigin = this.usersService.getLoginOrigin();
     let webUser: WebUser;
-    if(loggedUserType === LoggedUserType.BACKOFFICE){
+    if(loginOrigin === LoginOrigin.BACKOFFICE){
       if(!webUserId){
         throw new BadRequestException('Web User id is required');
       }
@@ -93,9 +94,10 @@ export class PapersService {
     if (!topic) {
       throw new NotFoundException('Topic not found');
     }
-    const lastRegister = await this.papersRepository.repository.findOne({
-      order: { correlative: 'DESC' },
-    });
+    const lastRegister = await this.papersRepository.repository
+    .createQueryBuilder('paper')
+    .orderBy("CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)", 'DESC')
+    .getOne();
     let correlative = 'TT-1';
     if(lastRegister?.correlative){
       const parts = lastRegister.correlative.split('-');
@@ -201,7 +203,7 @@ export class PapersService {
     const paper = await this.findOne(id);
     const { process } = paper;
     const isPreSelected = process === Process.PRESELECCIONADO;
-    const { state, reviewerUserId, leaderId } = changeStateDto;
+    const { state, reviewerUserId, leaderId, type } = changeStateDto;
     const invalidStateCode = 'INVALID_STATE';
     switch (state) {
       case PaperState.RECEIVED:
@@ -297,7 +299,6 @@ export class PapersService {
         }
         break;
       case PaperState.APPROVED:
-        const { type } = changeStateDto;
         if (!type) {
           throw new BadRequestException('Type is required to approve a paper');
         }
@@ -323,7 +324,7 @@ export class PapersService {
         });
         paper.process = Process.SELECCIONADO;
         break;
-      case PaperState.APPROVED:
+      case PaperState.DISMISSED:
         if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
           throw new UnauthorizedException('Only reviewer or leader can approve a paper');
         }

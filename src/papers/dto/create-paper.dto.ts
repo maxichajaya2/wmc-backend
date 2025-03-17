@@ -102,7 +102,8 @@ export class CreatePaperDto {
     eventDate?: Date;
 
     @IsEnum(PaperType)
-    type: PaperType;
+    @IsOptional()
+    type?: PaperType;
 }
 
 

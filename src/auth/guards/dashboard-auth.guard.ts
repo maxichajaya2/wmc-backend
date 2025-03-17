@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersRepository } from '../../domain/repositories/users.repository';
 import { RolesRepository } from '../../domain/repositories/roles.repository';
 import { manageAccessToken } from '../helpers/manage-token.helper';
-import { LoggedUserType } from '../../users/users.service';
+import { LoginOrigin } from '../auth.service';
 
 @Injectable()
 export class DashboardAuthGuard implements CanActivate {
@@ -20,15 +20,14 @@ export class DashboardAuthGuard implements CanActivate {
       jwtService: this.jwtService,
       findUserById: this.usersRepository.findById.bind(this.usersRepository),
       findRoleById: this.rolesRepository.findById.bind(this.rolesRepository),
-      isBackOffice: true,
     });
-    const { ok, user } = response;
-    if(!ok){
+    const { ok, user, origin } = response;
+    if(!ok || origin !== LoginOrigin.BACKOFFICE){
       throw new UnauthorizedException();
     }
     const request = context.switchToHttp().getRequest();
     request['loggedUser'] = user;
-    request['loggedUserType'] = LoggedUserType.BACKOFFICE;
+    request['loginOrigin'] = LoginOrigin.BACKOFFICE;
     return true;
   }
 }
