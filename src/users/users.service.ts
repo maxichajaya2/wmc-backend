@@ -119,7 +119,9 @@ export class UsersService {
   }
 
   getLoggedUser(): User | null {
-    return this.request['loggedUser'] ?? null;
+    const user = this.request['loggedUser'] ?? null;
+    console.debug({ loggedUser: user });
+    return user;
   }
 
   getLoginOrigin(): LoginOrigin {

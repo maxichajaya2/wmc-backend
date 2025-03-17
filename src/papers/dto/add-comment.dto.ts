@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, isNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, isNumber, IsOptional, IsString } from "class-validator";
 
 export class AddCommentDto {
     @IsString()
@@ -6,6 +6,6 @@ export class AddCommentDto {
     comentary?: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     fileUrl?: string;
 }

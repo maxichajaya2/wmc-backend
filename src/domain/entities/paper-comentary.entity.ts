@@ -17,7 +17,7 @@ export class PaperComentary{
     userId?: number;
 
     @ManyToOne(() => User, (user) => user.paperComentaries, { onDelete: 'CASCADE', nullable: false, eager: true })
-    @JoinColumn({ name: 'reviewerId' })
+    @JoinColumn({ name: 'userId' })
     user?: User;
 
     @Column({ type: 'int' })

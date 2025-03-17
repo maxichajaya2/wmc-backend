@@ -108,13 +108,13 @@ export class Paper {
   @JoinColumn({ name: 'topicId' })
   topic?: Topic;
 
-  @ManyToMany(() => Category, (category) => category.papers)
+  @ManyToOne(() => Category, (category) => category.papers, {eager: true})
   category: Category;
 
   @Column({ type: 'int', nullable: true })
   categoryId?: number;
 
-  @ManyToMany(() => User, (user) => user.ledPapers)
+  @ManyToOne(() => User, (user) => user.ledPapers)
   leader?: User;
 
   @Column({ type: 'int', nullable: true })

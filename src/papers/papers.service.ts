@@ -66,8 +66,9 @@ export class PapersService {
     const { topicId, categoryId } = createPaperDto;
     const loggedUser = this.usersService.getLoggedUser();
     const loginOrigin = this.usersService.getLoginOrigin();
+    const isBackOffice = loginOrigin === LoginOrigin.BACKOFFICE;
     let webUser: WebUser;
-    if(loginOrigin === LoginOrigin.BACKOFFICE){
+    if(isBackOffice){
       if(!webUserId){
         throw new BadRequestException('Web User id is required');
       }
@@ -113,6 +114,10 @@ export class PapersService {
       process: Process.PRESELECCIONADO,
       webUser,
       category,
+    }
+    if(isBackOffice){
+      paper.state = PaperState.RECEIVED;
+      paper.receivedDate = new Date();
     }
     const createdPaper = await this.papersRepository.repository.save(paper);
     for (const author of authors) {
@@ -231,10 +236,10 @@ export class PapersService {
         });
         break;
       case PaperState.SENT:
-        if (paper.state !== PaperState.REGISTERED) {
+        if (paper.state !== PaperState.RECEIVED) {
           throw new BadRequestException({
             code: invalidStateCode,
-            message: 'Paper must be registered to be sent',
+            message: 'Paper must be received to be sent',
           });
         }
         //TODO: validate that the action is done by the admin
