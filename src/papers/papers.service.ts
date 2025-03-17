@@ -317,17 +317,18 @@ export class PapersService {
           throw new UnauthorizedException('Only reviewer or leader can approve a paper');
         }
         paper.type = type;
-        paper.state = state;
         if (isPreSelected) {
-          paper.approvedDate = new Date();
+          paper.state = PaperState.RECEIVED;
+          paper.selectedReceivedDate = new Date();
+          paper.process = Process.SELECCIONADO;
         } else {
+          paper.state = state;
           paper.selectedApprovedDate = new Date();
         }
         await this.mailService.sendPaperUpdateStatusEmail({
           paper,
           to: paper.webUser.email
         });
-        paper.process = Process.SELECCIONADO;
         break;
       case PaperState.DISMISSED:
         if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
