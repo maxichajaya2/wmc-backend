@@ -42,14 +42,14 @@ export class PapersController {
     return this.papersService.remove(+id);
   }
 
-  @UseGuards(DashboardAuthGuard)
+  @UseGuards(GlobalGuard)
   @Post(':id/change-state')
   changeState(@Param('id') id: string, @Body() changeStateDto: ChangeStateDto) {
     return this.papersService.changeStatus(+id, changeStateDto);
   }
 
   //TODO: Implementar el guard
-  @UseGuards(DashboardAuthGuard)
+  @UseGuards(GlobalGuard)
   @Get(':id/comments')
   getComments(@Param('id') id: string) {
     return this.papersService.findComments(+id);

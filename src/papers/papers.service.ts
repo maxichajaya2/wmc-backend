@@ -204,11 +204,15 @@ export class PapersService {
   }
 
   async changeStatus(id: number, changeStateDto: ChangeStateDto) {
+    const { state, reviewerUserId, leaderId, type } = changeStateDto;
     const loggedUser = this.usersService.getLoggedUser();
+    const loginOrigin = this.usersService.getLoginOrigin();
+    if (loginOrigin !== LoginOrigin.BACKOFFICE && state !== PaperState.RECEIVED) {
+      throw new UnauthorizedException('Only backoffice can change the state of a paper');
+    }
     const paper = await this.findOne(id);
     const { process } = paper;
     const isPreSelected = process === Process.PRESELECCIONADO;
-    const { state, reviewerUserId, leaderId, type } = changeStateDto;
     const invalidStateCode = 'INVALID_STATE';
     switch (state) {
       case PaperState.RECEIVED:
