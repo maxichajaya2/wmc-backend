@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { SignInDto } from './dto/sign-in.dto';
+import { DashboardSignInDto } from './dto/dashboard-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { DashbaordLoginResponse, LoginResponse } from './types/login-response';
@@ -11,8 +11,10 @@ import { MailService } from '../common/services/mail.service';
 import { CreateWebUserDto } from '../web-users/dto/create-web-user.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { RolesRepository } from '../domain/repositories/roles.repository';
+import { DocumentType } from '../domain/entities/web-user.entity';
+import { SignInDto } from './dto/sign-in.dto';
 
-enum LoginErrors{
+enum LoginErrors {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
   PASSWORD_INVALID = 'PASSWORD_INVALID',
   PASSWORD_NOT_SET = 'PASSWORD_NOT_SET',
@@ -37,16 +39,16 @@ export class AuthService {
     private readonly rolesRepository: RolesRepository,
   ) { }
 
-  private generateJWT(payload: {sub: number, email: string, origin: LoginOrigin}) {
+  private generateJWT(payload: { sub: number, email: string, origin: LoginOrigin }) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
     })
   }
 
-  async signIn({ email, password: passwordPayload }: SignInDto): Promise<LoginResponse> {
+  async signIn({ documentType, documentNumber, password: passwordPayload }: SignInDto): Promise<LoginResponse> {
     try {
-      console.debug(`Sign in attempt for ${email}`);
-      const user = await this.webUsersRepository.findByEmail(email);
+      console.debug(`Sign in web user attempt for ${documentType} ${documentNumber}`);
+      const user = await this.webUsersRepository.findByDocument({ documentType, documentNumber });
       if (!user) {
         throw new UnauthorizedException({
           code: LoginErrors.USER_NOT_FOUND,
@@ -77,7 +79,7 @@ export class AuthService {
     }
   }
 
-  async dashboardSignIn({ email, password: passwordPayload }: SignInDto): Promise<DashbaordLoginResponse> {
+  async dashboardSignIn({ email, password: passwordPayload }: DashboardSignInDto): Promise<DashbaordLoginResponse> {
     try {
       console.debug(`Sign in attempt for ${email}`);
       const user = await this.usersRepository.findByEmail(email);
@@ -118,40 +120,41 @@ export class AuthService {
     return user;
   }
 
-  async preRegister(preRegisterDto: CreateWebUserDto){
+  async preRegister(preRegisterDto: CreateWebUserDto) {
     const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if(!emailRegex.test(preRegisterDto.email)){
+    if (!emailRegex.test(preRegisterDto.email)) {
       throw new BadRequestException('Email no válido');
     }
-    const { email } = preRegisterDto;
-    // if(![1,2].includes(idioma)){
-    //   throw new BadRequestException('Idioma no válido');
-    // }
-   if(await this.webUserAlreadyExists(email)){
-     throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
-   } 
-   const token = uuidv4();
-   await this.mailService.sendRegisterLink({ to: email, code: token });
-   const value = {
-    payload: preRegisterDto,
-    expiresAt: (new Date()).getTime() + VERIFICATION_USER_TTL,
-   }
+    const { email, documentType, documentNumber } = preRegisterDto;
+    const userByDocument = await this.webUsersRepository.findByDocument({ documentType, documentNumber });
+    const emailExists = await this.webUserEmailAlreadyExists(email);
+    if (emailExists || !!userByDocument) {
+      throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
+    }
+    const token = uuidv4();
+    await this.mailService.sendRegisterLink({ to: email, code: token });
+    const value = {
+      payload: preRegisterDto,
+      expiresAt: (new Date()).getTime() + VERIFICATION_USER_TTL,
+    }
     VERIFICATION_USER_CACHE[token] = JSON.stringify(value);
     return {
-      token
+      token: process.env.SEND_MAIL_NOTIFICATIONS === 'false' ? token : null,
     }
   }
 
-  async register(token: string){
+  async register(token: string) {
     const value = VERIFICATION_USER_CACHE[token];
-    if(!value){
+    if (!value) {
       throw new BadRequestException(APP_ERRORS[ERROR_CODES.INVALID_OTP]);
     }
     const { payload, expiresAt } = JSON.parse(value);
-    if((new Date()).getTime() > expiresAt){
+    if ((new Date()).getTime() > expiresAt) {
       throw new BadRequestException('Token expired');
     }
-    if(await this.webUserAlreadyExists(payload.email)){
+    const emailExists = await this.webUserEmailAlreadyExists(payload.email);
+    const userByDocument = await this.webUsersRepository.findByDocument({ documentType: payload.documentType, documentNumber: payload.documentNumber });
+    if (emailExists || !!userByDocument) {
       throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
     }
     const user = await this.webUsersRepository.create(payload);
@@ -163,7 +166,7 @@ export class AuthService {
     }
   }
 
-  private async webUserAlreadyExists(email: string) {
+  private async webUserEmailAlreadyExists(email: string) {
     const user = await this.webUsersRepository.findByEmail(email);
     return !!user;
   }
@@ -177,7 +180,7 @@ export class AuthService {
 
   async sendResetPasswordOtp(email: string) {
     const user = await this.webUsersRepository.findByEmail(email);
-    if(!user){
+    if (!user) {
       throw new NotFoundException('User not found');
     }
     const token = uuidv4();
@@ -197,18 +200,18 @@ export class AuthService {
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, password } = resetPasswordDto;
     const value = VERIFICATION_USER_CACHE[token];
-    if(!value){
+    if (!value) {
       throw new BadRequestException(APP_ERRORS[ERROR_CODES.INVALID_OTP]);
     }
-    console.log({value});
+    console.log({ value });
     delete VERIFICATION_USER_CACHE[token];
     const { payload, expiresAt } = JSON.parse(value);
     const { email } = payload;
-    if((new Date()).getTime() > expiresAt){
+    if ((new Date()).getTime() > expiresAt) {
       throw new BadRequestException('Token expired');
     }
     const user = await this.webUsersRepository.findByEmail(email);
-    if(!user){
+    if (!user) {
       throw new NotFoundException('User not found');
     }
     const updatedUser = await this.webUsersRepository.update(user.id, { password });

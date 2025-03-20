@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { WebUser } from '../entities/web-user.entity';
+import { DocumentType, WebUser } from '../entities/web-user.entity';
 import { CreateWebUserDto } from '../../web-users/dto/create-web-user.dto';
 import { UpdateWebUserDto } from '../../web-users/dto/update-web-user.dto';
 
@@ -22,6 +22,15 @@ export class WebUsersRepository {
         return this.repository.findOne({
             where: {
                 email
+            },
+        });
+    }
+
+    async findByDocument({documentType, documentNumber}: {documentType: DocumentType, documentNumber: string}): Promise<WebUser | null> {
+        return this.repository.findOne({
+            where: {
+                documentType,
+                documentNumber
             },
         });
     }
