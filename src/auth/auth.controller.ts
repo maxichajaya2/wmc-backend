@@ -1,12 +1,13 @@
 import { Controller, Get, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignInDto } from './dto/sign-in.dto';
+import { DashboardSignInDto } from './dto/dashboard-sign-in.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { RegisterDto } from './dto/register.dto';
 import { SendResetPasswordOtpDto } from './dto/send-reset-password-otp.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { CreateWebUserDto } from '../web-users/dto/create-web-user.dto';
 import { DashboardAuthGuard } from './guards/dashboard-auth.guard';
+import { SignInDto } from './dto/sign-in.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +23,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('dashboard-login')
-  dashboardSignIn(@Body() signInDto: SignInDto) {
+  dashboardSignIn(@Body() signInDto: DashboardSignInDto) {
     return this.authService.dashboardSignIn(signInDto);
   }
 

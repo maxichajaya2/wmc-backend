@@ -1,8 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn, OneToMany } from 'typeorm';
 import { Paper } from './paper.entity';
 import { Topic } from './topic.entity';
-import { PaperComentary } from './paper-comentary.entity';
-import { Enrollment } from './enrollment.entity';
 
 export enum DocumentType {
   NO_DOMICILIADO = '0',
