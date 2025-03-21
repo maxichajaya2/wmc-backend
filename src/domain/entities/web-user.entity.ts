@@ -70,6 +70,7 @@ export class WebUser {
 
   reviewedPapers?: Paper[];
 
+  @OneToMany(() => Paper, paper => paper.webUser)
   papers?: Paper[];
 
   topics?: Topic[];

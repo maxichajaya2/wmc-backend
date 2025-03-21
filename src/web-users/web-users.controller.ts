@@ -36,4 +36,9 @@ export class WebUsersController {
   // findEnrollments(@Param('id') id: string) {
   //   return this.webUsersService.findEnrollments(+id);
   // }
+
+  @Get(':id/papers')
+  findEnrollments(@Param('id') id: string) {
+    return this.webUsersService.getPapers(+id);
+  }
 }
