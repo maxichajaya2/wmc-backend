@@ -45,7 +45,7 @@ export class PapersService {
       where = { isActive: true };
     }
     if (user.role.id === RoleCodes.ADMIN) {
-      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
+      where["state"] = Not(In([PaperState.REGISTERED]));
     }
     if (user.role.id === RoleCodes.LIDER) {
       where["leaderId"] = user.id;
