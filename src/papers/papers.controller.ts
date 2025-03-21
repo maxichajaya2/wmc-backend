@@ -6,6 +6,7 @@ import { ChangeStateDto } from './dto/change-state.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { GlobalGuard } from '../auth/guards/global-guard';
+import { UpdatePaperDto } from './dto/update-paper.dto';
 
 @Controller('papers')
 export class PapersController {
@@ -18,6 +19,7 @@ export class PapersController {
   }
 
   //TODO: Implementar el guard
+  @UseGuards(DashboardAuthGuard)
   @Get()
   findAll(@Query('onlyActive') onlyActive: string) {
     return this.papersService.findAll({ onlyActive: onlyActive === 'true' });
@@ -29,9 +31,9 @@ export class PapersController {
     return this.papersService.findOne(+id, { onlyActive: onlyActive === 'true' });
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(GlobalGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaperDto: CreatePaperDto) {
+  update(@Param('id') id: string, @Body() updatePaperDto: UpdatePaperDto) {
     return this.papersService.update(+id, updatePaperDto);
   }
 
@@ -64,6 +66,7 @@ export class PapersController {
   @UseGuards(DashboardAuthGuard)
   @Patch(':id/comments/:commentId')
   updateComment(@Param('id') id: string, @Param('commentId') commentId: string, @Body() addCommentDto: AddCommentDto) {
+    console.log('updateComment');
     return this.papersService.updateComment(+id, +commentId, addCommentDto);
   }
 

@@ -19,6 +19,7 @@ import { MailService } from '../common/services/mail.service';
 import { RoleCodes } from '../domain/entities/role.entity';
 import { WebUser } from '../domain/entities/web-user.entity';
 import { LoginOrigin } from '../auth/auth.service';
+import { In, Not } from 'typeorm';
 
 @Injectable()
 export class PapersService {
@@ -37,9 +38,22 @@ export class PapersService {
   ) { }
 
   async findAll({ onlyActive } = { onlyActive: false }) {
+    const loggedUser = this.usersService.getLoggedUser();
+    const user = await this.usersRepository.findById(loggedUser.id);
     let where = {};
     if (onlyActive) {
       where = { isActive: true };
+    }
+    if (user.role.id === RoleCodes.ADMIN) {
+      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
+    }
+    if (user.role.id === RoleCodes.LIDER) {
+      where["leaderId"] = user.id;
+      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
+    }
+    if (user.role.id === RoleCodes.REVISOR) {
+      where["reviewerUserId"] = user.id;
+      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]));
     }
     return this.papersRepository.repository.find({
       where,
@@ -68,8 +82,8 @@ export class PapersService {
     const loginOrigin = this.usersService.getLoginOrigin();
     const isBackOffice = loginOrigin === LoginOrigin.BACKOFFICE;
     let webUser: WebUser;
-    if(isBackOffice){
-      if(!webUserId){
+    if (isBackOffice) {
+      if (!webUserId) {
         throw new BadRequestException('Web User id is required');
       }
       webUser = await this.webUsersRepository.repository.findOne({
@@ -96,11 +110,11 @@ export class PapersService {
       throw new NotFoundException('Topic not found');
     }
     const lastRegister = await this.papersRepository.repository
-    .createQueryBuilder('paper')
-    .orderBy("CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)", 'DESC')
-    .getOne();
+      .createQueryBuilder('paper')
+      .orderBy("CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)", 'DESC')
+      .getOne();
     let correlative = 'TT-1';
-    if(lastRegister?.correlative){
+    if (lastRegister?.correlative) {
       const parts = lastRegister.correlative.split('-');
       const number = +parts[1];
       correlative = `TT-${number + 1}`;
@@ -115,7 +129,7 @@ export class PapersService {
       webUser,
       category,
     }
-    if(isBackOffice){
+    if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
       paper.receivedDate = new Date();
     }
@@ -132,7 +146,22 @@ export class PapersService {
   }
 
   async update(id: number, body: UpdatePaperDto) {
+    console.log('Actualizando paper ' + id);
+    const loggedUser = this.usersService.getLoggedUser();
+    const loginOrigin = this.usersService.getLoginOrigin();
     const paper = await this.findOne(id);
+    if (loginOrigin === LoginOrigin.FRONTEND) {
+      const webUser = await this.webUsersRepository.repository.findOne({
+        where: { id: loggedUser.id },
+      });
+      if (!webUser) {
+        throw new NotFoundException('Web User not found');
+      }
+      delete body.webUserId;
+      if (paper.webUserId !== webUser.id) {
+        throw new UnauthorizedException('You are not allowed to update this paper');
+      }
+    }
     const { authors, ...updatePaperDto } = body;
     const { topicId, categoryId } = updatePaperDto;
     if (topicId && paper.topic.id !== topicId) {
@@ -165,33 +194,34 @@ export class PapersService {
     const currentAuthors = await this.paperAuthorsRepository.repository.find({
       where: { paperId: id },
     });
-    for (const currentAuthor of currentAuthors) {
-      const found = authors.find(a => a.id === currentAuthor.id);
-      if (!found) {
-        await this.paperAuthorsRepository.repository.softDelete(currentAuthor.id);
+    if (authors?.length > 0) {
+      for (const currentAuthor of currentAuthors) {
+        const found = authors.find(a => a.id === currentAuthor.id);
+        if (!found) {
+          await this.paperAuthorsRepository.repository.softDelete(currentAuthor.id);
+        }
       }
-    }
-
-    for (const author of authors) {
-      if (author.id) {
-        const authorModel = await this.paperAuthorsRepository.repository.findOne({
-          where: { id: author.id },
-        });
-        if (!authorModel) {
-          throw new NotFoundException('Author not found');
+      for (const author of authors) {
+        if (author.id) {
+          const authorModel = await this.paperAuthorsRepository.repository.findOne({
+            where: { id: author.id },
+          });
+          if (!authorModel) {
+            throw new NotFoundException('Author not found');
+          }
+          const newAuthor: PaperAuthor = {
+            ...authorModel,
+            ...author,
+          }
+          await this.paperAuthorsRepository.repository.update(author.id, newAuthor);
+        } else {
+          const newAuthor: PaperAuthor = {
+            ...author,
+            paper,
+            paperId: updatedPaper.id,
+          }
+          await this.paperAuthorsRepository.repository.save(newAuthor);
         }
-        const newAuthor: PaperAuthor = {
-          ...authorModel,
-          ...author,
-        }
-        await this.paperAuthorsRepository.repository.update(author.id, newAuthor);
-      } else {
-        const newAuthor: PaperAuthor = {
-          ...author,
-          paper,
-          paperId: updatedPaper.id,
-        }
-        await this.paperAuthorsRepository.repository.save(newAuthor);
       }
     }
 

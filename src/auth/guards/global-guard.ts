@@ -13,9 +13,10 @@ export class GlobalGuard implements CanActivate {
         private readonly usersRepository: UsersRepository,
         private readonly webUsersRepository: WebUsersRepository,
         private readonly rolesRepository: RolesRepository,
-    ) { }
+    ) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
+        console.log('GlobalGuard - canActivate'); 
         const request = context.switchToHttp().getRequest();
         const response = await manageAccessToken({
             context,

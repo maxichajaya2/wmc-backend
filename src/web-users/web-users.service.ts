@@ -3,12 +3,14 @@ import { UpdateWebUserDto } from './dto/update-web-user.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { WebUser } from './entities/web-user.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class WebUsersService {
 
   constructor(
     private readonly webUsersRepository: WebUsersRepository,
+    private readonly usersService: UsersService,
   ){}
 
   findAll({ onlyActive } = { onlyActive: false }) {
@@ -49,6 +51,19 @@ export class WebUsersService {
 
   remove(id: number) {
     return this.webUsersRepository.delete(id);
+  }
+
+  async getPapers(id: number){
+    const webUser = await this.webUsersRepository.repository.findOne({
+      where: {
+        id
+      },
+      relations: ['papers']
+    });
+    if (!webUser) {
+      throw new NotFoundException('User not found');
+    }
+    return webUser.papers;
   }
 
   // async findEnrollments(id: number) {
