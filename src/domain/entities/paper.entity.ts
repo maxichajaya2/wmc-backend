@@ -16,6 +16,16 @@ export enum PaperState {
   DISMISSED = 6,
 }
 
+export const paperStateMap = {
+  0: 'REGISTRADO',
+  1: 'RECIBIDO',
+  2: 'ENVIADO',
+  3: 'ASIGNADO',
+  4: 'EN REVISIÓN',
+  5: 'APROBADO',
+  6: 'RECHAZADO',
+}
+
 export enum PaperType{
   ORAL = 'O',
   POSTER = 'P',

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { SendContactEmailDto } from '../dtos/send-contact-email.dto';
-import { Paper } from '../../domain/entities/paper.entity';
+import { Paper, PaperState, paperStateMap } from '../../domain/entities/paper.entity';
 
 @Injectable()
 export class MailService {
@@ -95,7 +95,7 @@ export class MailService {
 
     async sendRegisterLink({ to, code }) {
         const appUrl = process.env.APP_URL;
-        const url = `${appUrl}/en/confirm-register?token=${code}`;
+        const url = `${appUrl}/confirmar-registro?token=${code}`;
         const template = `
                 <h1>Confirmación de registro</h1>
                 <p>Clic <a href="${url}">aquí</a> para resetear tu contraseña</p>
@@ -104,7 +104,7 @@ export class MailService {
         return this.sendMail({
             to,
             template,
-            subject: 'Recuperación de contraseña',
+            subject: 'Registro',
         })
             .then(() => {
                 console.log(`Link de registro enviado a ${to}`);
@@ -142,15 +142,35 @@ export class MailService {
         paper: Paper
     }) {
         const { state, title } = paper;
-        const template = `
-            <h1>Actualización de estado de paper</h1>
-            <p>El estado de tu paper <b>${title}</b> ha sido actualizado a <b>${state}</b></p>
+        let template = `
+            <h1>Actualización de estado de trabajo técnico</h1>
+            <p>El estado de tu trabajo técnico <b>${title}</b> ha sido actualizado a <b>${paperStateMap[state]}</b></p>
         `;
+
+        if (state === PaperState.RECEIVED) {
+            template = `
+            <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+                <p>Estimado participante,</p>
+                
+                <p>Agradecemos su participación en el <strong>Premio Nacional de Minería</strong> y por medio de esta comunicación confirmamos la recepción de su resumen.</p>
+                
+                <p>Estaremos en contacto para darle el resultado de la evaluación.</p>
+                
+                <p>Por favor, cualquier consulta sírvase contactarse por <strong>WhatsApp</strong> al <a href="https://wa.me/51973855242">973855242</a>.</p>
+                
+                <p>Saludos cordiales,</p>
+                
+                <p><strong>Carolina Galarza</strong><br>
+                Coordinadora Foro TIS<br>
+                PERUMIN 37 Convención Minera</p>
+            </body>
+            `;
+        }
 
         return this.sendMail({
             to,
             template,
-            subject: 'Actualización de estado de paper',
+            subject: 'Actualización de estado de trabajo técnico',
         })
             .then(() => {
                 console.log(`Email de actualización de estado de paper enviado a ${to}`);
