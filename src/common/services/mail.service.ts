@@ -98,7 +98,7 @@ export class MailService {
         const url = `${appUrl}/confirmar-registro?token=${code}`;
         const template = `
                 <h1>Confirmación de registro</h1>
-                <p>Clic <a href="${url}">aquí</a> para resetear tu contraseña</p>
+                <p>Clic <a href="${url}">aquí</a> para su registro.</p>
             `;
 
         return this.sendMail({

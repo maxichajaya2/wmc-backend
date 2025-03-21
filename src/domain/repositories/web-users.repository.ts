@@ -27,12 +27,14 @@ export class WebUsersRepository {
     }
 
     async findByDocument({documentType, documentNumber}: {documentType: DocumentType, documentNumber: string}): Promise<WebUser | null> {
-        return this.repository.findOne({
+        const userByDocyment = await this.repository.findOne({
             where: {
                 documentType,
                 documentNumber
             },
         });
+        console.log({userByDocyment});
+        return userByDocyment;
     }
 
     findById(id: number): Promise<WebUser | null> {
