@@ -246,21 +246,15 @@ export class PapersService {
     const invalidStateCode = 'INVALID_STATE';
     switch (state) {
       case PaperState.RECEIVED:
+        if (paper.state !== PaperState.REGISTERED) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'Paper must be registered to be received',
+          });
+        }
         if (isPreSelected) {
-          if (paper.state !== PaperState.REGISTERED) {
-            throw new BadRequestException({
-              code: invalidStateCode,
-              message: 'Paper must be registered to be received',
-            });
-          }
           paper.receivedDate = new Date();
         } else {
-          if (paper.state !== PaperState.APPROVED) {
-            throw new BadRequestException({
-              code: invalidStateCode,
-              message: 'Paper must be approved to be received',
-            });
-          }
           paper.selectedReceivedDate = new Date();
         }
         paper.state = state;
@@ -352,7 +346,7 @@ export class PapersService {
         }
         paper.type = type;
         if (isPreSelected) {
-          paper.state = PaperState.RECEIVED;
+          paper.state = PaperState.REGISTERED;
           paper.selectedReceivedDate = new Date();
           paper.process = Process.SELECCIONADO;
         } else {
