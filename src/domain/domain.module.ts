@@ -26,6 +26,8 @@ import { PaperAuthor } from './entities/paper-author.entity';
 import { PaperAuthorsRepository } from './repositories/paper-authors.repository';
 import { Category } from './entities/category.entity';
 import { CategoriesRepository } from './repositories/categories.repository';
+import { Parameter } from './entities/parameter.entity';
+import { ParametersRepository } from './repositories/parameters.repository';
 
 export const APP_ENTITIES = [
   Category,
@@ -41,6 +43,7 @@ export const APP_ENTITIES = [
   Province,
   District,
   PaperAuthor,
+  Parameter,
 ];
 
 @Global()
@@ -59,6 +62,7 @@ export const APP_ENTITIES = [
     DistrictsRepository,
     PaperAuthorsRepository,
     CategoriesRepository,
+    ParametersRepository,
   ],
   exports: [
     UsersRepository,
@@ -75,6 +79,7 @@ export const APP_ENTITIES = [
     DistrictsRepository,
     PaperAuthorsRepository,
     CategoriesRepository,
+    ParametersRepository,
   ],
   imports: [
     ConfigModule,

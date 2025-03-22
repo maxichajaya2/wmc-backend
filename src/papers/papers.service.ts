@@ -20,6 +20,7 @@ import { RoleCodes } from '../domain/entities/role.entity';
 import { WebUser } from '../domain/entities/web-user.entity';
 import { LoginOrigin } from '../auth/auth.service';
 import { In, Not } from 'typeorm';
+import { UploadFullFileDto } from './dto/upload-full-file.dto';
 
 @Injectable()
 export class PapersService {
@@ -237,9 +238,9 @@ export class PapersService {
     const { state, reviewerUserId, leaderId, type } = changeStateDto;
     const loggedUser = this.usersService.getLoggedUser();
     const loginOrigin = this.usersService.getLoginOrigin();
-    if (loginOrigin !== LoginOrigin.BACKOFFICE && state !== PaperState.RECEIVED) {
-      throw new UnauthorizedException('Only backoffice can change the state of a paper');
-    }
+    // if (loginOrigin !== LoginOrigin.BACKOFFICE && state !== PaperState.RECEIVED) {
+    //   throw new UnauthorizedException('Only backoffice can change the state of a paper');
+    // }
     const paper = await this.findOne(id);
     const { process } = paper;
     const isPreSelected = process === Process.PRESELECCIONADO;
@@ -296,13 +297,19 @@ export class PapersService {
             message: 'Paper must be sent to be assigned',
           });
         }
-        if (loggedUser.id !== paper.leaderId) {
+        if (loginOrigin === LoginOrigin.BACKOFFICE && loggedUser.id !== paper.leaderId) {
           throw new UnauthorizedException('Only leader can assign a paper');
+        }
+        if(loginOrigin === LoginOrigin.FRONTEND && loggedUser.id !== paper.webUserId){
+          throw new UnauthorizedException('Only the author can assign a paper');
         }
         paper.state = state;
         if (isPreSelected) {
           paper.assignedDate = new Date();
         } else {
+          if(!paper.fullFileUrl){
+            throw new BadRequestException('Full file is required to assign a paper');
+          }
           paper.selectedAssignedDate = new Date();
         }
         if (!reviewerUserId) {
@@ -332,9 +339,6 @@ export class PapersService {
         }
         break;
       case PaperState.APPROVED:
-        if (!type) {
-          throw new BadRequestException('Type is required to approve a paper');
-        }
         if (paper.state !== PaperState.UNDER_REVIEW) {
           throw new BadRequestException({
             code: invalidStateCode,
@@ -344,13 +348,15 @@ export class PapersService {
         if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
           throw new UnauthorizedException('Only reviewer or leader can approve a paper');
         }
-        paper.type = type;
+        paper.state = state;
         if (isPreSelected) {
-          paper.state = PaperState.REGISTERED;
+          if (!type) {
+            throw new BadRequestException('Type is required to approve a paper');
+          }
+          paper.type = type;
           paper.selectedReceivedDate = new Date();
           paper.process = Process.SELECCIONADO;
         } else {
-          paper.state = state;
           paper.selectedApprovedDate = new Date();
         }
         await this.mailService.sendPaperUpdateStatusEmail({
@@ -360,14 +366,22 @@ export class PapersService {
         break;
       case PaperState.DISMISSED:
         if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
-          throw new UnauthorizedException('Only reviewer or leader can approve a paper');
+          throw new UnauthorizedException('Only reviewer or leader can dismissed a paper');
         }
         paper.state = state;
         paper.dismissedDate = new Date();
+        const webUser = await this.webUsersRepository.repository.findOne({
+          where: { id: paper.webUserId },
+        });
+        if (!webUser) {
+          throw new NotFoundException('Web User not found');
+        }
         await this.mailService.sendPaperUpdateStatusEmail({
           paper,
           to: paper.webUser.email
         });
+        webUser.isActive = false;
+        await this.webUsersRepository.repository.save(webUser);
         break;
       default:
         throw new NotFoundException('Invalid state');
@@ -458,5 +472,18 @@ export class PapersService {
         country,
       }
     }
+  }
+
+  async uploadFullFile(id: number, uploadFullFileDto: UploadFullFileDto){
+    const { fullFileUrl } = uploadFullFileDto;
+    const paper = await this.papersRepository.repository.findOne({
+      where: { id },
+    });
+    if (!paper) {
+      throw new NotFoundException('Paper not found');
+    }
+    paper.fullFileUrl = fullFileUrl;
+    await this.papersRepository.repository.save(paper);
+    return this.findOne(id);
   }
 }

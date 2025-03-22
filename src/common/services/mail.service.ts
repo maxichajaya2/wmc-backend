@@ -95,6 +95,7 @@ export class MailService {
 
     async sendRegisterLink({ to, code }) {
         const appUrl = process.env.APP_URL;
+        console.log({code});
         const url = `${appUrl}/confirmar-registro?token=${code}`;
         const template = `
                 <h1>Confirmación de registro</h1>

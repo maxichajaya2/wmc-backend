@@ -7,6 +7,7 @@ import { AddCommentDto } from './dto/add-comment.dto';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { GlobalGuard } from '../auth/guards/global-guard';
 import { UpdatePaperDto } from './dto/update-paper.dto';
+import { UploadFullFileDto } from './dto/upload-full-file.dto';
 
 @Controller('papers')
 export class PapersController {
@@ -81,5 +82,11 @@ export class PapersController {
   @Get(':id/authors')
   getAuthors(@Param('id') id: string) {
     return this.papersService.findAuthors(+id);
+  }
+
+  @Post(':id/upload-full-file')
+  @UseGuards(AuthGuard)
+  uploadFullFile(@Param('id') id: string, @Body() uploadFullFileDto: UploadFullFileDto) {
+    return this.papersService.uploadFullFile(+id, uploadFullFileDto);
   }
 }

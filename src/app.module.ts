@@ -16,6 +16,7 @@ import { DistrictsModule } from './districts/districts.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { FilesModule } from './files/files.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ParametersModule } from './parameters/parameters.module';
 
 @Module({
   imports: [
@@ -49,7 +50,8 @@ import { CategoriesModule } from './categories/categories.module';
     // PavilionsModule,
     // StandsModule,
     FilesModule,
-    CategoriesModule
+    CategoriesModule,
+    ParametersModule
   ],
   controllers: [AppController],
   providers: [AppService],

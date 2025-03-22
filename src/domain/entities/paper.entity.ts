@@ -151,6 +151,9 @@ export class Paper {
   @Column({ type: 'varchar', length: 5, nullable: true })
   process: Process;
 
+  @Column({ type: 'text', nullable: true })
+  fullFileUrl?: string;
+
   // @Column({ type: 'boolean', default: true })
   // isActive?: boolean;
 

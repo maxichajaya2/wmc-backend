@@ -22,6 +22,9 @@ export class AuthGuard implements CanActivate {
     if (!ok || origin !== LoginOrigin.FRONTEND) {
       throw new UnauthorizedException();
     }
+    if(user.isActive === false){
+      throw new UnauthorizedException("User is not active");
+    }
     const request = context.switchToHttp().getRequest();
     request['loggedUser'] = user;
     console.log("seteando loginOrigin");
