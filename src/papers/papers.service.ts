@@ -291,25 +291,21 @@ export class PapersService {
         paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
-        if (paper.state !== PaperState.SENT) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be sent to be assigned',
-          });
-        }
         if (loginOrigin === LoginOrigin.BACKOFFICE && loggedUser.id !== paper.leaderId) {
           throw new UnauthorizedException('Only leader can assign a paper');
         }
         if(loginOrigin === LoginOrigin.FRONTEND && loggedUser.id !== paper.webUserId){
           throw new UnauthorizedException('Only the author can assign a paper');
         }
+        const isFirstAsignation = paper.state !== PaperState.APPROVED;
         paper.state = state;
-        if (isPreSelected) {
+        if(isFirstAsignation){
           paper.assignedDate = new Date();
         } else {
           if(!paper.fullFileUrl){
             throw new BadRequestException('Full file is required to assign a paper');
           }
+          paper.process = Process.SELECCIONADO;
           paper.selectedAssignedDate = new Date();
         }
         if (!reviewerUserId) {
@@ -322,6 +318,9 @@ export class PapersService {
         paper.reviewerUser = reviewerUser;
         break;
       case PaperState.UNDER_REVIEW:
+        if(loginOrigin !== LoginOrigin.BACKOFFICE){
+          throw new UnauthorizedException('Only backoffice can change the state to under review');
+        }
         if (paper.state !== PaperState.ASSIGNED) {
           throw new BadRequestException({
             code: invalidStateCode,
@@ -339,6 +338,9 @@ export class PapersService {
         }
         break;
       case PaperState.APPROVED:
+        if(loginOrigin !== LoginOrigin.BACKOFFICE){
+          throw new UnauthorizedException('Only backoffice can change the state to under review');
+        }
         if (paper.state !== PaperState.UNDER_REVIEW) {
           throw new BadRequestException({
             code: invalidStateCode,
@@ -350,13 +352,12 @@ export class PapersService {
         }
         paper.state = state;
         if (isPreSelected) {
+          paper.approvedDate = new Date();
+        } else {
           if (!type) {
             throw new BadRequestException('Type is required to approve a paper');
           }
           paper.type = type;
-          paper.selectedReceivedDate = new Date();
-          paper.process = Process.SELECCIONADO;
-        } else {
           paper.selectedApprovedDate = new Date();
         }
         await this.mailService.sendPaperUpdateStatusEmail({

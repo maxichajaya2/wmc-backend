@@ -32,6 +32,12 @@ export enum PaperType{
   PRESENTACION_INTERACTIVA = 'PI',
 }
 
+export const paperTypeMap = {
+  'O': 'ORAL',
+  'P': 'POSTER',
+  'PI': 'PRESENTACIÓN INTERACTIVA',
+}
+
 export enum Process{
   PRESELECCIONADO = 'P',
   SELECCIONADO = 'S',

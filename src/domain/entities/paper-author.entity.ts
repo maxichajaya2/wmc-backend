@@ -6,6 +6,11 @@ export enum PaperAuthorType {
   COAUTOR = 'C',
 }
 
+export const paperAuthorTypeMap = {
+  'A': 'AUTOR',
+  'C': 'COAUTOR',
+}
+
 @Entity()
 export class PaperAuthor {
   @PrimaryGeneratedColumn()

@@ -17,6 +17,7 @@ import { DepartmentsModule } from './departments/departments.module';
 import { FilesModule } from './files/files.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ParametersModule } from './parameters/parameters.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { ParametersModule } from './parameters/parameters.module';
     // StandsModule,
     FilesModule,
     CategoriesModule,
-    ParametersModule
+    ParametersModule,
+    ReportsModule
   ],
   controllers: [AppController],
   providers: [AppService],
