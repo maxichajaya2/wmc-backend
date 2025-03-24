@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
 import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
@@ -24,7 +29,6 @@ import { UploadFullFileDto } from './dto/upload-full-file.dto';
 
 @Injectable()
 export class PapersService {
-
   constructor(
     private readonly papersRepository: PapersRepository,
     private readonly categoriesRepository: CategoriesRepository,
@@ -36,7 +40,7 @@ export class PapersService {
     private readonly paperAuthorsRepository: PaperAuthorsRepository,
     private readonly countriesService: CountriesService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async findAll({ onlyActive } = { onlyActive: false }) {
     const loggedUser = this.usersService.getLoggedUser();
@@ -46,15 +50,17 @@ export class PapersService {
       where = { isActive: true };
     }
     if (user.role.id === RoleCodes.ADMIN) {
-      where["state"] = Not(In([PaperState.REGISTERED]));
+      where['state'] = Not(In([PaperState.REGISTERED]));
     }
     if (user.role.id === RoleCodes.LIDER) {
-      where["leaderId"] = user.id;
-      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
+      where['leaderId'] = user.id;
+      where['state'] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
     }
     if (user.role.id === RoleCodes.REVISOR) {
-      where["reviewerUserId"] = user.id;
-      where["state"] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]));
+      where['reviewerUserId'] = user.id;
+      where['state'] = Not(
+        In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
+      );
     }
     return this.papersRepository.repository.find({
       where,
@@ -112,7 +118,10 @@ export class PapersService {
     }
     const lastRegister = await this.papersRepository.repository
       .createQueryBuilder('paper')
-      .orderBy("CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)", 'DESC')
+      .orderBy(
+        "CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)",
+        'DESC',
+      )
       .getOne();
     let correlative = 'TT-1';
     if (lastRegister?.correlative) {
@@ -129,7 +138,7 @@ export class PapersService {
       process: Process.PRESELECCIONADO,
       webUser,
       category,
-    }
+    };
     if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
       paper.receivedDate = new Date();
@@ -140,7 +149,7 @@ export class PapersService {
         ...author,
         paper,
         paperId: createdPaper.id,
-      }
+      };
       await this.paperAuthorsRepository.repository.save(paperAuthor);
     }
     return createdPaper;
@@ -160,7 +169,9 @@ export class PapersService {
       }
       delete body.webUserId;
       if (paper.webUserId !== webUser.id) {
-        throw new UnauthorizedException('You are not allowed to update this paper');
+        throw new UnauthorizedException(
+          'You are not allowed to update this paper',
+        );
       }
     }
     const { authors, ...updatePaperDto } = body;
@@ -187,9 +198,8 @@ export class PapersService {
       ...paper,
       ...updatePaperDto,
       updatedAt: new Date(),
-    }
+    };
     await this.papersRepository.repository.update(id, updatedPaper);
-
 
     //eliminar autores que no estén en la lista
     const currentAuthors = await this.paperAuthorsRepository.repository.find({
@@ -197,7 +207,7 @@ export class PapersService {
     });
     if (authors?.length > 0) {
       for (const currentAuthor of currentAuthors) {
-        const found = authors.find(a => a.id === currentAuthor.id);
+        const found = authors.find((a) => a.id === currentAuthor.id);
         if (!found) {
           await this.paperAuthorsRepository.repository.softDelete(currentAuthor.id);
         }
@@ -247,21 +257,32 @@ export class PapersService {
     const invalidStateCode = 'INVALID_STATE';
     switch (state) {
       case PaperState.RECEIVED:
+        // Validamos si el estado actual es REGISTERED o si viene de un estado APPROVED con proceso PRESELECCIONADO
         if (paper.state !== PaperState.REGISTERED) {
-          throw new BadRequestException({
-            code: invalidStateCode,
-            message: 'Paper must be registered to be received',
-          });
-        }
-        if (isPreSelected) {
-          paper.receivedDate = new Date();
+          if (paper.state === PaperState.APPROVED && isPreSelected) {
+            // Si el paper está aprobado y es preseleccionado, se cambia a ASSIGNED
+            paper.state = PaperState.ASSIGNED;
+            paper.process = Process.SELECCIONADO;
+            paper.selectedAssignedDate = new Date();
+          } else {
+            throw new BadRequestException({
+              code: invalidStateCode,
+              message: 'Paper must be registered to be received',
+            });
+          }
         } else {
-          paper.selectedReceivedDate = new Date();
+          // Si el paper está registrado, el cambio es el flujo normal
+          paper.state = state;
+          if (isPreSelected) {
+            paper.receivedDate = new Date();
+          } else {
+            paper.selectedReceivedDate = new Date();
+          }
         }
-        paper.state = state;
+
         await this.mailService.sendPaperUpdateStatusEmail({
           paper,
-          to: paper.webUser.email
+          to: paper.webUser.email,
         });
         break;
       case PaperState.SENT:
@@ -282,7 +303,9 @@ export class PapersService {
           paper.selectedSentDate = new Date();
         }
         if (!leaderId) {
-          throw new BadRequestException('Leader id is required to send a paper');
+          throw new BadRequestException(
+            'Leader id is required to send a paper',
+          );
         }
         const leader = await this.usersRepository.findById(leaderId);
         if (!leader) {
@@ -291,19 +314,27 @@ export class PapersService {
         paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
-        if (loginOrigin === LoginOrigin.BACKOFFICE && loggedUser.id !== paper.leaderId) {
+        if (
+          loginOrigin === LoginOrigin.BACKOFFICE &&
+          loggedUser.id !== paper.leaderId
+        ) {
           throw new UnauthorizedException('Only leader can assign a paper');
         }
-        if(loginOrigin === LoginOrigin.FRONTEND && loggedUser.id !== paper.webUserId){
+        if (
+          loginOrigin === LoginOrigin.FRONTEND &&
+          loggedUser.id !== paper.webUserId
+        ) {
           throw new UnauthorizedException('Only the author can assign a paper');
         }
         const isFirstAsignation = paper.state !== PaperState.APPROVED;
         paper.state = state;
-        if(isFirstAsignation){
+        if (isFirstAsignation) {
           paper.assignedDate = new Date();
         } else {
-          if(!paper.fullFileUrl){
-            throw new BadRequestException('Full file is required to assign a paper');
+          if (!paper.fullFileUrl) {
+            throw new BadRequestException(
+              'Full file is required to assign a paper',
+            );
           }
           paper.process = Process.SELECCIONADO;
           paper.selectedAssignedDate = new Date();
@@ -311,15 +342,18 @@ export class PapersService {
         if (!reviewerUserId) {
           throw new BadRequestException('Reviewer user id is required');
         }
-        const reviewerUser = await this.usersRepository.findById(reviewerUserId);
+        const reviewerUser =
+          await this.usersRepository.findById(reviewerUserId);
         if (!reviewerUser) {
           throw new NotFoundException('Reviewer user not found');
         }
         paper.reviewerUser = reviewerUser;
         break;
       case PaperState.UNDER_REVIEW:
-        if(loginOrigin !== LoginOrigin.BACKOFFICE){
-          throw new UnauthorizedException('Only backoffice can change the state to under review');
+        if (loginOrigin !== LoginOrigin.BACKOFFICE) {
+          throw new UnauthorizedException(
+            'Only backoffice can change the state to under review',
+          );
         }
         if (paper.state !== PaperState.ASSIGNED) {
           throw new BadRequestException({
@@ -327,8 +361,13 @@ export class PapersService {
             message: 'Paper must be assigned to be under review',
           });
         }
-        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
-          throw new UnauthorizedException('Only reviewer or leader can review a paper');
+        if (
+          loggedUser.id !== paper.reviewerUserId &&
+          loggedUser.id !== paper.leaderId
+        ) {
+          throw new UnauthorizedException(
+            'Only reviewer or leader can review a paper',
+          );
         }
         paper.state = state;
         if (isPreSelected) {
@@ -338,8 +377,10 @@ export class PapersService {
         }
         break;
       case PaperState.APPROVED:
-        if(loginOrigin !== LoginOrigin.BACKOFFICE){
-          throw new UnauthorizedException('Only backoffice can change the state to under review');
+        if (loginOrigin !== LoginOrigin.BACKOFFICE) {
+          throw new UnauthorizedException(
+            'Only backoffice can change the state to under review',
+          );
         }
         if (paper.state !== PaperState.UNDER_REVIEW) {
           throw new BadRequestException({
@@ -347,27 +388,39 @@ export class PapersService {
             message: 'Paper must be under review to be approved',
           });
         }
-        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
-          throw new UnauthorizedException('Only reviewer or leader can approve a paper');
+        if (
+          loggedUser.id !== paper.reviewerUserId &&
+          loggedUser.id !== paper.leaderId
+        ) {
+          throw new UnauthorizedException(
+            'Only reviewer or leader can approve a paper',
+          );
         }
         paper.state = state;
         if (isPreSelected) {
           paper.approvedDate = new Date();
         } else {
           if (!type) {
-            throw new BadRequestException('Type is required to approve a paper');
+            throw new BadRequestException(
+              'Type is required to approve a paper',
+            );
           }
           paper.type = type;
           paper.selectedApprovedDate = new Date();
         }
         await this.mailService.sendPaperUpdateStatusEmail({
           paper,
-          to: paper.webUser.email
+          to: paper.webUser.email,
         });
         break;
       case PaperState.DISMISSED:
-        if (loggedUser.id !== paper.reviewerUserId && loggedUser.id !== paper.leaderId) {
-          throw new UnauthorizedException('Only reviewer or leader can dismissed a paper');
+        if (
+          loggedUser.id !== paper.reviewerUserId &&
+          loggedUser.id !== paper.leaderId
+        ) {
+          throw new UnauthorizedException(
+            'Only reviewer or leader can dismissed a paper',
+          );
         }
         paper.state = state;
         paper.dismissedDate = new Date();
@@ -379,7 +432,7 @@ export class PapersService {
         }
         await this.mailService.sendPaperUpdateStatusEmail({
           paper,
-          to: paper.webUser.email
+          to: paper.webUser.email,
         });
         webUser.isActive = false;
         await this.webUsersRepository.repository.save(webUser);
@@ -418,11 +471,15 @@ export class PapersService {
       paperId: paper.id,
       user,
       createdAt: new Date(),
-    }
+    };
     return this.paperCommentsReposiitory.repository.save(comment);
   }
 
-  async updateComment(id: number, commentId: number, updateCommentDto: AddCommentDto) {
+  async updateComment(
+    id: number,
+    commentId: number,
+    updateCommentDto: AddCommentDto,
+  ) {
     console.log('Actualizando comentario ' + commentId + ' del paper ' + id);
     const comment = await this.paperCommentsReposiitory.repository.findOne({
       where: { id: commentId },
@@ -461,7 +518,7 @@ export class PapersService {
     if (!paper) {
       throw new NotFoundException('Paper not found');
     }
-    return paper.authors.map(a => this.paperAuthorToJson(a));
+    return paper.authors.map((a) => this.paperAuthorToJson(a));
   }
 
   paperAuthorToJson(author: PaperAuthor) {
@@ -471,11 +528,11 @@ export class PapersService {
       return {
         ...author,
         country,
-      }
+      };
     }
   }
 
-  async uploadFullFile(id: number, uploadFullFileDto: UploadFullFileDto){
+  async uploadFullFile(id: number, uploadFullFileDto: UploadFullFileDto) {
     const { fullFileUrl } = uploadFullFileDto;
     const paper = await this.papersRepository.repository.findOne({
       where: { id },
