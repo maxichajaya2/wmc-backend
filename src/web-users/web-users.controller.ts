@@ -1,6 +1,7 @@
 import { Controller, Get, Body, Patch, Param, Delete, HttpCode, Post, Query } from '@nestjs/common';
 import { WebUsersService } from './web-users.service';
 import { UpdateWebUserDto } from './dto/update-web-user.dto';
+import { paperMapper } from '../papers/mappers/paper.mapper';
 
 @Controller('web-users')
 export class WebUsersController {
@@ -38,7 +39,8 @@ export class WebUsersController {
   // }
 
   @Get(':id/papers')
-  findEnrollments(@Param('id') id: string) {
-    return this.webUsersService.getPapers(+id);
+  async findEnrollments(@Param('id') id: string) {
+    const papers = await this.webUsersService.getPapers(+id);
+    return papers.map(p => paperMapper(p))
   }
 }
