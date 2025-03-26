@@ -8,6 +8,7 @@ import { AuthGuard } from '../auth/guards/auth.guard';
 import { GlobalGuard } from '../auth/guards/global-guard';
 import { UpdatePaperDto } from './dto/update-paper.dto';
 import { UploadFullFileDto } from './dto/upload-full-file.dto';
+import { RateDto } from './dto/rate.dto';
 
 @Controller('papers')
 export class PapersController {
@@ -88,5 +89,11 @@ export class PapersController {
   @UseGuards(AuthGuard)
   uploadFullFile(@Param('id') id: string, @Body() uploadFullFileDto: UploadFullFileDto) {
     return this.papersService.uploadFullFile(+id, uploadFullFileDto);
+  }
+
+  @Post(':id/rate')
+  @UseGuards(DashboardAuthGuard)
+  rate(@Param('id') id: string, @Body() rateDto: RateDto) {
+    return this.papersService.rate(+id, rateDto);
   }
 }

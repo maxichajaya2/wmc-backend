@@ -175,6 +175,30 @@ export class Paper {
   @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
   correlative: string;
 
+  @Column({ type: 'decimal', nullable: true })
+  phase1Score1?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase1Score2?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase1Score3?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase1Score?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase2Score1?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase2Score2?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase2Score3?: number;
+
+  @Column({ type: 'decimal', nullable: true })
+  phase2Score?: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

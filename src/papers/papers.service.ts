@@ -17,7 +17,7 @@ import { AddCommentDto } from './dto/add-comment.dto';
 import { PaperCommentsRepository } from '../domain/repositories/papers-comments.repository';
 import { PaperComentary } from '../domain/entities/paper-comentary.entity';
 import { PaperAuthorsRepository } from '../domain/repositories/paper-authors.repository';
-import { PaperAuthor } from '../domain/entities/paper-author.entity';
+import { PaperAuthor, PaperAuthorType } from '../domain/entities/paper-author.entity';
 import { CountriesService } from '../common/services/countries.service';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
 import { MailService } from '../common/services/mail.service';
@@ -26,6 +26,8 @@ import { WebUser } from '../domain/entities/web-user.entity';
 import { LoginOrigin } from '../auth/auth.service';
 import { In, Not } from 'typeorm';
 import { UploadFullFileDto } from './dto/upload-full-file.dto';
+import { paperMapper } from './mappers/paper.mapper';
+import { RateDto } from './dto/rate.dto';
 
 @Injectable()
 export class PapersService {
@@ -62,9 +64,11 @@ export class PapersService {
         In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
       );
     }
-    return this.papersRepository.repository.find({
+    const papers = await this.papersRepository.repository.find({
       where,
+      relations: ['authors'],
     });
+    return papers.map(p => paperMapper(p));
   }
 
   async findOne(id: number, { onlyActive } = { onlyActive: false }) {
@@ -544,5 +548,30 @@ export class PapersService {
     await this.papersRepository.repository.save(paper);
     return this.findOne(id);
   }
-  //
+
+  async rate(id: number, rateDto: RateDto){
+    const paper = await this.papersRepository.repository.findOne({
+      where: { id },
+    });
+    if (!paper) {
+      throw new NotFoundException('Paper not found');
+    }
+    const { score1, score2, score3 } = rateDto;
+    const {process: phase, state} = paper;
+    if(phase === Process.PRESELECCIONADO && state === PaperState.UNDER_REVIEW){
+      paper.phase1Score1 = score1;
+      paper.phase1Score2 = score2;
+      paper.phase1Score3 = score3;
+      paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+    } else if(phase === Process.SELECCIONADO && state === PaperState.UNDER_REVIEW){
+      paper.phase2Score1 = score1;
+      paper.phase2Score2 = score2;
+      paper.phase2Score3 = score3;
+      paper.phase2Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+    } else {
+      throw new BadRequestException('Invalid phase or state');
+    }
+    paper.updatedAt = new Date();
+    return this.papersRepository.repository.save(paper);
+  }
 }
