@@ -2,15 +2,52 @@ import { Injectable } from '@nestjs/common';
 import { PapersRepository } from '../domain/repositories/papers.repository';
 
 import { Border, Style, Workbook } from 'exceljs';
-import { paperStateMap, paperTypeMap } from '../domain/entities/paper.entity';
+import {
+  PaperState,
+  paperStateMap,
+  paperTypeMap,
+  Process,
+} from '../domain/entities/paper.entity';
 import { paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Raw } from 'typeorm';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly papersRepository: PapersRepository) {}
 
-  async getPapersReport() {
+  async getPapersReport(filters: {
+    state?: PaperState;
+    reviewerUserId?: number;
+    leaderId?: number;
+    topicId?: number;
+    categoryId?: number;
+    process?: Process;
+    startDate?: string;
+    endDate?: string;
+  }) {
+    const where: any = {};
+
+    if (filters.state) where.state = filters.state;
+    if (filters.reviewerUserId) where.reviewerUserId = filters.reviewerUserId;
+    if (filters.leaderId) where.leaderId = filters.leaderId;
+    if (filters.topicId) where.topicId = filters.topicId;
+    if (filters.categoryId) where.categoryId = filters.categoryId;
+    if (filters.process) where.process = filters.process;
+
+    if (filters.startDate || filters.endDate) {
+      const { startDate, endDate } = filters;
+      if (startDate && endDate) {
+        where.createdAt = Raw(
+          (alias) => `DATE(${alias}) BETWEEN '${startDate}' AND '${endDate}'`,
+        );
+      } else if (startDate) {
+        where.createdAt = Raw((alias) => `DATE(${alias}) >= '${startDate}'`);
+      } else if (endDate) {
+        where.createdAt = Raw((alias) => `DATE(${alias}) <= '${endDate}'`);
+      }
+    }
     const papers = await this.papersRepository.repository.find({
+      where,
       relations: ['webUser', 'category', 'topic', 'authors'],
     });
 
@@ -86,7 +123,7 @@ export class ReportsService {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'FF0AFF96' },
-      }
+      },
     };
     // Estilo para los headers de autor
     const headerAuthorStyle: Partial<Style> = {
@@ -189,10 +226,10 @@ export class ReportsService {
     // Combinar todas las columnas
     worksheet.columns = [...mainColumns, ...authorColumns];
     // COMBINAR LA PRIMERA FILA
-    worksheet.mergeCells(1,1,1, mainColumns.length + maxAuthors * 6);
+    worksheet.mergeCells(1, 1, 1, mainColumns.length + maxAuthors * 6);
     // DARLE NOMBRE A LA CELDA COMBINADA
-    worksheet.getCell(1,1).value = 'REPORTE DE TRABAJOS TÉCNICOS';
-    worksheet.getCell(1,1).style = titleStyle;
+    worksheet.getCell(1, 1).value = 'REPORTE DE TRABAJOS TÉCNICOS';
+    worksheet.getCell(1, 1).style = titleStyle;
 
     // Tercera fila: Headers de autores fusionados
     let colIndex = mainColumns.length + 1; // Inicio de las columnas de autores
