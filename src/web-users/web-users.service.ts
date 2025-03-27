@@ -58,7 +58,7 @@ export class WebUsersService {
       where: {
         id
       },
-      relations: ['papers']
+      relations: ['papers', 'papers.authors']
     });
     if (!webUser) {
       throw new NotFoundException('User not found');

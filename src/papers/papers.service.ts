@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { CreatePaperDto } from './dto/create-paper.dto';
+import { CreateAuthorDto, CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
 import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
 import { PapersRepository } from '../domain/repositories/papers.repository';
@@ -156,7 +156,7 @@ export class PapersService {
       };
       await this.paperAuthorsRepository.repository.save(paperAuthor);
     }
-    return createdPaper;
+    return paperMapper({...createdPaper, authors: authors as PaperAuthor[]}, { withAuthors: true });
   }
 
   async update(id: number, body: UpdatePaperDto) {
@@ -240,7 +240,8 @@ export class PapersService {
       }
     }
 
-    return updatedPaper;
+    // return updatedPaper;
+    return paperMapper({...updatedPaper, authors: authors as PaperAuthor[]}, { withAuthors: true })
   }
 
   async remove(id: number) {
