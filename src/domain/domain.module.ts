@@ -28,6 +28,7 @@ import { Category } from './entities/category.entity';
 import { CategoriesRepository } from './repositories/categories.repository';
 import { Parameter } from './entities/parameter.entity';
 import { ParametersRepository } from './repositories/parameters.repository';
+import { IimpService } from './services/iimp.service';
 
 export const APP_ENTITIES = [
   Category,
@@ -63,6 +64,7 @@ export const APP_ENTITIES = [
     PaperAuthorsRepository,
     CategoriesRepository,
     ParametersRepository,
+    IimpService,
   ],
   exports: [
     UsersRepository,
@@ -80,6 +82,7 @@ export const APP_ENTITIES = [
     PaperAuthorsRepository,
     CategoriesRepository,
     ParametersRepository,
+    IimpService,
   ],
   imports: [
     ConfigModule,

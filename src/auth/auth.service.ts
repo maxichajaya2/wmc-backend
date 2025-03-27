@@ -11,8 +11,9 @@ import { MailService } from '../common/services/mail.service';
 import { CreateWebUserDto } from '../web-users/dto/create-web-user.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { RolesRepository } from '../domain/repositories/roles.repository';
-import { DocumentType } from '../domain/entities/web-user.entity';
+import { DocumentType, WebUser } from '../domain/entities/web-user.entity';
 import { SignInDto } from './dto/sign-in.dto';
+import { IimpService } from '../domain/services/iimp.service';
 
 enum LoginErrors {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
@@ -37,6 +38,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
     private readonly rolesRepository: RolesRepository,
+    private readonly iimpService: IimpService,
   ) { }
 
   private generateJWT(payload: { sub: number, email: string, origin: LoginOrigin }) {
@@ -57,6 +59,20 @@ export class AuthService {
       }
       const isPasswordValid = user.password.trim() === passwordPayload.trim();
       if (!isPasswordValid) {
+        throw new UnauthorizedException({
+          code: LoginErrors.PASSWORD_INVALID,
+          message: 'Invalid password',
+        });
+      }
+      if(!user.isActive){
+        throw new UnauthorizedException({
+          code: LoginErrors.USER_NOT_FOUND,
+          message: 'User is blocked',
+        });
+      }
+      const verifiedIimpResponse = await this.iimpService.verifyCredentials(user);
+      if(!verifiedIimpResponse.ok){
+        console.log('Error al verificar credenciales en IIMP');
         throw new UnauthorizedException({
           code: LoginErrors.PASSWORD_INVALID,
           message: 'Invalid password',
@@ -157,6 +173,21 @@ export class AuthService {
     if (emailExists || !!userByDocument) {
       throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
     }
+    const userModel: WebUser = payload;
+    //handle error
+    const iimpUser = await this.iimpService.register(userModel);
+    if(!iimpUser.ok){
+      console.log('Error al registrar en IIMP');
+      throw new BadRequestException('Error al registrar en IIMP');
+    }
+    const credentials = await this.iimpService.credentialCreate(userModel);
+    if(!credentials.ok){
+      console.log('Error al crear credenciales en IIMP');
+      throw new BadRequestException('Error al crear credenciales en IIMP');
+    }
+    const { password, decrypted_password } = credentials.payload;
+    userModel.iimpPassword = password;
+    userModel.iimpDecryptedPassword = decrypted_password;
     const user = await this.webUsersRepository.create(payload);
     delete VERIFICATION_USER_CACHE[token];
     const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });

@@ -27,6 +27,9 @@ export class WebUser {
   @Column({ nullable: true })
   lastName?: string;
 
+  @Column({ nullable: true })
+  maternalLastName?: string;
+
   @Column({
     type: 'enum',
     enum: DocumentType,
@@ -62,6 +65,12 @@ export class WebUser {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  iimpPassword?: string;
+
+  @Column({ type: 'text', nullable: true })
+  iimpDecryptedPassword?: string;
 
   // @OneToMany(() => Enrollment, enrollment => enrollment.user)
   // enrollments?: Enrollment[];

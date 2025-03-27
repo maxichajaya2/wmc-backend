@@ -10,6 +10,10 @@ export class CreateWebUserDto {
     @IsNotEmpty()
     lastName: string;
 
+    @IsString()
+    @IsOptional()
+    maternalLastName: string;
+
     @IsEnum(DocumentType)
     documentType: DocumentType;
 

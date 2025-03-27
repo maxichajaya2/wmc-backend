@@ -11,7 +11,6 @@ import { WebUsersRepository } from '../domain/repositories/web-users.repository'
 import { CountriesService } from '../common/services/countries.service';
 import { ChangeRegistrationStatusDto } from './dto/change-registration-status.dto';
 import { ChangePaymentStatusDto } from './dto/change-payment-status.dto';
-import { SieService } from './services/sie.service';
 
 @Injectable()
 export class EnrollmentsService {
@@ -24,7 +23,6 @@ export class EnrollmentsService {
     private readonly feeRepository: FeesRepository,
     private readonly webUsersRepository: WebUsersRepository,
     private readonly countriesService: CountriesService,
-    private readonly sieService: SieService,
   ) { }
 
   async create(createEnrollmentDto: CreateEnrollmentDto) {
@@ -198,21 +196,6 @@ export class EnrollmentsService {
     const { status } = changeStatusDto;
     const enrollment = await this.findOne(id);
     console.log(enrollment);
-    if (status === RegistrationStatus.SIE) {
-      const { ok, payload } = await this.sieService.validate({
-        eventTypeCode: enrollment.fee.course.conferenceTypeId,
-        eventCode: enrollment.fee.course.id,
-        documentType: enrollment.user.documentType,
-        documentNumber: enrollment.user.documentNumber,
-      });
-      if (!ok) {
-        throw new BadRequestException({
-          code: 'SIE_VALIDATION_FAILED',
-          message: payload,
-        });
-      }
-      enrollment.registrationNumber = payload;
-    }
     enrollment.registrationStatus = status;
     await this.enrollmentsRepository.repository.update(id, enrollment);
     return enrollment;
