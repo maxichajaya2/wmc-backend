@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PapersRepository } from '../domain/repositories/papers.repository';
 
-import { Border, Style, Workbook } from 'exceljs';
+import { Style, Workbook } from 'exceljs';
 import {
   PaperState,
   paperStateMap,
@@ -9,7 +9,7 @@ import {
   Process,
 } from '../domain/entities/paper.entity';
 import { paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Raw } from 'typeorm';
+import { MoreThanOrEqual, Raw } from 'typeorm';
 
 @Injectable()
 export class ReportsService {
@@ -26,7 +26,8 @@ export class ReportsService {
     endDate?: string;
   }) {
     const where: any = {};
-
+    // siempre excluimos los state con PaperState.REGISTERED
+    where.state = MoreThanOrEqual(PaperState.RECEIVED);
     if (filters.state) where.state = filters.state;
     if (filters.reviewerUserId) where.reviewerUserId = filters.reviewerUserId;
     if (filters.leaderId) where.leaderId = filters.leaderId;
