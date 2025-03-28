@@ -57,7 +57,7 @@ export class AuthService {
           message: 'User not found',
         });
       }
-      const isPasswordValid = user.password.trim() === passwordPayload.trim();
+      const isPasswordValid = user.iimpDecryptedPassword.trim() === passwordPayload.trim();
       if (!isPasswordValid) {
         throw new UnauthorizedException({
           code: LoginErrors.PASSWORD_INVALID,
@@ -150,7 +150,7 @@ export class AuthService {
     const token = uuidv4();
     await this.mailService.sendRegisterLink({ to: email, code: token });
     const value = {
-      payload: preRegisterDto,
+      payload: {...preRegisterDto, password: 'not-needed'},
       expiresAt: (new Date()).getTime() + VERIFICATION_USER_TTL,
     }
     VERIFICATION_USER_CACHE[token] = JSON.stringify(value);

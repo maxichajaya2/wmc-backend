@@ -196,8 +196,8 @@ export class IimpService {
         }>(CREDENTIAL_API, body);
         console.log(`IimpService - verifyCredentials :: ${JSON.stringify({ status })}`);
         console.log(`IimpService - verifyCredentials :: ${JSON.stringify({ data })}`);
-        const { status: bodyStatus } = data;
-        if (bodyStatus) {
+        const { usuario: bodyStatus } = data;
+        if (bodyStatus.autorizacion_datos) {
             console.log('Credentials verified');
             return {
                 ok: true,
