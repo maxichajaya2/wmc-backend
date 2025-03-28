@@ -244,27 +244,71 @@ export class MailService {
 
   async sendPasswordGenerated({ email, password }) {
     const template = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
-                <h1 style="color: #333; text-align: center;">🔑 Acceso a Intranet</h1>
-                <p style="font-size: 16px; color: #555; text-align: center;">
-                    ¡Bienvenido! Hemos generado una contraseña para que puedas acceder a nuestra <strong>Intranet</strong>.
-                </p>
-                <div style="margin: 20px 0; padding: 15px; background-color: #fff; border-left: 4px solid #007BFF; text-align: center;">
-                    <p style="font-size: 16px; color: #555; margin: 0;"><strong>Tu nueva contraseña:</strong></p>
-                    <p style="font-size: 20px; color: #000; font-weight: bold; margin: 5px 0;">${password}</p>
-                </div>
-                <p style="font-size: 16px; color: #555; text-align: center;">
-                    Puedes ingresar a la Intranet haciendo clic en el siguiente botón:
-                </p>
-                <div style="text-align: center; margin-top: 15px;">
-                    <a href="https://forotis.perumin.com"
-                        target="_blank"
-                       style="display: inline-block; padding: 12px 20px; font-size: 16px; color: #fff; background-color: #007BFF; 
-                              text-decoration: none; border-radius: 5px; font-weight: bold;">
-                       Acceder a la Intranet
-                    </a>
-                </div>
-            </div>
+            <div
+      style="
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      "
+    >
+      <div style="text-align: center; padding: 20px 0">
+        <img
+          src="https://forotis.perumin.com/logo.png"
+          alt="PERUMIN 37"
+          style="max-width: 150px"
+        />
+      </div>
+      <h1 style="color: #333; text-align: center">🔑 Acceso a Intranet</h1>
+      <p style="font-size: 16px; color: #555; text-align: center">
+        ¡Bienvenido! Hemos generado una contraseña para que puedas acceder a
+        nuestra
+        <strong>Intranet</strong>
+        .
+      </p>
+      <div
+        style="
+          margin: 20px 0;
+          padding: 15px;
+          background-color: #fff;
+          border-left: 4px solid #007bff;
+          text-align: center;
+        "
+      >
+        <p style="font-size: 16px; color: #555; margin: 0">
+          <strong>Tu nueva contraseña:</strong>
+        </p>
+        <p
+          style="font-size: 20px; color: #000; font-weight: bold; margin: 5px 0"
+        >
+          ${password}
+        </p>
+      </div>
+      <p style="font-size: 16px; color: #555; text-align: center">
+        Puedes ingresar a la Intranet haciendo clic en el siguiente botón:
+      </p>
+      <div style="text-align: center; margin-top: 15px">
+        <a
+          href="https://forotis.perumin.com"
+          target="_blank"
+          style="
+            display: inline-block;
+            padding: 12px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+          "
+        >
+          Acceder a la Intranet
+        </a>
+      </div>
+    </div>
         `;
 
     return this.sendMail({
