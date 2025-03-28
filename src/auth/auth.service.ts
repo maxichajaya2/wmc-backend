@@ -247,7 +247,8 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const updatedUser = await this.webUsersRepository.update(user.id, { password });
+    await this.iimpService.authCredentialUpdate(user, password);
+    const updatedUser = await this.webUsersRepository.update(user.id, { iimpDecryptedPassword: password });
     const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
     return {
       user: updatedUser,

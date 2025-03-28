@@ -72,16 +72,36 @@ export class MailService {
 
   async sendResetPasswordLink({ to, code }) {
     const appUrl = process.env.APP_URL;
-    const url = `${appUrl}/en/reset-password?token=${code}`;
+    const url = `${appUrl}/en/restablecer-contrasena?token=${code}`;
     const template = `
-                <h1>Recupera tu contraseña</h1>
-                <p>Clic <a href="${url}">aquí</a> para resetear tu contraseña</p>
-            `;
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <div style="text-align: center; padding: 20px 0;">
+            <img src="https://forotis.perumin.com/logo.png" alt="PERUMIN 37" style="max-width: 150px;">
+        </div>
+        <h1 style="color: #333; text-align: center;">🔒 Recupera tu contraseña</h1>
+        <p style="font-size: 16px; color: #555; text-align: center;">
+            Para restablecer tu contraseña, haz clic en el siguiente enlace:
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="${url}" target="_blank"
+               style="display: inline-block; padding: 12px 20px; font-size: 16px; color: #fff; background-color: #007BFF; 
+                      text-decoration: none; border-radius: 5px; font-weight: bold;">
+               Restablecer contraseña
+            </a>
+        </div>
+        <p style="font-size: 14px; color: #777; text-align: center;">
+            Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+        </p>
+        <p style="font-size: 14px; color: #007BFF; word-break: break-word; text-align: center;">
+            <a href="${url}" style="color: #007BFF; text-decoration: none;">${url}</a>
+        </p>
+    </div>
+    `;
 
     return this.sendMail({
       to,
       template,
-      subject: 'Recuperación de contraseña',
+      subject: '[PERUMIN 37] - RECUPERACIÓN DE CONTRASEÑA',
     })
       .then(() => {
         console.log(`Link de reset password enviado a ${to}`);
