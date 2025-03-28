@@ -97,9 +97,23 @@ export class MailService {
     console.log({ code });
     const url = `${appUrl}/confirmar-registro?token=${code}`;
     const template = `
-                <h1>Confirmación de registro</h1>
-                <p>Clic <a href="${url}">aquí</a> para su registro.</p>
-            `;
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <h1 style="color: #333; text-align: center;">✅ Confirmación de Registro</h1>
+        <p style="font-size: 16px; color: #555; text-align: center;">
+            ¡Gracias por registrarte! Para completar el proceso, haz clic en el siguiente botón:
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="${url}" style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none; font-size: 18px; padding: 12px 24px; border-radius: 5px;">
+                Confirmar Registro
+            </a>
+        </div>
+        <p style="font-size: 14px; color: #777; text-align: center;">
+            Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+        </p>
+        <p style="font-size: 14px; color: #007BFF; word-break: break-word; text-align: center;">
+            <a href="${url}" style="color: #007BFF; text-decoration: none;">${url}</a>
+        </p>
+    </div>`;
 
     return this.sendMail({
       to,
@@ -137,7 +151,7 @@ export class MailService {
     });
   }
 
-  async sendPasswordGenerated({email, password}) {
+  async sendPasswordGenerated({ email, password }) {
     const template = `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
                 <h1 style="color: #333; text-align: center;">🔑 Acceso a Intranet</h1>
@@ -179,27 +193,48 @@ export class MailService {
   }) {
     const { state, title } = paper;
     let template = `
-            <h1>Actualización de estado de trabajo técnico</h1>
-            <p>El estado de tu trabajo técnico <b>${title}</b> ha sido actualizado a <b>${paperStateMap[state]}</b></p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <h1 style="color: #333; text-align: center;">📢 Actualización de Estado</h1>
+        <p style="font-size: 16px; color: #555; text-align: center;">
+            El estado de tu trabajo técnico <strong style="color: #007BFF;">${title}</strong> ha sido actualizado a:
+        </p>
+        <div style="text-align: center; margin: 20px 0;">
+            <span style="display: inline-block; background-color: #007BFF; color: #fff; font-size: 18px; padding: 8px 16px; border-radius: 5px;">
+                <strong>${paperStateMap[state]}</strong>
+            </span>
+        </div>
+        <p style="font-size: 14px; color: #777; text-align: center; margin-top: 20px;">
+            Para más detalles, por favor revisa tu cuenta en la plataforma.
+        </p>
+    </div>
         `;
 
     if (state === PaperState.RECEIVED) {
       template = `
-            <body style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <p>Estimado participante,</p>
-                
-                <p>Agradecemos su participación en el <strong>Premio Nacional de Minería</strong> y por medio de esta comunicación confirmamos la recepción de su resumen.</p>
-                
-                <p>Estaremos en contacto para darle el resultado de la evaluación.</p>
-                
-                <p>Por favor, cualquier consulta sírvase contactarse por <strong>WhatsApp</strong> al <a href="https://wa.me/51973855242">973855242</a>.</p>
-                
-                <p>Saludos cordiales,</p>
-                
-                <p><strong>Carolina Galarza</strong><br>
-                Coordinadora Foro TIS<br>
-                PERUMIN 37 Convención Minera</p>
-            </body>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
+        <p style="font-size: 16px; color: #555;">Estimado/a participante,</p>
+
+        <p style="font-size: 16px; color: #555;">
+            Agradecemos su participación en el <strong>Premio Nacional de Minería</strong>. Por medio de esta comunicación, confirmamos la recepción de su resumen.
+        </p>
+
+        <p style="font-size: 16px; color: #555;">
+            Estaremos en contacto para informarle sobre el resultado de la evaluación.
+        </p>
+
+        <p style="font-size: 16px; color: #555;">
+            Para cualquier consulta, puede contactarnos por <strong>WhatsApp</strong> al 
+            <a href="https://wa.me/51973855242" style="color: #007BFF; text-decoration: none;">973855242</a>.
+        </p>
+
+        <p style="font-size: 16px; color: #555;">Saludos cordiales,</p>
+
+        <p style="font-size: 16px; color: #000;">
+            <strong>Carolina Galarza</strong><br>
+            Coordinadora Foro TIS<br>
+            <span style="color: #007BFF;">PERUMIN 37 Convención Minera</span>
+        </p>
+    </div>
             `;
     }
 
