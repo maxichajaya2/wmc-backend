@@ -159,9 +159,6 @@ export class MailService {
                        Acceder a la Intranet
                     </a>
                 </div>
-                <p style="font-size: 14px; color: #777; text-align: center; margin-top: 20px;">
-                    Te recomendamos cambiar tu contraseña después de iniciar sesión por primera vez.
-                </p>
             </div>
         `;
 
