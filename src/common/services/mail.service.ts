@@ -72,7 +72,7 @@ export class MailService {
 
   async sendResetPasswordLink({ to, code }) {
     const appUrl = process.env.APP_URL;
-    const url = `${appUrl}/en/restablecer-contrasena?token=${code}`;
+    const url = `${appUrl}/restablecer-contrasena?token=${code}`;
     const template = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
         <div style="text-align: center; padding: 20px 0;">
