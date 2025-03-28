@@ -189,6 +189,8 @@ export class AuthService {
     userModel.iimpPassword = password;
     userModel.iimpDecryptedPassword = decrypted_password;
     const user = await this.webUsersRepository.create(payload);
+    // Enviar correo de bienvenida
+    await this.mailService.sendPasswordGenerated({ email: payload.email, password });
     delete VERIFICATION_USER_CACHE[token];
     const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
     return {
