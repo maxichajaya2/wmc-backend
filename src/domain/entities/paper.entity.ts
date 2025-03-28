@@ -43,6 +43,11 @@ export enum Process{
   SELECCIONADO = 'S',
 }
 
+export const processMap: Record<Process, string> = {
+  P: 'FASE 1',
+  S: 'FASE 2',
+}
+
 @Entity()
 export class Paper {
   @PrimaryGeneratedColumn()

@@ -7,6 +7,7 @@ import {
   paperStateMap,
   paperTypeMap,
   Process,
+  processMap,
 } from '../domain/entities/paper.entity';
 import { paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
 import { MoreThanOrEqual, Raw } from 'typeorm';
@@ -61,13 +62,19 @@ export class ReportsService {
         keywords,
         eventWhere,
         eventDate,
+        eventWhich,
+        process,
         type,
         state,
         authors,
+        receivedDate,
+        approvedDate,
+        selectedApprovedDate
       } = paper;
       const { name: categoryName } = category;
       const { name: topicName } = topic;
-      const phase = paperTypeMap[type];
+      const phase = processMap[process];
+      const typePaper = paperTypeMap[type];
       const stateName = paperStateMap[state];
 
       return {
@@ -79,7 +86,12 @@ export class ReportsService {
         keyWords: keywords.join(', '),
         eventWhere,
         eventDate,
+        eventWhich,
         phase,
+        typePaper,
+        receivedDate,
+        approvedDate,
+        selectedApprovedDate,
         state: stateName,
         authors: authors.map((author) => {
           const {
@@ -203,10 +215,15 @@ export class ReportsService {
       { header: 'TÍTULO', key: 'title', width: 30 },
       { header: 'IDIOMA', key: 'language', width: 10 },
       { header: 'PALABRAS CLAVES', key: 'keyWords', width: 25 },
-      { header: 'EVENTO (LUGAR)', key: 'eventWhere', width: 20 },
+      { header: 'EVENTO (LUGAR)', key: 'eventWhich', width: 20 },
+      { header: 'EVENTO (DONDE)', key: 'eventWhere', width: 20 },
       { header: 'EVENTO (FECHA)', key: 'eventDate', width: 15 },
+      { header: 'FECHA', key: 'receivedDate', width: 15 },
+      { header: 'FECHA PRESELECCION', key: 'approvedDate', width: 15 },
+      { header: 'FECHA SELECCIÓN', key: 'selectedApprovedDate', width: 15 },
       { header: 'FASE', key: 'phase', width: 15 },
       { header: 'ESTADO', key: 'state', width: 15 },
+      { header: 'TIPO SELECCIONADO', key: 'typePaper', width: 15 },
     ];
     // Determinar el número máximo de autores en los datos
     const maxAuthors = Math.max(
