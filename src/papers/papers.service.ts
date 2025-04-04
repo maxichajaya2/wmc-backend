@@ -1,10 +1,9 @@
 import {
-  BadRequestException,
-  Injectable,
+  BadRequestException, Injectable,
   NotFoundException,
-  UnauthorizedException,
+  UnauthorizedException
 } from '@nestjs/common';
-import { CreateAuthorDto, CreatePaperDto } from './dto/create-paper.dto';
+import { CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
 import { Paper, PaperState, Process } from '../domain/entities/paper.entity';
 import { PapersRepository } from '../domain/repositories/papers.repository';
@@ -17,7 +16,9 @@ import { AddCommentDto } from './dto/add-comment.dto';
 import { PaperCommentsRepository } from '../domain/repositories/papers-comments.repository';
 import { PaperComentary } from '../domain/entities/paper-comentary.entity';
 import { PaperAuthorsRepository } from '../domain/repositories/paper-authors.repository';
-import { PaperAuthor, PaperAuthorType } from '../domain/entities/paper-author.entity';
+import {
+  PaperAuthor
+} from '../domain/entities/paper-author.entity';
 import { CountriesService } from '../common/services/countries.service';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
 import { MailService } from '../common/services/mail.service';
@@ -68,7 +69,7 @@ export class PapersService {
       where,
       relations: ['authors'],
     });
-    return papers.map(p => paperMapper(p));
+    return papers.map((p) => paperMapper(p));
   }
 
   async findOne(id: number, { onlyActive } = { onlyActive: false }) {
@@ -122,11 +123,13 @@ export class PapersService {
     }
     const lastRegister = await this.papersRepository.repository
       .createQueryBuilder('paper')
+      .withDeleted()
       .orderBy(
         "CAST(SUBSTRING(paper.correlative FROM '[0-9]+') AS INTEGER)",
         'DESC',
       )
       .getOne();
+
     let correlative = 'TT-1';
     if (lastRegister?.correlative) {
       const parts = lastRegister.correlative.split('-');
@@ -156,7 +159,10 @@ export class PapersService {
       };
       await this.paperAuthorsRepository.repository.save(paperAuthor);
     }
-    return paperMapper({...createdPaper, authors: authors as PaperAuthor[]}, { withAuthors: true });
+    return paperMapper(
+      { ...createdPaper, authors: authors as PaperAuthor[] },
+      { withAuthors: true },
+    );
   }
 
   async update(id: number, body: UpdatePaperDto) {
@@ -213,35 +219,44 @@ export class PapersService {
       for (const currentAuthor of currentAuthors) {
         const found = authors.find((a) => a.id === currentAuthor.id);
         if (!found) {
-          await this.paperAuthorsRepository.repository.softDelete(currentAuthor.id);
+          await this.paperAuthorsRepository.repository.softDelete(
+            currentAuthor.id,
+          );
         }
       }
       for (const author of authors) {
         if (author.id) {
-          const authorModel = await this.paperAuthorsRepository.repository.findOne({
-            where: { id: author.id },
-          });
+          const authorModel =
+            await this.paperAuthorsRepository.repository.findOne({
+              where: { id: author.id },
+            });
           if (!authorModel) {
             throw new NotFoundException('Author not found');
           }
           const newAuthor: PaperAuthor = {
             ...authorModel,
             ...author,
-          }
-          await this.paperAuthorsRepository.repository.update(author.id, newAuthor);
+          };
+          await this.paperAuthorsRepository.repository.update(
+            author.id,
+            newAuthor,
+          );
         } else {
           const newAuthor: PaperAuthor = {
             ...author,
             paper,
             paperId: updatedPaper.id,
-          }
+          };
           await this.paperAuthorsRepository.repository.save(newAuthor);
         }
       }
     }
 
     // return updatedPaper;
-    return paperMapper({...updatedPaper, authors: authors as PaperAuthor[]}, { withAuthors: true })
+    return paperMapper(
+      { ...updatedPaper, authors: authors as PaperAuthor[] },
+      { withAuthors: true },
+    );
   }
 
   async remove(id: number) {
@@ -550,7 +565,7 @@ export class PapersService {
     return this.findOne(id);
   }
 
-  async rate(id: number, rateDto: RateDto){
+  async rate(id: number, rateDto: RateDto) {
     const paper = await this.papersRepository.repository.findOne({
       where: { id },
     });
@@ -558,13 +573,19 @@ export class PapersService {
       throw new NotFoundException('Paper not found');
     }
     const { score1, score2, score3 } = rateDto;
-    const {process: phase, state} = paper;
-    if(phase === Process.PRESELECCIONADO && state === PaperState.UNDER_REVIEW){
+    const { process: phase, state } = paper;
+    if (
+      phase === Process.PRESELECCIONADO &&
+      state === PaperState.UNDER_REVIEW
+    ) {
       paper.phase1Score1 = score1;
       paper.phase1Score2 = score2;
       paper.phase1Score3 = score3;
       paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
-    } else if(phase === Process.SELECCIONADO && state === PaperState.UNDER_REVIEW){
+    } else if (
+      phase === Process.SELECCIONADO &&
+      state === PaperState.UNDER_REVIEW
+    ) {
       paper.phase2Score1 = score1;
       paper.phase2Score2 = score2;
       paper.phase2Score3 = score3;
