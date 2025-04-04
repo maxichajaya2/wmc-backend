@@ -69,10 +69,12 @@ export class ReportsService {
         authors,
         receivedDate,
         approvedDate,
-        selectedApprovedDate
+        selectedApprovedDate,
+        phase1Score,
+        phase2Score,
       } = paper;
-      const { name: categoryName } = category;
-      const { name: topicName } = topic;
+      const { name: categoryName } = category ?? { name: 'Sin Categoria' };
+      const { name: topicName } = topic ?? { name: 'Sin Tema' };
       const phase = processMap[process];
       const typePaper = paperTypeMap[type];
       const stateName = paperStateMap[state];
@@ -93,6 +95,8 @@ export class ReportsService {
         approvedDate,
         selectedApprovedDate,
         state: stateName,
+        phase1Score: phase1Score ?? '--',
+        phase2Score: phase2Score ?? '--',
         authors: authors.map((author) => {
           const {
             name,
@@ -222,6 +226,8 @@ export class ReportsService {
       { header: 'FECHA PRESELECCION', key: 'approvedDate', width: 15 },
       { header: 'FECHA SELECCIÓN', key: 'selectedApprovedDate', width: 15 },
       { header: 'FASE', key: 'phase', width: 15 },
+      { header: 'PUNTAJE FASE 1', key: 'phase1Score', width: 10 },
+      { header: 'PUNTAJE FASE 2', key: 'phase2Score', width: 10 },
       { header: 'ESTADO', key: 'state', width: 15 },
       { header: 'TIPO SELECCIONADO', key: 'typePaper', width: 15 },
     ];
