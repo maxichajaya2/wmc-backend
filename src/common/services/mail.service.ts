@@ -428,19 +428,13 @@ export class MailService {
       <p style="font-size: 16px; color: #555">Estimado/a participante,</p>
 
       <p style="font-size: 16px; color: #555">
-        Agradecemos su participación en el
+        Confirmamos la recepción de su resumen con el cual está ingresando a competir en la convocatoria del
         <strong>Premio Nacional de Minería</strong>
-        . Por medio de esta comunicación, confirmamos la recepción de su
-        resumen.
+        . El comité estará realizando las evaluaciones hasta el 30 de mayo y puede hacer el seguimiento de su participación en el mismo portal de registro ingresando el usuario y contraseña.
       </p>
 
       <p style="font-size: 16px; color: #555">
-        Estaremos en contacto para informarle sobre el resultado de la
-        evaluación.
-      </p>
-
-      <p style="font-size: 16px; color: #555">
-        Para cualquier consulta, puede contactarnos por
+        Para cualquier consulta, puede contactarse al
         <strong>WhatsApp</strong>
         al
         <a
