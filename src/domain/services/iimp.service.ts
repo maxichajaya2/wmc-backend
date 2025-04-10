@@ -213,7 +213,7 @@ export class IimpService {
       `IimpService - verifyCredentials :: ${JSON.stringify({ data })}`,
     );
     const { usuario: bodyStatus } = data;
-    if (bodyStatus.web_access) {
+    if (bodyStatus.web_access || bodyStatus.autorizacion_datos) {
       console.log('Credentials verified');
       return {
         ok: true,
