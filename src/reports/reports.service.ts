@@ -55,6 +55,7 @@ export class ReportsService {
 
     const mappedPapers = papers.map((paper, index) => {
       const {
+        correlative,
         category,
         topic,
         title,
@@ -81,6 +82,7 @@ export class ReportsService {
 
       return {
         number: index + 1,
+        correlative,
         category: categoryName,
         topic: topicName,
         title,
@@ -214,6 +216,7 @@ export class ReportsService {
     // Definir columnas principales
     const mainColumns = [
       { header: 'N°', key: 'number', width: 5 },
+      { header: 'CORRELATIVO', key: 'correlative', width: 5 },
       { header: 'CATEGORÍA', key: 'category', width: 20 },
       { header: 'TEMA', key: 'topic', width: 20 },
       { header: 'TÍTULO', key: 'title', width: 30 },
