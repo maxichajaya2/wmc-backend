@@ -53,7 +53,7 @@ export class Paper {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, unique: true })
   title: string;
 
   @Column({ type: 'text', nullable: true })

@@ -1,7 +1,9 @@
 import {
-  BadRequestException, Injectable,
+  BadRequestException,
+  ConflictException,
+  Injectable,
   NotFoundException,
-  UnauthorizedException
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { UpdatePaperDto } from './dto/update-paper.dto';
@@ -16,9 +18,7 @@ import { AddCommentDto } from './dto/add-comment.dto';
 import { PaperCommentsRepository } from '../domain/repositories/papers-comments.repository';
 import { PaperComentary } from '../domain/entities/paper-comentary.entity';
 import { PaperAuthorsRepository } from '../domain/repositories/paper-authors.repository';
-import {
-  PaperAuthor
-} from '../domain/entities/paper-author.entity';
+import { PaperAuthor } from '../domain/entities/paper-author.entity';
 import { CountriesService } from '../common/services/countries.service';
 import { CategoriesRepository } from '../domain/repositories/categories.repository';
 import { MailService } from '../common/services/mail.service';
@@ -150,19 +150,27 @@ export class PapersService {
       paper.state = PaperState.RECEIVED;
       paper.receivedDate = new Date();
     }
-    const createdPaper = await this.papersRepository.repository.save(paper);
-    for (const author of authors) {
-      const paperAuthor: PaperAuthor = {
-        ...author,
-        paper,
-        paperId: createdPaper.id,
-      };
-      await this.paperAuthorsRepository.repository.save(paperAuthor);
+    try {
+      const createdPaper = await this.papersRepository.repository.save(paper);
+      for (const author of authors) {
+        const paperAuthor: PaperAuthor = {
+          ...author,
+          paper,
+          paperId: createdPaper.id,
+        };
+        await this.paperAuthorsRepository.repository.save(paperAuthor);
+      }
+      return paperMapper(
+        { ...createdPaper, authors: authors as PaperAuthor[] },
+        { withAuthors: true },
+      );
+    } catch (error) {
+      if (error.code === '23505') {
+        // código de error de violación de unique constraint en PostgreSQL
+        throw new ConflictException('El título ya está en uso.');
+      }
+      throw error;
     }
-    return paperMapper(
-      { ...createdPaper, authors: authors as PaperAuthor[] },
-      { withAuthors: true },
-    );
   }
 
   async update(id: number, body: UpdatePaperDto) {
