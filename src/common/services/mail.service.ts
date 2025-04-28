@@ -428,9 +428,9 @@ export class MailService {
       <p style="font-size: 16px; color: #555">Estimado/a participante,</p>
 
       <p style="font-size: 16px; color: #555">
-        Confirmamos la recepción de su resumen con el cual está ingresando a competir en la convocatoria del
+        Confirmamos la recepción de su resumen con el cual está ingresando a competir en la convocatoria de trabajos tecnicos del
         <strong>Premio Nacional de Minería</strong>
-        . El comité estará realizando las evaluaciones hasta el 30 de mayo y puede hacer el seguimiento de su participación en el mismo portal de registro ingresando el usuario y contraseña.
+        . El comité estará realizando las evaluaciones hasta el 13 de junio y puede hacer seguimiento de su participación por el mismo portal ingresando su usuario y contraseña.
       </p>
 
       <p style="font-size: 16px; color: #555">
