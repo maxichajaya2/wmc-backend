@@ -122,6 +122,11 @@ export class ReportsService {
           };
         }),
       };
+    })
+    .sort((a, b) => {
+      const numA = parseInt(a.correlative.match(/\d+/)[0], 10);
+      const numB = parseInt(b.correlative.match(/\d+/)[0], 10);
+      return numA - numB;
     });
 
     const workbook = new Workbook();
