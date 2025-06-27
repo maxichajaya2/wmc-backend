@@ -50,7 +50,7 @@ export class ReportsService {
     }
     const papers = await this.papersRepository.repository.find({
       where,
-      relations: ['webUser', 'category', 'topic', 'authors'],
+      relations: ['webUser', 'category', 'topic', 'authors', 'leader'],
     });
 
     const mappedPapers = papers.map((paper, index) => {
@@ -73,6 +73,8 @@ export class ReportsService {
         selectedApprovedDate,
         phase1Score,
         phase2Score,
+        leader,
+        reviewerUser,
       } = paper;
       const { name: categoryName } = category ?? { name: 'Sin Categoria' };
       const { name: topicName } = topic ?? { name: 'Sin Tema' };
@@ -96,6 +98,8 @@ export class ReportsService {
         receivedDate,
         approvedDate,
         selectedApprovedDate,
+        leader: leader ? `${leader.name}` : '--',
+        reviewer: reviewerUser ? `${reviewerUser.name}` : '--',
         state: stateName,
         phase1Score: phase1Score ?? '--',
         phase2Score: phase2Score ?? '--',
@@ -230,6 +234,9 @@ export class ReportsService {
       { header: 'EVENTO (LUGAR)', key: 'eventWhich', width: 20 },
       { header: 'EVENTO (DONDE)', key: 'eventWhere', width: 20 },
       { header: 'EVENTO (FECHA)', key: 'eventDate', width: 15 },
+      // Agregar lider y revisor
+      { header: 'LÍDER', key: 'leader', width: 20 },
+      { header: 'REVISOR', key: 'reviewer', width: 20 },
       { header: 'FECHA', key: 'receivedDate', width: 15 },
       { header: 'FECHA PRESELECCION', key: 'approvedDate', width: 15 },
       { header: 'FECHA SELECCIÓN', key: 'selectedApprovedDate', width: 15 },
