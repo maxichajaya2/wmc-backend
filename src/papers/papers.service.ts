@@ -308,10 +308,12 @@ export class PapersService {
           }
         }
 
-        await this.mailService.sendPaperUpdateStatusEmail({
-          paper,
-          to: paper.webUser.email,
-        });
+        if (paper.process === Process.PRESELECCIONADO) {
+          await this.mailService.sendPaperUpdateStatusEmail({
+            paper,
+            to: paper.webUser.email,
+          });
+        }
         break;
       case PaperState.SENT:
         if (paper.state !== PaperState.RECEIVED) {
@@ -436,10 +438,12 @@ export class PapersService {
           paper.type = type;
           paper.selectedApprovedDate = new Date();
         }
-        await this.mailService.sendPaperUpdateStatusEmail({
-          paper,
-          to: paper.webUser.email,
-        });
+        if (paper.process === Process.PRESELECCIONADO) {
+          await this.mailService.sendPaperUpdateStatusEmail({
+            paper,
+            to: paper.webUser.email,
+          });
+        }
         break;
       case PaperState.DISMISSED:
         if (
@@ -458,10 +462,12 @@ export class PapersService {
         if (!webUser) {
           throw new NotFoundException('Web User not found');
         }
-        await this.mailService.sendPaperUpdateStatusEmail({
-          paper,
-          to: paper.webUser.email,
-        });
+        if (paper.process === Process.PRESELECCIONADO) {
+          await this.mailService.sendPaperUpdateStatusEmail({
+            paper,
+            to: paper.webUser.email,
+          });
+        }
         webUser.isActive = false;
         await this.webUsersRepository.repository.save(webUser);
         break;
@@ -570,6 +576,9 @@ export class PapersService {
     }
     paper.fullFileUrl = fullFileUrl;
     await this.papersRepository.repository.save(paper);
+    await this.changeStatus(id, {
+      state: PaperState.RECEIVED,
+    });
     return this.findOne(id);
   }
 
