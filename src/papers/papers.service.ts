@@ -79,7 +79,7 @@ export class PapersService {
     }
     const paper = await this.papersRepository.repository.findOne({
       where,
-      relations: ['webUser', 'reviewerUser', 'topic'],
+      relations: ['webUser', 'reviewerUser', 'topic', 'authors'],
     });
     if (!paper) {
       throw new NotFoundException('Paper not found');
