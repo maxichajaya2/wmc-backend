@@ -579,7 +579,8 @@ export class PapersService {
     await this.changeStatus(id, {
       state: PaperState.RECEIVED,
     });
-    return this.findOne(id);
+    const updtPaper = await this.findOne(id);
+    return paperMapper(updtPaper);
   }
 
   async rate(id: number, rateDto: RateDto) {
