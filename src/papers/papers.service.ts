@@ -217,7 +217,7 @@ export class PapersService {
       ...updatePaperDto,
       updatedAt: new Date(),
     };
-    await this.papersRepository.repository.update(id, updatedPaper);
+    await this.papersRepository.repository.save(updatedPaper);
 
     //eliminar autores que no estén en la lista
     const currentAuthors = await this.paperAuthorsRepository.repository.find({
