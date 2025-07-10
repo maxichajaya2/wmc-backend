@@ -45,7 +45,7 @@ export class PapersService {
     private readonly mailService: MailService,
   ) {}
 
-  async findAll({ onlyActive } = { onlyActive: false }) {
+  async findAll({ onlyActive, viewAll } = { onlyActive: false, viewAll: false }) {
     const loggedUser = this.usersService.getLoggedUser();
     const user = await this.usersRepository.findById(loggedUser.id);
     let where = {};
@@ -56,11 +56,15 @@ export class PapersService {
       where['state'] = Not(In([PaperState.REGISTERED]));
     }
     if (user.role.id === RoleCodes.LIDER) {
-      where['leaderId'] = user.id;
+      if (!viewAll) {
+        where['leaderId'] = user.id;
+      }
       where['state'] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
     }
     if (user.role.id === RoleCodes.REVISOR) {
-      where['reviewerUserId'] = user.id;
+      if (!viewAll) {
+        where['reviewerUserId'] = user.id;
+      }
       where['state'] = Not(
         In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
       );

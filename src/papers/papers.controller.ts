@@ -23,8 +23,8 @@ export class PapersController {
   //TODO: Implementar el guard
   @UseGuards(DashboardAuthGuard)
   @Get()
-  findAll(@Query('onlyActive') onlyActive: string) {
-    return this.papersService.findAll({ onlyActive: onlyActive === 'true' });
+  findAll(@Query('onlyActive') onlyActive: string, @Query('viewAll') viewAll: string) {
+    return this.papersService.findAll({ onlyActive: onlyActive === 'true', viewAll: viewAll === 'true' });
   }
 
   //TODO: Implementar el guard
