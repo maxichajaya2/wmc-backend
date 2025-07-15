@@ -9,7 +9,7 @@ import {
   Process,
   processMap,
 } from '../domain/entities/paper.entity';
-import { paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
+import { PaperAuthorType, paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
 import { MoreThanOrEqual, Raw } from 'typeorm';
 
 @Injectable()
@@ -53,85 +53,94 @@ export class ReportsService {
       relations: ['webUser', 'category', 'topic', 'authors', 'leader'],
     });
 
-    const mappedPapers = papers.map((paper, index) => {
-      const {
-        correlative,
-        category,
-        topic,
-        title,
-        language,
-        keywords,
-        eventWhere,
-        eventDate,
-        eventWhich,
-        process,
-        type,
-        state,
-        authors,
-        receivedDate,
-        approvedDate,
-        selectedApprovedDate,
-        phase1Score,
-        phase2Score,
-        leader,
-        reviewerUser,
-      } = paper;
-      const { name: categoryName } = category ?? { name: 'Sin Categoria' };
-      const { name: topicName } = topic ?? { name: 'Sin Tema' };
-      const phase = processMap[process];
-      const typePaper = paperTypeMap[type];
-      const stateName = paperStateMap[state];
+    const mappedPapers = papers
+      .map((paper, index) => {
+        const {
+          correlative,
+          category,
+          topic,
+          title,
+          language,
+          keywords,
+          eventWhere,
+          eventDate,
+          eventWhich,
+          process,
+          type,
+          state,
+          authors,
+          receivedDate,
+          approvedDate,
+          selectedApprovedDate,
+          phase1Score,
+          phase2Score,
+          leader,
+          reviewerUser,
+        } = paper;
+        const { name: categoryName } = category ?? { name: 'Sin Categoria' };
+        const { name: topicName } = topic ?? { name: 'Sin Tema' };
+        const phase = processMap[process];
+        const typePaper = paperTypeMap[type];
+        const stateName = paperStateMap[state];
 
-      return {
-        number: index + 1,
-        correlative,
-        category: categoryName,
-        topic: topicName,
-        title,
-        language,
-        keyWords: keywords.join(', '),
-        eventWhere,
-        eventDate,
-        eventWhich,
-        phase,
-        typePaper,
-        receivedDate,
-        approvedDate,
-        selectedApprovedDate,
-        leader: leader ? `${leader.name}` : '--',
-        reviewer: reviewerUser ? `${reviewerUser.name}` : '--',
-        state: stateName,
-        phase1Score: phase1Score ?? '--',
-        phase2Score: phase2Score ?? '--',
-        authors: authors.map((author) => {
-          const {
-            name,
-            middle,
-            last,
-            remissive,
-            institution,
-            cellphone,
-            email,
-            type,
-          } = author;
-          const fullName = `${name} ${middle} ${last}`;
-          const typeName = paperAuthorTypeMap[type];
-          return {
-            name: fullName,
-            remissive,
-            institution,
-            cellphone,
-            email,
-            type: typeName,
-          };
-        }),
-      };
-    })
-    .sort((a, b) => {
-      const numA = parseInt(a.correlative.match(/\d+/)[0], 10);
-      const numB = parseInt(b.correlative.match(/\d+/)[0], 10);
-      return numA - numB;
-    });
+        return {
+          number: index + 1,
+          correlative,
+          category: categoryName,
+          topic: topicName,
+          title,
+          language,
+          keyWords: keywords.join(', '),
+          eventWhere,
+          eventDate,
+          eventWhich,
+          phase,
+          typePaper,
+          receivedDate,
+          approvedDate,
+          selectedApprovedDate,
+          leader: leader ? `${leader.name}` : '--',
+          reviewer: reviewerUser ? `${reviewerUser.name}` : '--',
+          state: stateName,
+          phase1Score: phase1Score ?? '--',
+          phase2Score: phase2Score ?? '--',
+          authors: authors
+            .sort((a, b) => {
+              if (a.type === PaperAuthorType.AUTOR && b.type !== PaperAuthorType.AUTOR)
+                return -1;
+              if (a.type !== PaperAuthorType.AUTOR && b.type === PaperAuthorType.AUTOR)
+                return 1;
+              return 0;
+            })
+            .map((author) => {
+              const {
+                name,
+                middle,
+                last,
+                remissive,
+                institution,
+                cellphone,
+                email,
+                type,
+              } = author;
+              const fullName = `${name} ${middle} ${last}`;
+              const typeName = paperAuthorTypeMap[type];
+              return {
+                name: fullName,
+                remissive,
+                institution,
+                cellphone,
+                email,
+                type: typeName,
+              };
+            }),
+        };
+      })
+      .sort((a, b) => {
+        const numA = parseInt(a.correlative.match(/\d+/)[0], 10);
+        const numB = parseInt(b.correlative.match(/\d+/)[0], 10);
+        return numA - numB;
+      });
 
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet('Trabajos Técnicos');
