@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { DashboardSignInDto } from './dto/dashboard-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -14,6 +19,7 @@ import { RolesRepository } from '../domain/repositories/roles.repository';
 import { DocumentType, WebUser } from '../domain/entities/web-user.entity';
 import { SignInDto } from './dto/sign-in.dto';
 import { IimpService } from '../domain/services/iimp.service';
+import e = require('express');
 
 enum LoginErrors {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
@@ -39,46 +45,65 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly rolesRepository: RolesRepository,
     private readonly iimpService: IimpService,
-  ) { }
+  ) {}
 
-  private generateJWT(payload: { sub: number, email: string, origin: LoginOrigin }) {
+  private generateJWT(payload: {
+    sub: number;
+    email: string;
+    origin: LoginOrigin;
+  }) {
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
-    })
+    });
   }
 
-  async signIn({ documentType, documentNumber, password: passwordPayload }: SignInDto): Promise<LoginResponse> {
+  async signIn({
+    documentType,
+    documentNumber,
+    password: passwordPayload,
+  }: SignInDto): Promise<LoginResponse> {
     try {
-      console.debug(`Sign in web user attempt for ${documentType} ${documentNumber}`);
-      const user = await this.webUsersRepository.findByDocument({ documentType, documentNumber });
+      console.debug(
+        `Sign in web user attempt for ${documentType} ${documentNumber}`,
+      );
+      const user = await this.webUsersRepository.findByDocument({
+        documentType,
+        documentNumber,
+      });
       if (!user) {
         throw new UnauthorizedException({
           code: LoginErrors.USER_NOT_FOUND,
           message: 'User not found',
         });
       }
-      const isPasswordValid = user.iimpDecryptedPassword.trim() === passwordPayload.trim();
+      const isPasswordValid =
+        user.iimpDecryptedPassword.trim() === passwordPayload.trim();
       if (!isPasswordValid) {
         throw new UnauthorizedException({
           code: LoginErrors.PASSWORD_INVALID,
           message: 'Invalid password',
         });
       }
-      if(!user.isActive){
+      if (!user.isActive) {
         throw new UnauthorizedException({
           code: LoginErrors.USER_NOT_FOUND,
           message: 'User is blocked',
         });
       }
-      const verifiedIimpResponse = await this.iimpService.verifyCredentials(user);
-      if(!verifiedIimpResponse.ok){
+      const verifiedIimpResponse =
+        await this.iimpService.verifyCredentials(user);
+      if (!verifiedIimpResponse.ok) {
         console.log('Error al verificar credenciales en IIMP');
         throw new UnauthorizedException({
           code: LoginErrors.PASSWORD_INVALID,
           message: 'Invalid password',
         });
       }
-      const payload = { sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND };
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        origin: LoginOrigin.FRONTEND,
+      };
       try {
         const token = await this.generateJWT(payload);
         return {
@@ -95,7 +120,10 @@ export class AuthService {
     }
   }
 
-  async dashboardSignIn({ email, password: passwordPayload }: DashboardSignInDto): Promise<DashbaordLoginResponse> {
+  async dashboardSignIn({
+    email,
+    password: passwordPayload,
+  }: DashboardSignInDto): Promise<DashbaordLoginResponse> {
     try {
       console.debug(`Sign in attempt for ${email}`);
       const user = await this.usersRepository.findByEmail(email);
@@ -114,7 +142,11 @@ export class AuthService {
           message: 'Invalid password',
         });
       }
-      const payload = { sub: user.id, email: user.email, origin: LoginOrigin.BACKOFFICE };
+      const payload = {
+        sub: user.id,
+        email: user.email,
+        origin: LoginOrigin.BACKOFFICE,
+      };
       try {
         const token = await this.generateJWT(payload);
         return {
@@ -137,26 +169,34 @@ export class AuthService {
   }
 
   async preRegister(preRegisterDto: CreateWebUserDto) {
-    const emailRegex = new RegExp('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    const emailRegex = new RegExp(
+      '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     if (!emailRegex.test(preRegisterDto.email)) {
       throw new BadRequestException('Email no válido');
     }
     const { email, documentType, documentNumber } = preRegisterDto;
-    const userByDocument = await this.webUsersRepository.findByDocument({ documentType, documentNumber });
+    const userByDocument = await this.webUsersRepository.findByDocument({
+      documentType,
+      documentNumber,
+    });
     const emailExists = await this.webUserEmailAlreadyExists(email);
     if (emailExists || !!userByDocument) {
-      throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
+      throw new BadRequestException(
+        APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS],
+      );
     }
     const token = uuidv4();
     await this.mailService.sendRegisterLink({ to: email, code: token });
     const value = {
-      payload: {...preRegisterDto, password: 'not-needed'},
-      expiresAt: (new Date()).getTime() + VERIFICATION_USER_TTL,
-    }
+      // payload: { ...preRegisterDto, password: 'not-needed' },
+      payload: { ...preRegisterDto },
+      expiresAt: new Date().getTime() + VERIFICATION_USER_TTL,
+    };
     VERIFICATION_USER_CACHE[token] = JSON.stringify(value);
     return {
       token: process.env.SEND_MAIL_NOTIFICATIONS === 'false' ? token : null,
-    }
+    };
   }
 
   async register(token: string) {
@@ -165,38 +205,96 @@ export class AuthService {
       throw new BadRequestException(APP_ERRORS[ERROR_CODES.INVALID_OTP]);
     }
     const { payload, expiresAt } = JSON.parse(value);
-    if ((new Date()).getTime() > expiresAt) {
+    if (new Date().getTime() > expiresAt) {
       throw new BadRequestException('Token expired');
     }
     const emailExists = await this.webUserEmailAlreadyExists(payload.email);
-    const userByDocument = await this.webUsersRepository.findByDocument({ documentType: payload.documentType, documentNumber: payload.documentNumber });
+    const userByDocument = await this.webUsersRepository.findByDocument({
+      documentType: payload.documentType,
+      documentNumber: payload.documentNumber,
+    });
     if (emailExists || !!userByDocument) {
-      throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
+      throw new BadRequestException(
+        APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS],
+      );
     }
     const userModel: WebUser = payload;
     //handle error
+
+    /***  REGISTRO IIMP ***/
     const iimpUser = await this.iimpService.register(userModel);
-    if(!iimpUser.ok){
+
+    if (!iimpUser.ok) {
       console.log('Error al registrar en IIMP');
-      throw new BadRequestException('Error al registrar en IIMP');
+      // throw new BadRequestException('Error al registrar en IIMP');
+      throw new BadRequestException({
+        ok: false,
+        code: 'IIMP_REGISTER_FAILED',
+        message: 'No se pudo registrar el usuario en el sistema IIMP.',
+      });
     }
+
+    let password = '';
+    let decryptedPassword = '';
+
+    /*** CREDENCIALES IIMP  ***/
     const credentials = await this.iimpService.credentialCreate(userModel);
-    if(!credentials.ok){
-      console.log('Error al crear credenciales en IIMP');
-      throw new BadRequestException('Error al crear credenciales en IIMP');
+
+    if (!credentials.ok) {
+      const newPassword = await this.iimpService.authCredentialUpdate(
+        userModel,
+        payload.password,
+      );
+      if (!newPassword.ok) {
+        throw new BadRequestException('Error al crear credenciales en IIMP');
+      }
+      const existUser = await this.iimpService.passwordConsult(
+        payload.documentType,
+        payload.documentNumber,
+      );
+
+      if (existUser.ok) {
+        const { raw } = existUser.payload;
+
+        password = raw?.usuario?.password ?? raw?.password;
+        decryptedPassword =
+          raw?.usuario?.decrypted_password ?? raw?.decrypted_password;
+      } else {
+        throw new BadRequestException({
+          ok: false,
+          code: 'IIMP_USER_NOT_FOUND',
+          message: 'No se encontraron las credenciales en IIMP.',
+        });
+      }
+    } else {
+      password = credentials.payload.password;
+      decryptedPassword = credentials.payload.decrypted_password;
     }
-    const { password, decrypted_password } = credentials.payload;
+
+    // const { password, decrypted_password } = credentials.payload;
     userModel.iimpPassword = password;
-    userModel.iimpDecryptedPassword = decrypted_password;
+    userModel.iimpDecryptedPassword = decryptedPassword;
+    payload.iimpPassword = password;
+    payload.iimpDecryptedPassword = decryptedPassword;
+    // const user = await this.webUsersRepository.create(payload);
     const user = await this.webUsersRepository.create(payload);
     // Enviar correo de bienvenida
-    await this.mailService.sendPasswordGenerated({ email: payload.email, password: decrypted_password });
+    await this.mailService.sendPasswordGenerated({
+      email: payload.email,
+      password: decryptedPassword,
+    });
     delete VERIFICATION_USER_CACHE[token];
-    const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
+    const jwt = await this.generateJWT({
+      sub: user.id,
+      email: user.email,
+      origin: LoginOrigin.FRONTEND,
+    });
     return {
+      ok: true,
+      message: 'Registro exitoso. Revise su correo electrónico.',
       user,
       token: jwt,
-    }
+    };
   }
 
   private async webUserEmailAlreadyExists(email: string) {
@@ -227,7 +325,7 @@ export class AuthService {
     return {
       message: 'OTP sent successfully',
       token,
-    }
+    };
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
@@ -240,7 +338,7 @@ export class AuthService {
     delete VERIFICATION_USER_CACHE[token];
     const { payload, expiresAt } = JSON.parse(value);
     const { email } = payload;
-    if ((new Date()).getTime() > expiresAt) {
+    if (new Date().getTime() > expiresAt) {
       throw new BadRequestException('Token expired');
     }
     const user = await this.webUsersRepository.findByEmail(email);
@@ -248,11 +346,17 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
     await this.iimpService.authCredentialUpdate(user, password);
-    const updatedUser = await this.webUsersRepository.update(user.id, { iimpDecryptedPassword: password });
-    const jwt = await this.generateJWT({ sub: user.id, email: user.email, origin: LoginOrigin.FRONTEND });
+    const updatedUser = await this.webUsersRepository.update(user.id, {
+      iimpDecryptedPassword: password,
+    });
+    const jwt = await this.generateJWT({
+      sub: user.id,
+      email: user.email,
+      origin: LoginOrigin.FRONTEND,
+    });
     return {
       user: updatedUser,
       token: jwt,
-    }
+    };
   }
 }

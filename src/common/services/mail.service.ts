@@ -76,7 +76,7 @@ export class MailService {
     const template = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
         <div style="text-align: center; padding: 20px 0;">
-            <img src="https://forotis.perumin.com/logo.png" alt="PERUMIN 37" style="max-width: 150px;">
+            <img src="https://forotis.perumin.com/img/logo-proexplo.png" alt="PROEXPLO2025" style="max-width: 150px;">
         </div>
         <h1 style="color: #333; text-align: center;">🔒 Recupera tu contraseña</h1>
         <p style="font-size: 16px; color: #555; text-align: center;">
@@ -101,7 +101,7 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - RECUPERACIÓN DE CONTRASEÑA',
+      subject: '[PROEXPLO 2025] - RECUPERACIÓN DE CONTRASEÑA',
     })
       .then(() => {
         console.log(`Link de reset password enviado a ${to}`);
@@ -130,21 +130,18 @@ export class MailService {
     >
       <div style="text-align: center; padding: 20px 0">
         <img
-          src="https://forotis.perumin.com/logo.png"
-          alt="PERUMIN 37"
+          src="https://forotis.perumin.com/img/logo-proexplo.png"
+          alt="PROEXPLO 2025"
           style="max-width: 150px"
         />
       </div>
       <h1 style="color: #333; text-align: center">
-        [PERUMIN 37] - CONFIRMACIÓN DE REGISTRO
+        [PROEXPLO 2025] - CONFIRMACIÓN DE REGISTRO
       </h1>
 
       <p style="font-size: 16px; color: #555; text-align: center">
-        Bienvenido a la plataforma de presentación de Trabajos Técnicos para el
-        <strong>FORO TIS</strong>
-        en
-        <strong>PERUMIN 37 Convención Minera</strong>
-        .
+        Bienvenido a la plataforma de presentación de Trabajos Técnicos para
+        <strong>PROEXPLO 2025</strong>.
       </p>
 
       <p style="font-size: 16px; color: #555; text-align: center">
@@ -190,7 +187,7 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - CONFIRMACIÓN DE REGISTRO',
+      subject: '[PROEXPLO2025] - CONFIRMACIÓN DE REGISTRO',
     })
       .then(() => {
         console.log(`Link de registro enviado a ${to}`);
@@ -217,8 +214,8 @@ export class MailService {
     >
       <div style="text-align: center; padding: 20px 0">
         <img
-          src="https://forotis.perumin.com/logo.png"
-          alt="PERUMIN 37"
+          src="https://forotis.perumin.com/img/logo-proexplo.png"
+          alt="PROEXPLO2025"
           style="max-width: 150px"
         />
       </div>
@@ -257,7 +254,7 @@ export class MailService {
     return this.sendMail({
       to: email,
       template,
-      subject: '[PERUMIN 37] - Contacto',
+      subject: '[PROEXPLO2025] - Contacto',
       bcc: true,
     });
   }
@@ -277,8 +274,8 @@ export class MailService {
     >
       <div style="text-align: center; padding: 20px 0">
         <img
-          src="https://forotis.perumin.com/logo.png"
-          alt="PERUMIN 37"
+          src="https://forotis.perumin.com/img/logo-proexplo.png"
+          alt="PROEXPLO 2025"
           style="max-width: 150px"
         />
       </div>
@@ -334,7 +331,7 @@ export class MailService {
     return this.sendMail({
       to: email,
       template,
-      subject: '[PERUMIN 37] - Acceso a la Intranet',
+      subject: '[PROEXPLO2025] - Acceso a la Intranet',
       bcc: true,
     });
   }
@@ -361,8 +358,8 @@ export class MailService {
     >
       <div style="text-align: center; padding: 20px 0">
         <img
-          src="https://forotis.perumin.com/logo.png"
-          alt="PERUMIN 37"
+          src="https://forotis.perumin.com/img/logo-proexplo.png"
+          alt="PROEXPLO 2025"
           style="max-width: 150px"
         />
       </div>
@@ -419,8 +416,8 @@ export class MailService {
     >
       <div style="text-align: center; padding: 20px 0">
         <img
-          src="https://forotis.perumin.com/logo.png"
-          alt="PERUMIN 37"
+          src="https://forotis.perumin.com/img/logo-proexplo.png"
+          alt="PROEXPLO 2025"
           style="max-width: 150px"
         />
       </div>
@@ -451,9 +448,9 @@ export class MailService {
       <p style="font-size: 16px; color: #000">
         <strong>Carolina Galarza</strong>
         <br />
-        Coordinadora Foro TIS
+        Coordinadora PROEXPLO 2025
         <br />
-        <span style="color: #007bff">PERUMIN 37 Convención Minera</span>
+        <span style="color: #007bff">PROEXPLO 2025</span>
       </p>
     </div>
             `;
@@ -462,7 +459,7 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - Actualización de estado de trabajo técnico',
+      subject: '[PROEXPLO 2025] - Actualización de estado de trabajo técnico',
     })
       .then(() => {
         console.log(

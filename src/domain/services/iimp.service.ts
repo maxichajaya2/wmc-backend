@@ -154,6 +154,127 @@ export class IimpService {
     };
   }
 
+  // async passwordConsult(
+  //   documentType: string, // código IIMP: "1","2",...
+  //   documentNumber: string,
+  // ): Promise<
+  //   ServiceResponse<{
+  //     email: string;
+  //     decrypted_password: string;
+  //     estado: string;
+  //     personId: number;
+  //   } | null>
+  // > {
+  //   const { id_event, siecode_event } =
+  //     await this.parametersRepository.getEventParameters();
+
+  //   const body = {
+  //     ipAddress: '200.37.185.4',
+  //     event: 'perumin',
+  //     accessKey: '$2y$10EoqWZuIEQ4vnwtm2IU3bruqmBD9yDiLrdIGNTHnSIRgAAatpBE9YK',
+  //     serviceKey: 'auth_events',
+  //     id_event,
+  //     siecode_event,
+  //     data: {
+  //       service: 'password_consult',
+  //       id_tipo_documento: '1', // ← usa lo que te pasan
+  //       documento: '70921145', // ← usa lo que te pasan
+  //       evento_nombre: 'perumin 37',
+  //     },
+  //   };
+
+  //   const { data } = await axios.post<{
+  //     status: boolean;
+  //     message: string;
+  //     usuario?: {
+  //       id_persona: number;
+  //       documento: string;
+  //       correo: string;
+  //       password: string;
+  //       decrypted_password: string;
+  //       estado: string;
+  //     };
+  //   }>(CREDENTIAL_API, body);
+
+  //   // Existe si status === true, tenga o no 'usuario'
+  //   if (data?.status === true) {
+  //     const u = data.usuario;
+  //     return {
+  //       ok: true,
+  //       payload: u
+  //         ? {
+  //             email: u.correo,
+  //             decrypted_password: u.decrypted_password,
+  //             estado: u.estado,
+  //             personId: u.id_persona,
+  //           }
+  //         : null, // existe pero el servicio no mandó 'usuario'
+  //     };
+  //   }
+
+  //   return { ok: false, payload: null };
+  // }
+
+  async passwordConsult(
+  documentType: string, // código IIMP: "1","2",...
+  documentNumber: string,
+): Promise<
+  ServiceResponse<{
+    email?: string;
+    decrypted_password?: string;
+    estado?: string;
+    personId?: number;
+    raw?: any; // <-- para incluir toda la data cruda
+  } | null>
+> {
+  const { id_event, siecode_event } =
+    await this.parametersRepository.getEventParameters();
+
+  const body = {
+    ipAddress: '200.37.185.4',
+    event: 'perumin',
+    accessKey: '$2y$10EoqWZuIEQ4vnwtm2IU3bruqmBD9yDiLrdIGNTHnSIRgAAatpBE9YK',
+    serviceKey: 'auth_events',
+    id_event,
+    siecode_event,
+    data: {
+      service: 'password_consult',
+      id_tipo_documento: documentType, // ← usa lo que te pasan
+      documento: documentNumber, // ← usa lo que te pasan
+      evento_nombre: 'perumin 37',
+    },
+  };
+
+  const { data } = await axios.post<{
+    status: boolean;
+    message: string;
+    usuario?: {
+      id_persona: number;
+      documento: string;
+      correo: string;
+      password: string;
+      decrypted_password: string;
+      estado: string;
+    };
+  }>(CREDENTIAL_API, body);
+
+  // 🔍 Devuelve toda la respuesta para inspeccionarla
+  return {
+    ok: data?.status ?? false,
+    payload: data?.usuario
+      ? {
+          email: data.usuario.correo,
+          decrypted_password: data.usuario.decrypted_password,
+          estado: data.usuario.estado,
+          personId: data.usuario.id_persona,
+          raw: data, // <--- toda la respuesta completa del IIMP
+        }
+      : {
+          raw: data, // <--- incluso si no hay 'usuario', igual lo devuelves
+        },
+  };
+}
+
   async verifyCredentials(
     webUser: WebUser,
   ): Promise<ServiceResponse<ValidateSieResponse>> {
