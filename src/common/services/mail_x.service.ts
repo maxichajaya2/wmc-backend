@@ -52,20 +52,20 @@ export class MailService {
 
   async sendVerificationCode({ to, code }) {
     const template = `
-                <h1>Código de verificación</h1>
-                <p>Your Código de verificación is: <b>${code}</b></p>
+                <h1>Verification code</h1>
+                <p>Your verification code is: <b>${code}</b></p>
             `;
 
     return this.sendMail({
       to,
       template,
-      subject: 'Código de verificación',
+      subject: 'Verification code',
     })
       .then(() => {
-        console.log(`Código de verificación sent to ${to}`);
+        console.log(`Verification code sent to ${to}`);
       })
       .catch((error) => {
-        console.error(`Error sending código de verificación to ${to}`);
+        console.error(`Error sending verification code to ${to}`);
         console.error(error.message);
       });
   }
@@ -78,19 +78,19 @@ export class MailService {
         <div style="text-align: center; padding: 20px 0;">
             <img src="https://forotis.perumin.com/logo.png" alt="PERUMIN 37" style="max-width: 150px;">
         </div>
-        <h1 style="color: #333; text-align: center;">🔒 Recupera tu contraseña</h1>
+        <h1 style="color: #333; text-align: center;">🔒 Recover your password</h1>
         <p style="font-size: 16px; color: #555; text-align: center;">
-            Para restablecer tu contraseña, haz clic en el siguiente enlace:
+            To recover your password, click on the following link:
         </p>
         <div style="text-align: center; margin: 20px 0;">
             <a href="${url}" target="_blank"
                style="display: inline-block; padding: 12px 20px; font-size: 16px; color: #fff; background-color: #007BFF; 
                       text-decoration: none; border-radius: 5px; font-weight: bold;">
-               Restablecer contraseña
+               Reset password
             </a>
         </div>
         <p style="font-size: 14px; color: #777; text-align: center;">
-            Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+            If the button doesn't work, copy and paste the following link into your browser:
         </p>
         <p style="font-size: 14px; color: #007BFF; word-break: break-word; text-align: center;">
             <a href="${url}" style="color: #007BFF; text-decoration: none;">${url}</a>
@@ -101,7 +101,7 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - RECUPERACIÓN DE CONTRASEÑA',
+      subject: '[World Mining Congress] - RECUPERACIÓN DE CONTRASEÑA',
     })
       .then(() => {
         console.log(`Link de reset password enviado a ${to}`);
@@ -136,20 +136,19 @@ export class MailService {
         />
       </div>
       <h1 style="color: #333; text-align: center">
-        [PERUMIN 37] - CONFIRMACIÓN DE REGISTRO
+        [WMC] - REGISTRATION CONFIRMATION
       </h1>
 
       <p style="font-size: 16px; color: #555; text-align: center">
-        Bienvenido a la plataforma de presentación de Trabajos Técnicos para el
-        <strong>FORO TIS</strong>
+        Welcome to the platform for submitting Technical Papers for the
+        <strong>WMC</strong>
         en
-        <strong>PERUMIN 37 Convención Minera</strong>
+        <strong>WORLD MINING CONGRESS</strong>
         .
       </p>
 
       <p style="font-size: 16px; color: #555; text-align: center">
-        Para confirmar su registro y acceder a la plataforma, haga clic en el
-        siguiente botón:
+        To confirm your registration and access the platform, click on the following button:
       </p>
 
       <div style="text-align: center; margin: 20px 0">
@@ -165,13 +164,12 @@ export class MailService {
             border-radius: 5px;
           "
         >
-          Confirmar Registro
+          Confirm Registration
         </a>
       </div>
 
       <p style="font-size: 14px; color: #777; text-align: center">
-        Si el botón no funciona, copie y pegue el siguiente enlace en su
-        navegador:
+        If the button doesn't work, copy and paste the following link into your browser:
       </p>
       <p
         style="
@@ -190,7 +188,7 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - CONFIRMACIÓN DE REGISTRO',
+      subject: '[WMC] - REGISTRATION CONFIRMATION',
     })
       .then(() => {
         console.log(`Link de registro enviado a ${to}`);
@@ -222,10 +220,10 @@ export class MailService {
           style="max-width: 150px"
         />
       </div>
-      <h1 style="color: #333; text-align: center">📩 Contacto</h1>
+      <h1 style="color: #333; text-align: center">📩 Contact</h1>
 
       <p style="font-size: 16px; color: #555">
-        <strong>Nombre:</strong>
+        <strong>Name:</strong>
         <span style="color: #000">${name}</span>
       </p>
       <p style="font-size: 16px; color: #555">
@@ -235,7 +233,7 @@ export class MailService {
         </a>
       </p>
       <p style="font-size: 16px; color: #555">
-        <strong>Teléfono:</strong>
+        <strong>Phone:</strong>
         <span style="color: #000">${phone}</span>
       </p>
 
@@ -248,7 +246,7 @@ export class MailService {
         "
       >
         <p style="font-size: 16px; color: #555; margin: 0">
-          <strong>Mensaje:</strong>
+          <strong>Message:</strong>
         </p>
         <p style="font-size: 16px; color: #000; margin: 5px 0">${message}</p>
       </div>
@@ -257,7 +255,7 @@ export class MailService {
     return this.sendMail({
       to: email,
       template,
-      subject: '[PERUMIN 37] - Contacto',
+      subject: '[WMC] - Contact',
       bcc: true,
     });
   }
@@ -282,10 +280,9 @@ export class MailService {
           style="max-width: 150px"
         />
       </div>
-      <h1 style="color: #333; text-align: center">🔑 Acceso a Intranet</h1>
+      <h1 style="color: #333; text-align: center">🔑 Intranet access</h1>
       <p style="font-size: 16px; color: #555; text-align: center">
-        ¡Bienvenido! Hemos generado una contraseña para que puedas acceder a
-        nuestra
+        Welcome! We have generated a password for you to access our
         <strong>Intranet</strong>
         .
       </p>
@@ -299,7 +296,7 @@ export class MailService {
         "
       >
         <p style="font-size: 16px; color: #555; margin: 0">
-          <strong>Tu nueva contraseña:</strong>
+          <strong>Your new password:</strong>
         </p>
         <p
           style="font-size: 20px; color: #000; font-weight: bold; margin: 5px 0"
@@ -308,7 +305,7 @@ export class MailService {
         </p>
       </div>
       <p style="font-size: 16px; color: #555; text-align: center">
-        Puedes ingresar a la Intranet haciendo clic en el siguiente botón:
+        You can access the Intranet by clicking on the following button:
       </p>
       <div style="text-align: center; margin-top: 15px">
         <a
@@ -325,7 +322,7 @@ export class MailService {
             font-weight: bold;
           "
         >
-          Acceder a la Intranet
+          Access the Intranet
         </a>
       </div>
     </div>
@@ -334,7 +331,7 @@ export class MailService {
     return this.sendMail({
       to: email,
       template,
-      subject: '[PERUMIN 37] - Acceso a la Intranet',
+      subject: '[WMC] - Intranet access',
       bcc: true,
     });
   }
@@ -367,13 +364,13 @@ export class MailService {
         />
       </div>
       <h1 style="color: #333; text-align: center">
-        📢 Actualización de Estado
+        📢 Status Update
       </h1>
 
       <p style="font-size: 16px; color: #555; text-align: center">
-        El estado de tu trabajo técnico
+        The status of your technical work
         <strong style="color: #007bff">${title}</strong>
-        ha sido actualizado a:
+        has been updated to:
       </p>
 
       <div style="text-align: center; margin: 20px 0">
@@ -399,7 +396,7 @@ export class MailService {
           margin-top: 20px;
         "
       >
-        Para más detalles, por favor revisa tu cuenta en la plataforma.
+        For more details, please check your account on the platform.
       </p>
     </div>
         `;
@@ -425,18 +422,18 @@ export class MailService {
         />
       </div>
 
-      <p style="font-size: 16px; color: #555">Estimado/a participante,</p>
+      <p style="font-size: 16px; color: #555">Dear participant,</p>
 
       <p style="font-size: 16px; color: #555">
-        Confirmamos la recepción de su resumen con el cual está ingresando a competir en la convocatoria de trabajos tecnicos del
-        <strong>Premio Nacional de Minería</strong>
-        . El comité estará realizando las evaluaciones hasta el 13 de junio y puede hacer seguimiento de su participación por el mismo portal ingresando su usuario y contraseña.
+        We confirm the receipt of your summary with which you are entering to compete in the call for technical papers of the
+        <strong>National Mining Award</strong>
+        . The committee will be evaluating until June 13 and you can follow up on your participation through the same portal by entering your username and password.
       </p>
 
       <p style="font-size: 16px; color: #555">
-        Para cualquier consulta, puede contactarse al
+        For any inquiries, you can contact
         <strong>WhatsApp</strong>
-        al
+        at
         <a
           href="https://wa.me/51973855242"
           style="color: #007bff; text-decoration: none"
@@ -446,14 +443,14 @@ export class MailService {
         .
       </p>
 
-      <p style="font-size: 16px; color: #555">Saludos cordiales,</p>
+      <p style="font-size: 16px; color: #555">Best regards,</p>
 
       <p style="font-size: 16px; color: #000">
         <strong>Carolina Galarza</strong>
         <br />
         Coordinadora Foro TIS
         <br />
-        <span style="color: #007bff">PERUMIN 37 Convención Minera</span>
+        <span style="color: #007bff">World Mining Congress</span>
       </p>
     </div>
             `;
@@ -462,11 +459,11 @@ export class MailService {
     return this.sendMail({
       to,
       template,
-      subject: '[PERUMIN 37] - Actualización de estado de trabajo técnico',
+      subject: '[WMC] - Technical work status update',
     })
       .then(() => {
         console.log(
-          `Email de actualización de estado de paper enviado a ${to}`,
+          `Status update email sent to ${to}`,
         );
       })
       .catch((error) => {
