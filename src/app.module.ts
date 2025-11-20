@@ -18,6 +18,7 @@ import { FilesModule } from './files/files.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ParametersModule } from './parameters/parameters.module';
 import { ReportsModule } from './reports/reports.module';
+import { Abstract } from './domain/entities/abstract.entity';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ReportsModule } from './reports/reports.module';
     RolesModule,
     PermissionsModule,
     WebUsersModule,
+    Abstract,
     // PagesModule,
     // BlocksModule,
     // GalleryModule,

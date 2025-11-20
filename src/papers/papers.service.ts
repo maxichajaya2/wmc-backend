@@ -45,7 +45,9 @@ export class PapersService {
     private readonly mailService: MailService,
   ) {}
 
-  async findAll({ onlyActive, viewAll } = { onlyActive: false, viewAll: false }) {
+  async findAll(
+    { onlyActive, viewAll } = { onlyActive: false, viewAll: false },
+  ) {
     const loggedUser = this.usersService.getLoggedUser();
     const user = await this.usersRepository.findById(loggedUser.id);
     let where = {};
@@ -92,7 +94,7 @@ export class PapersService {
   }
 
   async create(body: CreatePaperDto) {
-    const { authors, webUserId, ...createPaperDto } = body;
+    const { authors, webUserId, codigo, ...createPaperDto } = body;
     const { topicId, categoryId } = createPaperDto;
     const loggedUser = this.usersService.getLoggedUser();
     const loginOrigin = this.usersService.getLoginOrigin();
@@ -135,11 +137,29 @@ export class PapersService {
       .getOne();
 
     let correlative = 'TT-1';
-    if (lastRegister?.correlative) {
-      const parts = lastRegister.correlative.split('-');
-      const number = +parts[1];
-      correlative = `TT-${number + 1}`;
+
+    // if (lastRegister?.correlative) {
+    //   const parts = lastRegister.correlative.split('-');
+    //   const number = +parts[1];
+    //   correlative = `TT-${number + 1}`;
+    // }
+
+    if (codigo) {
+      // 👉 si viene un código desde abstract → úsalo
+      correlative = codigo;
+    } else {
+      // 👉 si NO viene, genera TT-X
+      let base = 'TT-1';
+
+      if (lastRegister?.correlative) {
+        const parts = lastRegister.correlative.split('-');
+        const number = +parts[1];
+        base = `TT-${number + 1}`;
+      }
+
+      correlative = base;
     }
+
     const paper: Paper = {
       ...createPaperDto,
       state: PaperState.REGISTERED,

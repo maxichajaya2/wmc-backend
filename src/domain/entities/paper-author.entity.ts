@@ -42,6 +42,19 @@ export class PaperAuthor {
 
   @Column({ type: 'text', nullable: true })
   countryCode?: string | null;
+  
+  @Column({ type: 'text', nullable: true })
+  address?: string | null;
+  
+  @Column({ type: 'text', nullable: true })
+  city?: string | null;
+ 
+  @Column({ type: 'text', nullable: true })
+  state?: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  professionalDesignation?: string | null;
+
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string;

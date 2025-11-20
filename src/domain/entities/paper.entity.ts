@@ -1,10 +1,21 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { DocumentType, WebUser } from "./web-user.entity";
-import { User } from "./user.entity";
-import { Topic } from "./topic.entity";
-import { PaperComentary } from "./paper-comentary.entity";
-import { PaperAuthor } from "./paper-author.entity";
-import { Category } from "./category.entity";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { DocumentType, WebUser } from './web-user.entity';
+import { User } from './user.entity';
+import { Topic } from './topic.entity';
+import { PaperComentary } from './paper-comentary.entity';
+import { PaperAuthor } from './paper-author.entity';
+import { Category } from './category.entity';
 
 export enum PaperState {
   REGISTERED = 0,
@@ -24,21 +35,21 @@ export const paperStateMap = {
   4: 'EN REVISIÓN',
   5: 'APROBADO',
   6: 'RECHAZADO',
-}
+};
 
-export enum PaperType{
+export enum PaperType {
   ORAL = 'O',
   POSTER = 'P',
   PRESENTACION_INTERACTIVA = 'PI',
 }
 
 export const paperTypeMap = {
-  'O': 'ORAL',
-  'P': 'POSTER',
-  'PI': 'PRESENTACIÓN INTERACTIVA',
-}
+  O: 'ORAL',
+  P: 'POSTER',
+  PI: 'PRESENTACIÓN INTERACTIVA',
+};
 
-export enum Process{
+export enum Process {
   PRESELECCIONADO = 'P',
   SELECCIONADO = 'S',
 }
@@ -46,7 +57,7 @@ export enum Process{
 export const processMap: Record<Process, string> = {
   P: 'FASE 1',
   S: 'FASE 2',
-}
+};
 
 @Entity()
 export class Paper {
@@ -59,8 +70,26 @@ export class Paper {
   @Column({ type: 'text', nullable: true })
   resume: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  authorBiography: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  abstractText: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  proposalSignificance: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  agreeTerms?: boolean;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  industry?: string;
+
   @Column({ type: 'varchar', length: 255, nullable: true })
   file?: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  copyrightForm?: string | null;
 
   @Column({ type: 'int' })
   state: PaperState;
@@ -104,14 +133,22 @@ export class Paper {
   @Column({ type: 'int', nullable: true })
   webUserId?: number | null;
 
-  @ManyToOne(() => WebUser, (user) => user.papers, { nullable: true, onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => WebUser, (user) => user.papers, {
+    nullable: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'webUserId' })
   webUser: WebUser;
 
   @Column({ type: 'int', nullable: true })
   reviewerUserId?: number | null;
 
-  @ManyToOne(() => User, (user) => user.reviewedPapers, { nullable: true, onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => User, (user) => user.reviewedPapers, {
+    nullable: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'reviewerUserId' })
   reviewerUser?: User | null;
 
@@ -125,11 +162,14 @@ export class Paper {
   @Column({ type: 'int', nullable: true })
   topicId: number;
 
-  @ManyToOne(() => Topic, (topic) => topic.papers, { onDelete: 'CASCADE', eager: true })
+  @ManyToOne(() => Topic, (topic) => topic.papers, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   @JoinColumn({ name: 'topicId' })
   topic?: Topic;
 
-  @ManyToOne(() => Category, (category) => category.papers, {eager: true})
+  @ManyToOne(() => Category, (category) => category.papers, { eager: true })
   category: Category;
 
   @Column({ type: 'int', nullable: true })
@@ -144,7 +184,7 @@ export class Paper {
   @Column({ type: 'varchar', length: 255, nullable: true })
   language?: string;
 
-  @Column("text", { array: true })
+  @Column('text', { array: true })
   keywords?: string[];
 
   @Column({ type: 'boolean', default: false })
@@ -168,13 +208,17 @@ export class Paper {
   // @Column({ type: 'boolean', default: true })
   // isActive?: boolean;
 
-  @OneToMany(() => PaperComentary, (paperComentary) => paperComentary.paper, { onDelete: 'CASCADE' })
+  @OneToMany(() => PaperComentary, (paperComentary) => paperComentary.paper, {
+    onDelete: 'CASCADE',
+  })
   comentaries?: PaperComentary[];
 
   @Column({ type: 'varchar', length: 5, nullable: true })
   type?: PaperType;
 
-  @OneToMany(() => PaperAuthor, (paperAuthor) => paperAuthor.paper, { onDelete: 'CASCADE' })
+  @OneToMany(() => PaperAuthor, (paperAuthor) => paperAuthor.paper, {
+    onDelete: 'CASCADE',
+  })
   authors?: PaperAuthor[];
 
   @Column({ type: 'varchar', length: 255, nullable: true, unique: true })

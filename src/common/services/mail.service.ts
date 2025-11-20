@@ -56,73 +56,73 @@ export class MailService {
     //             <p>Your Código de verificación is: <b>${code}</b></p>
     //         `;
     const template = `
-      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
-        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+        <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+          <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
 
-          <!-- HEADER -->
-          <tr>
-            <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-              <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
-            </td>
-          </tr>
+            <!-- HEADER -->
+            <tr>
+              <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
+                <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+              </td>
+            </tr>
 
-          <!-- TITLE -->
-          <tr>
-            <td style="padding: 30px 40px 10px; text-align:center;">
-              <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
-                Código de verificación
-              </h1>
-            </td>
-          </tr>
+            <!-- TITLE -->
+            <tr>
+              <td style="padding: 30px 40px 10px; text-align:center;">
+                <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
+                  Verification Code
+                </h1>
+              </td>
+            </tr>
 
-          <!-- BODY TEXT -->
-          <tr>
-            <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
-              Usa el siguiente código para continuar con tu proceso:
-            </td>
-          </tr>
+            <!-- BODY TEXT -->
+            <tr>
+              <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
+                Use the following code to continue your process:
+              </td>
+            </tr>
 
-          <!-- CODE BOX -->
-          <tr>
-            <td style="padding: 20px 40px 30px; text-align:center;">
-              <div style="
-                display:inline-block;
-                background:#ffffff;
-                border-left:4px solid #004d58;
-                padding:14px 24px;
-                font-size:22px;
-                font-weight:bold;
-                color:#000;
-                font-family:Consolas,'Courier New',monospace;
-                border-radius:6px;
-              ">
-                ${code}
-              </div>
-            </td>
-          </tr>
+            <!-- CODE BOX -->
+            <tr>
+              <td style="padding: 20px 40px 30px; text-align:center;">
+                <div style="
+                  display:inline-block;
+                  background:#ffffff;
+                  border-left:4px solid #004d58;
+                  padding:14px 24px;
+                  font-size:22px;
+                  font-weight:bold;
+                  color:#000;
+                  font-family:Consolas,'Courier New',monospace;
+                  border-radius:6px;
+                ">
+                  ${code}
+                </div>
+              </td>
+            </tr>
 
-          <!-- FOOTER -->
-          <tr>
-            <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
-              © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
-              Lima, Perú
-            </td>
-          </tr>
+            <!-- FOOTER -->
+            <tr>
+              <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+                © ${new Date().getFullYear() + 1} World Mining Congress. All rights reserved.<br>
+                Lima, Peru
+              </td>
+            </tr>
 
-        </table>
-      </div>
+          </table>
+        </div>
       `;
 
     return this.sendMail({
       to,
       template,
-      subject: 'Código de verificación',
+      subject: 'Verification Code',
     })
       .then(() => {
-        console.log(`Código de verificación sent to ${to}`);
+        console.log(`Verification code sent to ${to}`);
       })
       .catch((error) => {
-        console.error(`Error sending código de verificación to ${to}`);
+        console.error(`Error sending verification code to ${to}`);
         console.error(error.message);
       });
   }
@@ -133,7 +133,7 @@ export class MailService {
     // const template = `
     // <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9;">
     //     <div style="text-align: center; padding: 20px 0;">
-    //         <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS 26" style="max-width: 150px;">
+    //         <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS 26" style="max-width: 150px;">
     //     </div>
     //     <h1 style="color: #333; text-align: center;">🔒 Recupera tu contraseña</h1>
     //     <p style="font-size: 16px; color: #555; text-align: center;">
@@ -155,77 +155,77 @@ export class MailService {
     // </div>
     // `;
     const template = `
-      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
-        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+        <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+          <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
 
-          <!-- HEADER -->
-          <tr>
-            <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-              <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
-            </td>
-          </tr>
+            <!-- HEADER -->
+            <tr>
+              <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+                <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+              </td>
+            </tr>
 
-          <!-- TITLE -->
-          <tr>
-            <td style="padding: 30px 40px 10px; text-align:center;">
-              <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
-                Recupera tu contraseña
-              </h1>
-            </td>
-          </tr>
+            <!-- TITLE -->
+            <tr>
+              <td style="padding: 30px 40px 10px; text-align:center;">
+                <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
+                  Reset your password
+                </h1>
+              </td>
+            </tr>
 
-          <!-- BODY TEXT -->
-          <tr>
-            <td style="padding: 10px 40px 20px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
-              Para restablecer tu contraseña, haz clic en el siguiente botón:
-            </td>
-          </tr>
+            <!-- BODY TEXT -->
+            <tr>
+              <td style="padding: 10px 40px 20px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
+                To reset your password, click the button below:
+              </td>
+            </tr>
 
-          <!-- BUTTON -->
-          <tr>
-            <td style="text-align:center; padding:10px 0 25px;">
-              <a href="${url}" target="_blank"
-                style="background:#004d58; color:white; text-decoration:none; padding:14px 28px; border-radius:6px; font-size:16px; display:inline-block; font-weight:bold;">
-                Restablecer contraseña
-              </a>
-            </td>
-          </tr>
+            <!-- BUTTON -->
+            <tr>
+              <td style="text-align:center; padding:10px 0 25px;">
+                <a href="${url}" target="_blank"
+                  style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); color:white; text-decoration:none; padding:14px 28px; border-radius:6px; font-size:16px; display:inline-block; font-weight:bold;">
+                  Reset password
+                </a>
+              </td>
+            </tr>
 
-          <!-- URL FALLBACK -->
-          <tr>
-            <td style="padding:10px 40px 5px; font-size:13px; color:#666; text-align:center;">
-              Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
-            </td>
-          </tr>
+            <!-- URL FALLBACK -->
+            <tr>
+              <td style="padding:10px 40px 5px; font-size:13px; color:#666; text-align:center;">
+                If the button doesn’t work, copy and paste the following link into your browser:
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 0 40px 30px; text-align:center; word-break:break-word;">
-              <a href="${url}" style="color:#004d58; font-size:13px; text-decoration:none;">${url}</a>
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 0 40px 30px; text-align:center; word-break:break-word;">
+                <a href="${url}" style="color:#004d58; font-size:13px; text-decoration:none;>${url}</a>
+              </td>
+            </tr>
 
-          <!-- FOOTER -->
-          <tr>
-            <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
-              © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
-              Lima, Perú
-            </td>
-          </tr>
+            <!-- FOOTER -->
+            <tr>
+              <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+                © ${new Date().getFullYear() + 1} World Mining Congress. All rights reserved.<br>
+                Lima, Peru
+              </td>
+            </tr>
 
-        </table>
-      </div>
-      `;
+          </table>
+        </div>
+          `;
 
     return this.sendMail({
       to,
       template,
-      subject: '[WORLD MINING CONGRESS 26] - RECUPERACIÓN DE CONTRASEÑA',
+      subject: '[WORLD MINING CONGRESS 26] - Reset Your Password',
     })
       .then(() => {
-        console.log(`Link de reset password enviado a ${to}`);
+        console.log(`Password reset link sent to ${to}`);
       })
       .catch((error) => {
-        console.error(`Error sending reseta password to ${to}`);
+        console.error(`Error sending password reset link to ${to}`);
         console.error(error.message);
       });
   }
@@ -248,7 +248,7 @@ export class MailService {
     // >
     //   <div style="text-align: center; padding: 20px 0">
     //     <img
-    //       src="https://forotis.perumin.com/logo-wmc.png"
+    //       src="https://papers.wmc2026.org/logo-wmc.png"
     //       alt="WORLD MINING CONGRESS 26"
     //       style="max-width: 150px"
     //     />
@@ -308,8 +308,8 @@ export class MailService {
 
           <!-- HEADER -->
           <tr>
-            <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-              <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
             </td>
           </tr>
 
@@ -317,7 +317,7 @@ export class MailService {
           <tr>
             <td style="padding: 30px 40px 10px; text-align:center;">
               <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
-                CONFIRMACIÓN DE REGISTRO
+                REGISTRATION CONFIRMATION
               </h1>
             </td>
           </tr>
@@ -325,14 +325,14 @@ export class MailService {
           <!-- BODY TEXT -->
           <tr>
             <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px;">
-              Bienvenido a la plataforma de presentación de Trabajos Técnicos para el
+              Welcome to the Technical Paper Submission Platform for the
               <strong>WORLD MINING CONGRESS 2026</strong>.
             </td>
           </tr>
 
           <tr>
             <td style="padding: 5px 40px 20px; text-align:center; color:#444; font-size:15px;">
-              Para confirmar su registro y acceder a la plataforma, haga clic en el siguiente botón:
+              To confirm your registration and access the platform, click the button below:
             </td>
           </tr>
 
@@ -340,8 +340,8 @@ export class MailService {
           <tr>
             <td style="text-align:center; padding:20px;">
               <a href="${url}"
-                style="background:#004d58; color:white; text-decoration:none; padding:14px 28px; border-radius:6px; font-size:16px; display:inline-block;">
-                Confirmar Registro
+                style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); color:white; text-decoration:none; padding:14px 28px; border-radius:6px; font-size:16px; display:inline-block;">
+                Confirm Registration
               </a>
             </td>
           </tr>
@@ -349,7 +349,7 @@ export class MailService {
           <!-- URL FALLBACK -->
           <tr>
             <td style="padding:10px 40px; font-size:13px; color:#555; text-align:center;">
-              Si el botón no funciona, copie y pegue el siguiente enlace en su navegador:
+              If the button doesn't work, copy and paste the following link into your browser:
             </td>
           </tr>
 
@@ -361,15 +361,15 @@ export class MailService {
 
           <!-- FOOTER -->
           <tr>
-            <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
-              © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
-              Lima, Perú
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+              © ${new Date().getFullYear() + 1} World Mining Congress. All rights reserved.<br>
+              Lima, Peru
             </td>
           </tr>
 
         </table>
       </div>
-      `;
+    `;
 
     return this.sendMail({
       to,
@@ -401,7 +401,7 @@ export class MailService {
     // >
     //   <div style="text-align: center; padding: 20px 0">
     //     <img
-    //       src="https://forotis.perumin.com/logo-wmc.png"
+    //       src="https://papers.wmc2026.org/logo-wmc.png"
     //       alt="WORLD MINING CONGRESS 26"
     //       style="max-width: 150px"
     //     />
@@ -444,8 +444,8 @@ export class MailService {
 
           <!-- HEADER -->
           <tr>
-            <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-              <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
             </td>
           </tr>
 
@@ -492,7 +492,7 @@ export class MailService {
 
           <!-- FOOTER -->
           <tr>
-            <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
               © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
               Lima, Perú
             </td>
@@ -525,7 +525,7 @@ export class MailService {
     // >
     //   <div style="text-align: center; padding: 20px 0">
     //     <img
-    //       src="https://forotis.perumin.com/logo-wmc.png"
+    //       src="https://papers.wmc2026.org/logo-wmc.png"
     //       alt="WORLD MINING CONGRESS 26"
     //       style="max-width: 150px"
     //     />
@@ -560,7 +560,7 @@ export class MailService {
     //   </p>
     //   <div style="text-align: center; margin-top: 15px">
     //     <a
-    //       href="https://forotis.perumin.com"
+    //       href="https://papers.wmc2026.org"
     //       target="_blank"
     //       style="
     //         display: inline-block;
@@ -580,76 +580,75 @@ export class MailService {
     //     `;
 
     const template = `
-            <div
-      style="
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-      "
-    >
-      <div style="text-align: center; padding: 20px 0">
-        <img
-          src="https://forotis.perumin.com/logo-wmc.png"
-          alt="WORLD MINING CONGRESS 26"
-          style="max-width: 150px"
-        />
-      </div>
-      <h1 style="color: #333; text-align: center">🔑 Acceso a Intranet</h1>
-      <p style="font-size: 16px; color: #555; text-align: center">
-        ¡Bienvenido! Hemos generado una contraseña para que puedas acceder a
-        nuestra
-        <strong>Intranet</strong>
-        .
-      </p>
       <div
         style="
-          margin: 20px 0;
-          padding: 15px;
-          background-color: #fff;
-          border-left: 4px solid #007bff;
-          text-align: center;
+          font-family: Arial, sans-serif;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          background-color: #f9f9f9;
         "
       >
-        <p style="font-size: 16px; color: #555; margin: 0">
-          <strong>Tu nueva contraseña:</strong>
+        <div style="text-align: center; padding: 20px 0">
+          <img
+            src="https://papers.wmc2026.org/logo-wmc.png"
+            alt="WORLD MINING CONGRESS 26"
+            style="max-width: 150px"
+          />
+        </div>
+        <h1 style="color: #333; text-align: center">🔑 Intranet Access</h1>
+        <p style="font-size: 16px; color: #555; text-align: center">
+          Welcome! We have generated a password for you to access our
+          <strong>Intranet</strong>.
         </p>
-        <p
-          style="font-size: 20px; color: #000; font-weight: bold; margin: 5px 0"
-        >
-          ${password}
-        </p>
-      </div>
-      <p style="font-size: 16px; color: #555; text-align: center">
-        Puedes ingresar a la Intranet haciendo clic en el siguiente botón:
-      </p>
-      <div style="text-align: center; margin-top: 15px">
-        <a
-          href="https://forotis.perumin.com"
-          target="_blank"
+        <div
           style="
-            display: inline-block;
-            padding: 12px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fff;
+            border-left: 4px solid #007bff;
+            text-align: center;
           "
         >
-          Acceder a la Intranet
-        </a>
+          <p style="font-size: 16px; color: #555; margin: 0">
+            <strong>Your new password:</strong>
+          </p>
+          <p
+            style="font-size: 20px; color: #000; font-weight: bold; margin: 5px 0"
+          >
+            ${password}
+          </p>
+        </div>
+        <p style="font-size: 16px; color: #555; text-align: center">
+          You can access the Intranet by clicking the button below:
+        </p>
+        <div style="text-align: center; margin-top: 15px">
+          <a
+            href="https://papers.wmc2026.org"
+            target="_blank"
+            style="
+              display: inline-block;
+              padding: 12px 20px;
+              font-size: 16px;
+              color: #fff;
+               background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f);
+              text-decoration: none;
+              border-radius: 5px;
+              font-weight: bold;
+            "
+          >
+            Access Intranet
+          </a>
+        </div>
       </div>
-    </div>
-        `;
+    `;
+
     return this.sendMail({
       to: email,
       template,
-      subject: '[WORLD MINING CONGRESS 26] - Acceso a la Intranet',
+      subject: '[WORLD MINING CONGRESS 26] - Intranet Access',
       bcc: true,
     });
   }
@@ -676,7 +675,7 @@ export class MailService {
     // >
     //   <div style="text-align: center; padding: 20px 0">
     //     <img
-    //       src="https://forotis.perumin.com/logo-wmc.png"
+    //       src="https://papers.wmc2026.org/logo-wmc.png"
     //       alt="WORLD MINING CONGRESS 26"
     //       style="max-width: 150px"
     //     />
@@ -725,8 +724,8 @@ export class MailService {
 
           <!-- HEADER -->
           <tr>
-            <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-              <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
             </td>
           </tr>
 
@@ -774,7 +773,7 @@ export class MailService {
 
           <!-- FOOTER -->
           <tr>
-            <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
+            <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
               © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
               Lima, Perú
             </td>
@@ -799,7 +798,7 @@ export class MailService {
       // >
       //   <div style="text-align: center; padding: 20px 0">
       //     <img
-      //       src="https://forotis.perumin.com/logo-wmc.png"
+      //       src="https://papers.wmc2026.org/logo-wmc.png"
       //       alt="WORLD MINING CONGRESS 26"
       //       style="max-width: 150px"
       //     />
@@ -837,14 +836,14 @@ export class MailService {
       //   </p>
       // </div>
       //         `;
-      template = `
+     template = `
         <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
           <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
 
             <!-- HEADER -->
             <tr>
-              <td style="background: linear-gradient(90deg, #004d58, #003540); padding:25px 0; text-align:center;">
-                <img src="https://forotis.perumin.com/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+              <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+                <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
               </td>
             </tr>
 
@@ -853,34 +852,37 @@ export class MailService {
               <td style="padding: 30px 40px; color:#444; font-size:15px; line-height:1.6; text-align:left;">
 
                 <p style="margin:0 0 18px;">
-                  Estimado/a participante,
+                  Dear participant,
                 </p>
 
                 <p style="margin:0 0 18px;">
-                  Confirmamos la recepción de su resumen con el cual está ingresando a competir en la convocatoria de Trabajos Técnicos del
-                  <strong>Premio Nacional de Minería</strong>.
+                  Thank you for completing your registration to submit a technical paper for the
+                  <strong>World Mining Congress 2026</strong>. Your submission has been successfully received and is
+                  currently under review.
                 </p>
 
                 <p style="margin:0 0 18px;">
-                  El comité estará realizando las evaluaciones hasta el <strong>13 de junio</strong>. Puede hacer seguimiento de su participación ingresando al portal con su usuario y contraseña.
+                  The Technical Committee will evaluate all submissions through <strong>January 22</strong>.
+                  You can check the status of your submission by logging into the platform with your user credentials.
                 </p>
 
                 <p style="margin:0 0 18px;">
-                  Para cualquier consulta, puede contactarse vía <strong>WhatsApp</strong> al:
+                  If you have any questions or need assistance, our team is available via <strong>Email address</strong>:
                   <br>
-                  <a href="https://wa.me/51973855242" style="color:#004d58; text-decoration:none; font-weight:bold;">
-                    +51 973 855 242
+                  <a href="mailto:wmc2026authors@iimp.org.pe" style="color:#004d58; text-decoration:none; font-weight:bold;">
+                    wmc2026authors@iimp.org.pe
                   </a>
                 </p>
 
                 <p style="margin:0 0 24px;">
-                  Saludos cordiales,
+                  We appreciate your contribution and commitment to promoting knowledge exchange
+                  within the global mining community.
                 </p>
 
                 <p style="margin:0;">
-                  <strong style="color:#000;">Carolina Galarza</strong><br>
-                  Coordinadora Foro TIS<br>
-                  <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 26 – Convención Minera</span>
+                  <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
+                  Program Chair, WMC 2026<br>
+                  <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
                 </p>
 
               </td>
@@ -888,31 +890,29 @@ export class MailService {
 
             <!-- FOOTER -->
             <tr>
-              <td style="background:#f1f1f1; text-align:center; padding:18px; font-size:12px; color:#666;">
-                © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
-                Lima, Perú
+              <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+                © ${new Date().getFullYear() + 1} World Mining Congress. All rights reserved.<br>
+                Lima, Peru
               </td>
             </tr>
 
           </table>
         </div>
-        `;
+          `;
+
     }
 
     return this.sendMail({
       to,
       template,
-      subject:
-        '[WORLD MINING CONGRESS 26] - Actualización de estado de trabajo técnico',
+      subject: '[WORLD MINING CONGRESS 26] - Technical Paper Status Update',
     })
       .then(() => {
-        console.log(
-          `Email de actualización de estado de paper enviado a ${to}`,
-        );
+        console.log(`Technical paper status update email sent to ${to}`);
       })
       .catch((error) => {
         console.error(
-          `Error sending email de actualización de estado de paper to ${to}`,
+          `Error sending technical paper status update email to ${to}`,
         );
         console.error(error.message);
       });
