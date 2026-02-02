@@ -9,8 +9,12 @@ import {
   Process,
   processMap,
 } from '../domain/entities/paper.entity';
-import { PaperAuthorType, paperAuthorTypeMap } from '../domain/entities/paper-author.entity';
+import {
+  PaperAuthorType,
+  paperAuthorTypeMap,
+} from '../domain/entities/paper-author.entity';
 import { MoreThanOrEqual, Raw } from 'typeorm';
+
 
 @Injectable()
 export class ReportsService {
@@ -60,7 +64,9 @@ export class ReportsService {
           category,
           topic,
           title,
-          language,
+          file,
+          industry,
+          // language,
           keywords,
           eventWhere,
           eventDate,
@@ -68,6 +74,7 @@ export class ReportsService {
           process,
           type,
           state,
+          agreeTerms, 
           authors,
           receivedDate,
           approvedDate,
@@ -76,6 +83,7 @@ export class ReportsService {
           phase2Score,
           leader,
           reviewerUser,
+          
         } = paper;
         const { name: categoryName } = category ?? { name: 'Sin Categoria' };
         const { name: topicName } = topic ?? { name: 'Sin Tema' };
@@ -89,11 +97,13 @@ export class ReportsService {
           category: categoryName,
           topic: topicName,
           title,
-          language,
+          // language,
           keyWords: keywords.join(', '),
           eventWhere,
           eventDate,
           eventWhich,
+          industry,
+          agreeTerms,
           phase,
           typePaper,
           receivedDate,
@@ -104,11 +114,18 @@ export class ReportsService {
           state: stateName,
           phase1Score: phase1Score ?? '--',
           phase2Score: phase2Score ?? '--',
+          fileUrl: file ?? '', // si `file` ya viene como URL completa
           authors: authors
             .sort((a, b) => {
-              if (a.type === PaperAuthorType.AUTOR && b.type !== PaperAuthorType.AUTOR)
+              if (
+                a.type === PaperAuthorType.AUTOR &&
+                b.type !== PaperAuthorType.AUTOR
+              )
                 return -1;
-              if (a.type !== PaperAuthorType.AUTOR && b.type === PaperAuthorType.AUTOR)
+              if (
+                a.type !== PaperAuthorType.AUTOR &&
+                b.type === PaperAuthorType.AUTOR
+              )
                 return 1;
               return 0;
             })
@@ -120,10 +137,14 @@ export class ReportsService {
                 remissive,
                 institution,
                 cellphone,
+                countryCode,
+                address,
+                city,
+                state,
                 email,
                 type,
               } = author;
-              const fullName = `${name} ${middle} ${last}`;
+              const fullName = `${name} ${middle}`;
               const typeName = paperAuthorTypeMap[type];
               return {
                 name: fullName,
@@ -131,6 +152,10 @@ export class ReportsService {
                 institution,
                 cellphone,
                 email,
+                countryCode,
+                address,
+                city,
+                state,
                 type: typeName,
               };
             }),
@@ -238,11 +263,14 @@ export class ReportsService {
       { header: 'CATEGORÍA', key: 'category', width: 20 },
       { header: 'TEMA', key: 'topic', width: 20 },
       { header: 'TÍTULO', key: 'title', width: 30 },
-      { header: 'IDIOMA', key: 'language', width: 10 },
+      // { header: 'IDIOMA', key: 'language', width: 10 },
       { header: 'PALABRAS CLAVES', key: 'keyWords', width: 25 },
       { header: 'EVENTO (LUGAR)', key: 'eventWhich', width: 20 },
       { header: 'EVENTO (DONDE)', key: 'eventWhere', width: 20 },
       { header: 'EVENTO (FECHA)', key: 'eventDate', width: 15 },
+      { header: 'URL DOCUMENTO', key: 'fileUrl', width: 40 },
+      { header: 'TIPO INDUSTRIA', key: 'industry', width: 20 },
+      { header: 'ACEPTO CONDICIONES', key: 'agreeTerms', width: 20 },
       // Agregar lider y revisor
       { header: 'LÍDER', key: 'leader', width: 20 },
       { header: 'REVISOR', key: 'reviewer', width: 20 },
@@ -268,7 +296,10 @@ export class ReportsService {
         { header: `AUTOR ${i} (EMPRESA)`, key: `institution${i}`, width: 20 },
         { header: `AUTOR ${i} (CELULAR)`, key: `cellphone${i}`, width: 15 },
         { header: `AUTOR ${i} (EMAIL)`, key: `email${i}`, width: 25 },
-        { header: `AUTOR ${i} (TIPO)`, key: `type${i}`, width: 15 },
+        { header: `AUTOR ${i} (PAIS)`, key: `countryCode${i}`, width: 15 },
+        { header: `AUTOR ${i} (DIRECCION)`, key: `address${i}`, width: 25 },
+        { header: `AUTOR ${i} (CIUDAD)`, key: `city${i}`, width: 25 },
+        { header: `AUTOR ${i} (ESTADO)`, key: `state${i}`, width: 15 },
       );
     }
     // Combinar todas las columnas
@@ -318,6 +349,10 @@ export class ReportsService {
           row[`institution${index + 1}`] = author.institution;
           row[`cellphone${index + 1}`] = author.cellphone;
           row[`email${index + 1}`] = author.email;
+          row[`countryCode${index + 1}`] = author.countryCode;
+          row[`address${index + 1}`] = author.address;
+          row[`city${index + 1}`] = author.city;
+          row[`state${index + 1}`] = author.state;
           row[`type${index + 1}`] = author.type;
         }
       });

@@ -1,109 +1,159 @@
-import { Type } from "class-transformer";
-import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
-import { PaperType } from "../../domain/entities/paper.entity";
-import { PaperAuthorType } from "../../domain/entities/paper-author.entity";
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { PaperType } from '../../domain/entities/paper.entity';
+import { PaperAuthorType } from '../../domain/entities/paper-author.entity';
 
-export class CreateAuthorDto{
+export class CreateAuthorDto {
+  @IsNumber()
+  @IsOptional()
+  id?: number;
 
-    @IsNumber()
-    @IsOptional()
-    id?: number;
+  @IsEnum(PaperAuthorType)
+  type: PaperAuthorType;
 
-    @IsEnum(PaperAuthorType)
-    type: PaperAuthorType;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsOptional()
+  middle?: string;
 
-    @IsString()
-    @IsOptional()
-    middle?: string;
+  @IsString()
+  @IsOptional()
+  last?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    last?: string;
+  @IsString()
+  @IsOptional()
+  address?: string;
 
-    @IsString()
-    @IsOptional()
-    remissive?: string | null;
+  @IsString()
+  @IsOptional()
+  city?: string;
 
-    @IsString()
-    @IsOptional()
-    institution?: string | null;
+  @IsString()
+  @IsOptional()
+  state?: string;
 
-    @IsString()
-    @IsOptional()
-    countryCode?: string | null;
+  @IsString()
+  @IsOptional()
+  professionalDesignation?: string;
 
-    @IsString()
-    @IsOptional()
-    email?: string;
+  @IsString()
+  @IsOptional()
+  remissive?: string | null;
 
-    @IsString()
-    @IsOptional()
-    emailCorp?: string;
+  @IsString()
+  @IsOptional()
+  institution?: string | null;
 
-    @IsString()
-    @IsOptional()
-    cellphone?: string;
+  @IsString()
+  @IsOptional()
+  countryCode?: string | null;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
+
+  @IsString()
+  @IsOptional()
+  emailCorp?: string;
+
+  @IsString()
+  @IsOptional()
+  cellphone?: string;
 }
 
 export class CreatePaperDto {
-    @IsString()
-    @IsNotEmpty()
-    title: string;
+  @IsString()
+  @IsNotEmpty()
+  title: string;
 
-    @IsString()
-    @IsOptional()
-    resume: string | null;
+  @IsOptional()
+  @IsString()
+  codigo?: string;
 
-    @IsString()
-    @IsOptional()
-    file: string | null;
+  @IsString()
+  @IsOptional()
+  resume: string | null;
 
-    @IsNumber()
-    topicId: number;
+  @IsString()
+  @IsOptional()
+  authorBiography: string | null;
 
-    @IsArray()
-    @ValidateNested({ each: true })
-    @Type(() => CreateAuthorDto)
-    @IsOptional()
-    authors: CreateAuthorDto[];
+  @IsString()
+  @IsOptional()
+  abstractText: string | null;
 
-    @IsNumber()
-    categoryId: number;
+  @IsString()
+  @IsOptional()
+  proposalSignificance: string | null;
 
-    @IsString()
-    @IsOptional()
-    language?: string;
+  @IsBoolean()
+  @IsNotEmpty()
+  agreeTerms?: boolean;
 
-    @IsArray()
-    keywords: string[];
+  @IsString()
+  @IsOptional()
+  industry?: string;
 
-    @IsBoolean()
-    @IsOptional()
-    flagEvent?: boolean;
+  @IsString()
+  @IsOptional()
+  file: string | null;
 
-    @IsString()
-    @IsOptional()
-    eventWhere?: string;
+ @IsString()
+  @IsOptional()
+  copyrightForm?: string | null;
 
-    @IsNumber()
-    @IsOptional()
-    webUserId?: number;
+  @IsNumber()
+  topicId: number;
 
-    @IsString()
-    @IsOptional()
-    eventWhich?: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAuthorDto)
+  @IsOptional()
+  authors: CreateAuthorDto[];
 
-    @IsString()
-    @IsOptional()
-    eventDate?: Date;
+  @IsNumber()
+  categoryId: number;
 
-    @IsEnum(PaperType)
-    @IsOptional()
-    type?: PaperType;
+  @IsString()
+  @IsOptional()
+  language?: string;
+
+  @IsArray()
+  keywords: string[];
+
+  @IsBoolean()
+  @IsOptional()
+  flagEvent?: boolean;
+
+  @IsString()
+  @IsOptional()
+  eventWhere?: string;
+
+  @IsNumber()
+  @IsOptional()
+  webUserId?: number;
+
+  @IsString()
+  @IsOptional()
+  eventWhich?: string;
+
+  @IsString()
+  @IsOptional()
+  eventDate?: Date;
+
+  @IsEnum(PaperType)
+  @IsOptional()
+  type?: PaperType;
 }
-
-

@@ -29,6 +29,8 @@ import { CategoriesRepository } from './repositories/categories.repository';
 import { Parameter } from './entities/parameter.entity';
 import { ParametersRepository } from './repositories/parameters.repository';
 import { IimpService } from './services/iimp.service';
+import { Abstract } from './entities/abstract.entity';
+import { AbstractRepository } from './repositories/abstract.repository';
 
 export const APP_ENTITIES = [
   Category,
@@ -45,6 +47,7 @@ export const APP_ENTITIES = [
   District,
   PaperAuthor,
   Parameter,
+  Abstract,
 ];
 
 @Global()
@@ -65,6 +68,7 @@ export const APP_ENTITIES = [
     CategoriesRepository,
     ParametersRepository,
     IimpService,
+    AbstractRepository,
   ],
   exports: [
     UsersRepository,
@@ -83,6 +87,7 @@ export const APP_ENTITIES = [
     CategoriesRepository,
     ParametersRepository,
     IimpService,
+    AbstractRepository,
   ],
   imports: [
     ConfigModule,
@@ -102,9 +107,9 @@ export const APP_ENTITIES = [
         cli: {
           migrationsDir: 'src/domain/migrations',
         },
-      })
+      }),
     }),
     TypeOrmModule.forFeature(APP_ENTITIES),
   ],
 })
-export class DomainModule { }
+export class DomainModule {}

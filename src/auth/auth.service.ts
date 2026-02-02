@@ -19,7 +19,6 @@ import { RolesRepository } from '../domain/repositories/roles.repository';
 import { DocumentType, WebUser } from '../domain/entities/web-user.entity';
 import { SignInDto } from './dto/sign-in.dto';
 import { IimpService } from '../domain/services/iimp.service';
-import e = require('express');
 
 enum LoginErrors {
   USER_NOT_FOUND = 'USER_NOT_FOUND',
@@ -57,6 +56,69 @@ export class AuthService {
     });
   }
 
+  // async signIn({
+  //   documentType,
+  //   documentNumber,
+  //   password: passwordPayload,
+  //   }: SignInDto): Promise<LoginResponse> {
+  //   try {
+  //     console.debug(
+  //       `Sign in web user attempt for ${documentType} ${documentNumber}`,
+  //     );
+  //     const user = await this.webUsersRepository.findByDocument({
+  //       documentType,
+  //       documentNumber,
+  //     });
+  //     if (!user) {
+  //       throw new UnauthorizedException({
+  //         code: LoginErrors.USER_NOT_FOUND,
+  //         message: 'User not found',
+  //       });
+  //     }
+  //     const isPasswordValid =
+  //       user.iimpDecryptedPassword.trim() === passwordPayload.trim();
+  //     if (!isPasswordValid) {
+  //       throw new UnauthorizedException({
+  //         code: LoginErrors.PASSWORD_INVALID,
+  //         message: 'Invalid password',
+  //       });
+  //     }
+  //     if (!user.isActive) {
+  //       throw new UnauthorizedException({
+  //         code: LoginErrors.USER_NOT_FOUND,
+  //         message: 'User is blocked',
+  //       });
+  //     }
+  //     const verifiedIimpResponse =
+  //       await this.iimpService.verifyCredentials(user);
+  //     if (!verifiedIimpResponse.ok) {
+  //       console.log('Error al verificar credenciales en IIMP');
+  //       throw new UnauthorizedException({
+  //         code: LoginErrors.PASSWORD_INVALID,
+  //         message: 'Invalid password',
+  //       });
+  //     }
+  //     const payload = {
+  //       sub: user.id,
+  //       email: user.email,
+  //       origin: LoginOrigin.FRONTEND,
+  //     };
+  //     try {
+  //       const token = await this.generateJWT(payload);
+  //       return {
+  //         user,
+  //         token,
+  //       };
+  //     } catch (error) {
+  //       console.debug(`Error getting token ${error.message}`);
+  //       throw error;
+  //     }
+  //   } catch (error) {
+  //     console.debug(error.message);
+  //     throw error;
+  //   }
+  // }
+
   async signIn({
     documentType,
     documentNumber,
@@ -66,6 +128,8 @@ export class AuthService {
       console.debug(
         `Sign in web user attempt for ${documentType} ${documentNumber}`,
       );
+
+      // 1. Buscar usuario en Base de Datos Local
       const user = await this.webUsersRepository.findByDocument({
         documentType,
         documentNumber,
@@ -76,29 +140,51 @@ export class AuthService {
           message: 'User not found',
         });
       }
+
+      // 2. Validar contraseña contra la Base de Datos Local
+      // Asumimos que iimpDecryptedPassword tiene la contraseña correcta guardada
       const isPasswordValid =
         user.iimpDecryptedPassword.trim() === passwordPayload.trim();
+
       if (!isPasswordValid) {
+        // AQUI PODRIAS AGREGAR UN "FALLBACK":
+        // Si falla localmente, intentar con el servicio IIMP por si el usuario cambió su clave allá recientemente.
+        // Pero por ahora, si falla local, lanzamos error.
         throw new UnauthorizedException({
           code: LoginErrors.PASSWORD_INVALID,
           message: 'Invalid password',
         });
       }
+
       if (!user.isActive) {
         throw new UnauthorizedException({
           code: LoginErrors.USER_NOT_FOUND,
           message: 'User is blocked',
         });
       }
-      const verifiedIimpResponse =
-        await this.iimpService.verifyCredentials(user);
-      if (!verifiedIimpResponse.ok) {
-        console.log('Error al verificar credenciales en IIMP');
-        throw new UnauthorizedException({
-          code: LoginErrors.PASSWORD_INVALID,
-          message: 'Invalid password',
-        });
+
+      // --- CAMBIO PRINCIPAL AQUÍ ---
+      // Antes este bloque lanzaba error si IIMP fallaba. Ahora lo hacemos opcional o informativo.
+
+      try {
+        const verifiedIimpResponse =
+          await this.iimpService.verifyCredentials(user);
+        if (!verifiedIimpResponse.ok) {
+          console.warn(
+            'Advertencia: Credenciales válidas localmente, pero IIMP retornó error o rechazo.',
+          );
+          // YA NO lanzamos el throw new UnauthorizedException
+        }
+      } catch (iimpError) {
+        // Si el servicio IIMP está caído (timeout, error 500), capturamos el error
+        // y permitimos que el flujo continúe porque la validación local fue exitosa.
+        console.error(
+          'El servicio IIMP no responde, permitiendo acceso por validación local.',
+          iimpError.message,
+        );
       }
+      // -----------------------------
+
       const payload = {
         sub: user.id,
         email: user.email,
@@ -180,17 +266,14 @@ export class AuthService {
       documentType,
       documentNumber,
     });
-    const emailExists = await this.webUserEmailAlreadyExists(email);
-    if (emailExists || !!userByDocument) {
-      throw new BadRequestException(
-        APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS],
-      );
-    }
+    // const emailExists = await this.webUserEmailAlreadyExists(email);
+    // if (emailExists || !!userByDocument) {
+    //   throw new BadRequestException(APP_ERRORS[ERROR_CODES.USER_ALREADY_EXISTS]);
+    // }
     const token = uuidv4();
     await this.mailService.sendRegisterLink({ to: email, code: token });
     const value = {
-      // payload: { ...preRegisterDto, password: 'not-needed' },
-      payload: { ...preRegisterDto },
+      payload: { ...preRegisterDto, password: 'not-needed' },
       expiresAt: new Date().getTime() + VERIFICATION_USER_TTL,
     };
     VERIFICATION_USER_CACHE[token] = JSON.stringify(value);
@@ -220,68 +303,24 @@ export class AuthService {
     }
     const userModel: WebUser = payload;
     //handle error
-
-    /***  REGISTRO IIMP ***/
     const iimpUser = await this.iimpService.register(userModel);
-
     if (!iimpUser.ok) {
       console.log('Error al registrar en IIMP');
-      // throw new BadRequestException('Error al registrar en IIMP');
-      throw new BadRequestException({
-        ok: false,
-        code: 'IIMP_REGISTER_FAILED',
-        message: 'No se pudo registrar el usuario en el sistema IIMP.',
-      });
+      throw new BadRequestException('Error al registrar en IIMP');
     }
-
-    let password = '';
-    let decryptedPassword = '';
-
-    /*** CREDENCIALES IIMP  ***/
     const credentials = await this.iimpService.credentialCreate(userModel);
-
     if (!credentials.ok) {
-      const newPassword = await this.iimpService.authCredentialUpdate(
-        userModel,
-        payload.password,
-      );
-      if (!newPassword.ok) {
-        throw new BadRequestException('Error al crear credenciales en IIMP');
-      }
-      const existUser = await this.iimpService.passwordConsult(
-        payload.documentType,
-        payload.documentNumber,
-      );
-
-      if (existUser.ok) {
-        const { raw } = existUser.payload;
-
-        password = raw?.usuario?.password ?? raw?.password;
-        decryptedPassword =
-          raw?.usuario?.decrypted_password ?? raw?.decrypted_password;
-      } else {
-        throw new BadRequestException({
-          ok: false,
-          code: 'IIMP_USER_NOT_FOUND',
-          message: 'No se encontraron las credenciales en IIMP.',
-        });
-      }
-    } else {
-      password = credentials.payload.password;
-      decryptedPassword = credentials.payload.decrypted_password;
+      console.log('Error al crear credenciales en IIMP');
+      throw new BadRequestException('Error al crear credenciales en IIMP');
     }
-
-    // const { password, decrypted_password } = credentials.payload;
+    const { password, decrypted_password } = credentials.payload;
     userModel.iimpPassword = password;
-    userModel.iimpDecryptedPassword = decryptedPassword;
-    payload.iimpPassword = password;
-    payload.iimpDecryptedPassword = decryptedPassword;
-    // const user = await this.webUsersRepository.create(payload);
+    userModel.iimpDecryptedPassword = decrypted_password;
     const user = await this.webUsersRepository.create(payload);
     // Enviar correo de bienvenida
     await this.mailService.sendPasswordGenerated({
       email: payload.email,
-      password: decryptedPassword,
+      password: decrypted_password,
     });
     delete VERIFICATION_USER_CACHE[token];
     const jwt = await this.generateJWT({
@@ -290,8 +329,6 @@ export class AuthService {
       origin: LoginOrigin.FRONTEND,
     });
     return {
-      ok: true,
-      message: 'Registro exitoso. Revise su correo electrónico.',
       user,
       token: jwt,
     };
