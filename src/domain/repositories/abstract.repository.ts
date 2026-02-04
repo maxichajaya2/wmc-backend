@@ -15,4 +15,10 @@ export class AbstractRepository {
       where: { email }
     });
   }
+
+  async findByEmailRegister(email: string) {
+    return await this.repository.findOne({
+      where: { email: email }
+    });
+  }
 }

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { DashboardSignInDto } from './dto/dashboard-sign-in.dto';
 import { AuthGuard } from './guards/auth.guard';
@@ -11,9 +20,7 @@ import { SignInDto } from './dto/sign-in.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-  ) { }
+  constructor(private readonly authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -27,11 +34,15 @@ export class AuthController {
     return this.authService.dashboardSignIn(signInDto);
   }
 
+  //  PREREGISTER
+  // ==============================
   @Post('pre-register')
   preRegister(@Body() registerDto: CreateWebUserDto) {
     return this.authService.preRegister(registerDto);
   }
 
+  //  REGISTER
+  // ===========================
   @Post('register')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto.token);
@@ -49,12 +60,17 @@ export class AuthController {
     return this.authService.getAuthenticatedUser(req);
   }
 
+  //  RECUPERAR CONTRASEÑA
+  // ===========================
   @HttpCode(HttpStatus.OK)
   @Post('send-reset-password-otp')
-  sendResetPasswordOtp(@Body() sendResetPasswordOtpDto: SendResetPasswordOtpDto) {
+  sendResetPasswordOtp(
+    @Body() sendResetPasswordOtpDto: SendResetPasswordOtpDto,
+  ) {
     return this.authService.sendResetPasswordOtp(sendResetPasswordOtpDto.email);
   }
-
+//  RESETEAR CONTRASEÑA
+  // ===========================
   @HttpCode(HttpStatus.OK)
   @Post('reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
