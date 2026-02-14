@@ -1,5 +1,14 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Paper } from "./paper.entity";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Paper } from './paper.entity';
 
 export enum PaperAuthorType {
   AUTOR = 'A',
@@ -7,9 +16,9 @@ export enum PaperAuthorType {
 }
 
 export const paperAuthorTypeMap = {
-  'A': 'AUTOR',
-  'C': 'COAUTOR',
-}
+  A: 'AUTOR',
+  C: 'COAUTOR',
+};
 
 @Entity()
 export class PaperAuthor {
@@ -18,12 +27,15 @@ export class PaperAuthor {
 
   @Column({ type: 'int', nullable: true })
   paperId?: number;
-  
-  @ManyToOne(() => Paper, paper => paper.authors, { onDelete: 'CASCADE' })
+
+  @ManyToOne(() => Paper, (paper) => paper.authors, { onDelete: 'CASCADE' })
   paper: Paper;
 
   @Column({ type: 'varchar', length: 255 })
   type: PaperAuthorType;
+
+  @Column({ type: 'varchar', length: 255, nullable: true }) // <--- Agregar nullable: true
+  other?: string;
 
   @Column({ type: 'text', nullable: true })
   name?: string;
@@ -42,19 +54,18 @@ export class PaperAuthor {
 
   @Column({ type: 'text', nullable: true })
   countryCode?: string | null;
-  
+
   @Column({ type: 'text', nullable: true })
   address?: string | null;
-  
+
   @Column({ type: 'text', nullable: true })
   city?: string | null;
- 
+
   @Column({ type: 'text', nullable: true })
   state?: string | null;
 
   @Column({ type: 'text', nullable: true })
   professionalDesignation?: string | null;
-
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   email?: string;
@@ -65,7 +76,7 @@ export class PaperAuthor {
   @Column({ type: 'varchar', length: 255, nullable: true })
   cellphone?: string;
 
-  @CreateDateColumn({nullable: true})
+  @CreateDateColumn({ nullable: true })
   createdAt?: Date;
 
   @UpdateDateColumn()

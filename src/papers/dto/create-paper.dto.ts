@@ -38,6 +38,10 @@ export class CreateAuthorDto {
 
   @IsString()
   @IsOptional()
+  other?:string;
+
+  @IsString()
+  @IsOptional()
   city?: string;
 
   @IsString()
