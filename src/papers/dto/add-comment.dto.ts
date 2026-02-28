@@ -8,4 +8,8 @@ export class AddCommentDto {
     @IsString()
     @IsOptional()
     fileUrl?: string;
+
+    @IsNumber()
+    @IsOptional()
+    blockId?: number;
 }

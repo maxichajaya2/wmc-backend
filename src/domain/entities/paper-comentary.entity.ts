@@ -27,6 +27,9 @@ export class PaperComentary{
     @JoinColumn({ name: 'paperId' })
     paper?: Paper;
 
+    @Column({ type: 'int', nullable: true })
+    blockId?: number;
+
     @CreateDateColumn()
     createdAt: Date;
 
