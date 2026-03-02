@@ -99,7 +99,7 @@ export class PapersService {
         In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
       );
     }
-    // 
+    //
     const papers = await this.papersRepository.repository.find({
       where,
       relations: [
@@ -110,7 +110,7 @@ export class PapersService {
         'reviewerUser',
         'reviewerSupport1', // <-- TRAER RELACIÓN APOYO 1
         'reviewerSupport2', // <-- TRAER RELACIÓN APOYO 2
-        'reviewerSupport3'  // <-- TRAER RELACIÓN APOYO 3
+        'reviewerSupport3', // <-- TRAER RELACIÓN APOYO 3
       ],
     });
 
@@ -129,14 +129,14 @@ export class PapersService {
     const paper = await this.papersRepository.repository.findOne({
       where,
       relations: [
-        'webUser', 
-        'reviewerUser', 
+        'webUser',
+        'reviewerUser',
         'reviewerSupport1', // <-- TRAER RELACIÓN APOYO 1
         'reviewerSupport2', // <-- TRAER RELACIÓN APOYO 2
         'reviewerSupport3', // <-- TRAER RELACIÓN APOYO 3
-        'topic', 
+        'topic',
         'category',
-        'authors'
+        'authors',
       ],
     });
     if (!paper) {
@@ -222,9 +222,9 @@ export class PapersService {
       webUser,
       category,
       reviewerUserId: null,
-      reviewerSupport1Id: null,   // Inicializar
-      reviewerSupport2Id: null,   // Inicializar
-      reviewerSupport3Id: null,   // Inicializar
+      reviewerSupport1Id: null, // Inicializar
+      reviewerSupport2Id: null, // Inicializar
+      reviewerSupport3Id: null, // Inicializar
     };
     if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
@@ -430,11 +430,15 @@ export class PapersService {
         paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
+        const isAdmin = loggedUser.role.id === RoleCodes.ADMIN;
         if (
           loginOrigin === LoginOrigin.BACKOFFICE &&
-          loggedUser.id !== paper.leaderId
+          loggedUser.id !== paper.leaderId &&
+          !isAdmin
         ) {
-          throw new UnauthorizedException('Only leader can assign a paper');
+          throw new UnauthorizedException(
+            'Only leader or admin can assign a paper',
+          );
         }
         if (
           loginOrigin === LoginOrigin.FRONTEND &&
@@ -463,7 +467,10 @@ export class PapersService {
         if (!reviewerUser) {
           throw new NotFoundException('Reviewer user not found');
         }
-        paper.reviewerUser = reviewerUser;
+        paper.reviewerUserId = reviewerUserId;
+        paper.reviewerSupport1Id = changeStateDto.reviewerSupport1Id || null;
+        paper.reviewerSupport2Id = changeStateDto.reviewerSupport2Id || null;
+        paper.reviewerSupport3Id = changeStateDto.reviewerSupport3Id || null;
         break;
       case PaperState.UNDER_REVIEW:
         if (loginOrigin !== LoginOrigin.BACKOFFICE) {
