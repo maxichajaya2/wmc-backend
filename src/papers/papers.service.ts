@@ -562,7 +562,7 @@ export class PapersService {
           throw new NotFoundException('Web User not found');
         }
         if (paper.process === Process.PRESELECCIONADO) {
-          await this.mailService.sendPaperUpdateStatusEmail({
+          await this.mailService.sendPaperDismissEmail({
             paper,
             to: paper.webUser.email,
           });
