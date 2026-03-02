@@ -430,11 +430,15 @@ export class PapersService {
         paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
+        const isAdmin = loggedUser.role.id === RoleCodes.ADMIN;
         if (
           loginOrigin === LoginOrigin.BACKOFFICE &&
-          loggedUser.id !== paper.leaderId
+          loggedUser.id !== paper.leaderId &&
+          !isAdmin
         ) {
-          throw new UnauthorizedException('Only leader can assign a paper');
+          throw new UnauthorizedException(
+            'Only leader or admin can assign a paper',
+          );
         }
         if (
           loginOrigin === LoginOrigin.FRONTEND &&
@@ -455,18 +459,46 @@ export class PapersService {
           paper.process = Process.SELECCIONADO;
           paper.selectedAssignedDate = new Date();
         }
-        if (!reviewerUserId) {
-          throw new BadRequestException('Reviewer user id is required');
+        if (reviewerUserId !== undefined) {
+          const mainReviewer = reviewerUserId
+            ? await this.usersRepository.findById(reviewerUserId)
+            : null;
+          if (reviewerUserId && !mainReviewer) {
+            throw new NotFoundException('Main reviewer user not found');
+          }
+          paper.reviewerUser = mainReviewer;
+          paper.reviewerUserId = mainReviewer ? mainReviewer.id : null;
         }
-        const reviewerUser =
-          await this.usersRepository.findById(reviewerUserId);
-        if (!reviewerUser) {
-          throw new NotFoundException('Reviewer user not found');
+
+        if (changeStateDto.reviewerSupport1Id !== undefined) {
+          const support1 = changeStateDto.reviewerSupport1Id
+            ? await this.usersRepository.findById(
+                changeStateDto.reviewerSupport1Id,
+              )
+            : null;
+          paper.reviewerSupport1 = support1;
+          paper.reviewerSupport1Id = support1 ? support1.id : null;
         }
-        paper.reviewerUserId = reviewerUserId;
-        paper.reviewerSupport1Id = changeStateDto.reviewerSupport1Id || null;
-        paper.reviewerSupport2Id = changeStateDto.reviewerSupport2Id || null;
-        paper.reviewerSupport3Id = changeStateDto.reviewerSupport3Id || null;
+
+        if (changeStateDto.reviewerSupport2Id !== undefined) {
+          const support2 = changeStateDto.reviewerSupport2Id
+            ? await this.usersRepository.findById(
+                changeStateDto.reviewerSupport2Id,
+              )
+            : null;
+          paper.reviewerSupport2 = support2;
+          paper.reviewerSupport2Id = support2 ? support2.id : null;
+        }
+
+        if (changeStateDto.reviewerSupport3Id !== undefined) {
+          const support3 = changeStateDto.reviewerSupport3Id
+            ? await this.usersRepository.findById(
+                changeStateDto.reviewerSupport3Id,
+              )
+            : null;
+          paper.reviewerSupport3 = support3;
+          paper.reviewerSupport3Id = support3 ? support3.id : null;
+        }
         break;
       case PaperState.UNDER_REVIEW:
         if (loginOrigin !== LoginOrigin.BACKOFFICE) {
@@ -612,7 +644,10 @@ export class PapersService {
         throw new NotFoundException('Invalid state');
     }
     await this.papersRepository.repository.save(paper);
-    return paper;
+
+    // Fetch the updated paper with all relations to ensure IDs and objects are returned correctly
+    const finalPaper = await this.findOne(paper.id);
+    return finalPaper;
   }
 
   async findComments(id: number) {
