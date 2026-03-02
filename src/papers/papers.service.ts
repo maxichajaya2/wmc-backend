@@ -15,6 +15,7 @@ import { UsersService } from '../users/users.service';
 import { ChangeStateDto } from './dto/change-state.dto';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { AddCommentDto } from './dto/add-comment.dto';
+
 import { PaperCommentsRepository } from '../domain/repositories/papers-comments.repository';
 import { PaperComentary } from '../domain/entities/paper-comentary.entity';
 import { PaperAuthorsRepository } from '../domain/repositories/paper-authors.repository';
@@ -45,6 +46,33 @@ export class PapersService {
     private readonly mailService: MailService,
   ) {}
 
+  async assignReviewers(paperId: number, reviewerIds: number[]) {
+    const paper = await this.papersRepository.repository.findOne({
+      where: { id: paperId },
+    });
+
+    if (!paper) throw new NotFoundException('Paper no encontrado');
+
+    // Usamos Object.assign para actualizar las propiedades de forma segura
+    Object.assign(paper, {
+      reviewerUserId: reviewerIds[0] || null,
+      reviewerSupport1Id: reviewerIds[1] || null,
+      reviewerSupport2Id: reviewerIds[2] || null,
+      reviewerSupport3Id: reviewerIds[3] || null,
+    });
+
+    // Actualizar estado
+    paper.state = PaperState.ASSIGNED;
+
+    if (paper.process === Process.PRESELECCIONADO) {
+      paper.assignedDate = new Date();
+    } else {
+      paper.selectedAssignedDate = new Date();
+    }
+
+    return await this.papersRepository.repository.save(paper);
+  }
+
   async findAll(
     { onlyActive, viewAll } = { onlyActive: false, viewAll: false },
   ) {
@@ -71,10 +99,21 @@ export class PapersService {
         In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
       );
     }
+    // 
     const papers = await this.papersRepository.repository.find({
       where,
-      relations: ['authors'],
+      relations: [
+        'authors',
+        'webUser',
+        'category',
+        'topic',
+        'reviewerUser',
+        'reviewerSupport1', // <-- TRAER RELACIÓN APOYO 1
+        'reviewerSupport2', // <-- TRAER RELACIÓN APOYO 2
+        'reviewerSupport3'  // <-- TRAER RELACIÓN APOYO 3
+      ],
     });
+
     return papers.map((p) => paperMapper(p));
   }
 
@@ -83,9 +122,22 @@ export class PapersService {
     if (onlyActive) {
       where['isActive'] = true;
     }
+    // const paper = await this.papersRepository.repository.findOne({
+    //   where,
+    //   relations: ['webUser', 'reviewerUser', 'topic', 'authors'],
+    // });
     const paper = await this.papersRepository.repository.findOne({
       where,
-      relations: ['webUser', 'reviewerUser', 'topic', 'authors'],
+      relations: [
+        'webUser', 
+        'reviewerUser', 
+        'reviewerSupport1', // <-- TRAER RELACIÓN APOYO 1
+        'reviewerSupport2', // <-- TRAER RELACIÓN APOYO 2
+        'reviewerSupport3', // <-- TRAER RELACIÓN APOYO 3
+        'topic', 
+        'category',
+        'authors'
+      ],
     });
     if (!paper) {
       throw new NotFoundException('Paper not found');
@@ -169,6 +221,10 @@ export class PapersService {
       process: Process.PRESELECCIONADO,
       webUser,
       category,
+      reviewerUserId: null,
+      reviewerSupport1Id: null,   // Inicializar
+      reviewerSupport2Id: null,   // Inicializar
+      reviewerSupport3Id: null,   // Inicializar
     };
     if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
@@ -236,6 +292,11 @@ export class PapersService {
       }
       paper.category = category;
     }
+
+    if (paper.state === PaperState.OBSERVED) {
+      paper.state = PaperState.SUBSANATED;
+    }
+
     const updatedPaper = {
       ...paper,
       ...updatePaperDto,
@@ -332,6 +393,7 @@ export class PapersService {
           }
         }
 
+        // PRESELECCIONADO-> RECEIVED: se notifica al autor que su paper ha sido recibido
         if (paper.process === Process.PRESELECCIONADO) {
           await this.mailService.sendPaperUpdateStatusEmail({
             paper,
@@ -436,7 +498,10 @@ export class PapersService {
             'Only backoffice can change the state to under review',
           );
         }
-        if (paper.state !== PaperState.UNDER_REVIEW) {
+        if (
+          paper.state !== PaperState.UNDER_REVIEW &&
+          paper.state !== PaperState.SUBSANATED
+        ) {
           throw new BadRequestException({
             code: invalidStateCode,
             message: 'Paper must be under review to be approved',
@@ -468,6 +533,13 @@ export class PapersService {
             to: paper.webUser.email,
           });
         }
+        if (paper.process === Process.SELECCIONADO) {
+          await this.mailService.sendPaperApprovedEmail({
+            paper,
+            to: paper.webUser.email,
+          });
+        }
+
         break;
       case PaperState.DISMISSED:
         if (
@@ -495,6 +567,44 @@ export class PapersService {
         webUser.isActive = false;
         await this.webUsersRepository.repository.save(webUser);
         break;
+      case PaperState.OBSERVED:
+        if (
+          loggedUser.role.id !== RoleCodes.REVISOR &&
+          loggedUser.role.id !== RoleCodes.LIDER &&
+          loggedUser.role.id !== RoleCodes.ADMIN
+        ) {
+          throw new UnauthorizedException(
+            'No tienes permiso para observar este paper',
+          );
+        }
+
+        // El paper debe estar UNDER_REVIEW para ser observado
+        if (
+          paper.state !== PaperState.UNDER_REVIEW &&
+          paper.state !== PaperState.ASSIGNED &&
+          paper.state !== PaperState.SUBSANATED
+        ) {
+          throw new BadRequestException({
+            code: invalidStateCode,
+            message: 'El paper debe estar en revisión para ser observado',
+          });
+        }
+        paper.state = PaperState.OBSERVED;
+
+        if (paper.state === PaperState.OBSERVED) {
+          await this.mailService.sendPaperObservedEmail({
+            paper,
+            to: paper.webUser.email,
+          });
+        }
+
+        // paper.observedDate = new Date();
+
+        break;
+      case PaperState.SUBSANATED:
+        paper.state = PaperState.SUBSANATED;
+        break;
+
       default:
         throw new NotFoundException('Invalid state');
     }
@@ -595,9 +705,23 @@ export class PapersService {
     const paper = await this.papersRepository.repository.findOne({
       where: { id },
     });
+    const previousState = paper.state;
     if (!paper) {
       throw new NotFoundException('Paper not found');
     }
+
+    if (previousState === PaperState.OBSERVED) {
+      // Si estaba observado, al subir el nuevo archivo pasa a SUBSANATED
+      await this.changeStatus(id, {
+        state: PaperState.SUBSANATED,
+      });
+    } else {
+      // Flujo normal (primera subida)
+      await this.changeStatus(id, {
+        state: PaperState.RECEIVED,
+      });
+    }
+
     paper.fullFileUrl = fullFileUrl;
     await this.papersRepository.repository.save(paper);
     await this.changeStatus(id, {
@@ -607,26 +731,113 @@ export class PapersService {
     return paperMapper(updtPaper);
   }
 
+  // async uploadFullFile(id: number, uploadFullFileDto: UploadFullFileDto) {
+  //   const { fullFileUrl } = uploadFullFileDto;
+
+  //   // 1. Buscamos el paper con sus relaciones
+  //   const paper = await this.papersRepository.repository.findOne({
+  //     where: { id },
+  //     relations: ['webUser'],
+  //   });
+
+  //   if (!paper) throw new NotFoundException('Paper not found');
+
+  //   console.log('Estado actual antes de subir:', paper.state);
+
+  //   // 2. LÓGICA CRÍTICA: Cambiar el estado
+  //   // Si está observado, forzamos el cambio a SUBSANATED
+  //   if (paper.state === PaperState.OBSERVED) {
+  //     paper.state = PaperState.SUBSANATED;
+  //   } else {
+  //     // Si es la primera subida o cualquier otro estado, pasa a RECEIVED
+  //     paper.state = PaperState.RECEIVED;
+  //     if (paper.process === Process.PRESELECCIONADO) {
+  //       paper.receivedDate = new Date();
+  //     } else {
+  //       paper.selectedReceivedDate = new Date();
+  //     }
+  //   }
+
+  //   // 3. Guardamos la URL del archivo y la fecha
+  //   paper.fullFileUrl = fullFileUrl;
+  //   paper.updatedAt = new Date();
+
+  //   // 4. Guardamos todo en un SOLO save (esto evita que el estado se pierda)
+  //   const savedPaper = await this.papersRepository.repository.save(paper);
+  //   console.log('Nuevo estado guardado:', savedPaper.state);
+
+  //   // 5. Notificar por email si es necesario
+  //   if (paper.webUser?.email) {
+  //     await this.mailService.sendPaperUpdateStatusEmail({
+  //       paper: savedPaper,
+  //       to: paper.webUser.email,
+  //     });
+  //   }
+
+  //   return paperMapper(savedPaper);
+  // }
+
+  // async rate(id: number, rateDto: RateDto) {
+  //   const paper = await this.papersRepository.repository.findOne({
+  //     where: { id },
+  //   });
+  //   if (!paper) {
+  //     throw new NotFoundException('Paper not found');
+  //   }
+  //   const { score1, score2, score3 } = rateDto;
+  //   const { process: phase, state } = paper;
+  //   if (
+  //     phase === Process.PRESELECCIONADO &&
+  //     state === PaperState.UNDER_REVIEW
+  //   ) {
+  //     paper.phase1Score1 = score1;
+  //     paper.phase1Score2 = score2;
+  //     paper.phase1Score3 = score3;
+  //     paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+  //   } else if (
+  //     phase === Process.SELECCIONADO &&
+  //     state === PaperState.UNDER_REVIEW &&
+  //     state === PaperState.SUBSANATED &&
+  //   ) {
+  //     paper.phase2Score1 = score1;
+  //     paper.phase2Score2 = score2;
+  //     paper.phase2Score3 = score3;
+  //     paper.phase2Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+  //   } else {
+  //     throw new BadRequestException('Invalid phase or state');
+  //   }
+  //   paper.updatedAt = new Date();
+  //   return this.papersRepository.repository.save(paper);
+  // }
+
   async rate(id: number, rateDto: RateDto) {
     const paper = await this.papersRepository.repository.findOne({
       where: { id },
     });
+
     if (!paper) {
       throw new NotFoundException('Paper not found');
     }
+
     const { score1, score2, score3 } = rateDto;
     const { process: phase, state } = paper;
+
+    // Lógica para Fase 1
     if (
       phase === Process.PRESELECCIONADO &&
-      state === PaperState.UNDER_REVIEW
+      (state === PaperState.UNDER_REVIEW ||
+        state === PaperState.SUBSANATED ||
+        state === PaperState.OBSERVED)
     ) {
       paper.phase1Score1 = score1;
       paper.phase1Score2 = score2;
       paper.phase1Score3 = score3;
       paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
-    } else if (
+    }
+    // Lógica para Fase 2
+    else if (
       phase === Process.SELECCIONADO &&
-      state === PaperState.UNDER_REVIEW
+      (state === PaperState.UNDER_REVIEW || state === PaperState.SUBSANATED) // Usar || en lugar de &&
     ) {
       paper.phase2Score1 = score1;
       paper.phase2Score2 = score2;
@@ -635,6 +846,7 @@ export class PapersService {
     } else {
       throw new BadRequestException('Invalid phase or state');
     }
+
     paper.updatedAt = new Date();
     return this.papersRepository.repository.save(paper);
   }

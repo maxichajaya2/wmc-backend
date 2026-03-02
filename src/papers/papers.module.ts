@@ -6,6 +6,7 @@ import { PapersController } from './papers.controller';
   controllers: [PapersController],
   providers: [
     PapersService,
+    
   ],
 })
 export class PapersModule {}

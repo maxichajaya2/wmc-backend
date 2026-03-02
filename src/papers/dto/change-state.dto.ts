@@ -1,19 +1,30 @@
-import { IsEnum, IsNumber, IsOptional } from "class-validator";
-import { PaperState, PaperType } from "../../domain/entities/paper.entity";
+import { IsEnum, IsNumber, IsOptional } from 'class-validator';
+import { PaperState, PaperType } from '../../domain/entities/paper.entity';
 
-export class ChangeStateDto{
-    @IsEnum(PaperState)
-    state: PaperState;
+export class ChangeStateDto {
+  @IsEnum(PaperState)
+  state: PaperState;
 
-    @IsNumber()
-    @IsOptional()
-    reviewerUserId?: number;
+  @IsOptional()
+  reviewerUserId?: number;
 
-    @IsNumber()
-    @IsOptional()
-    leaderId?: number;
+  @IsNumber()
+  @IsOptional()
+  leaderId?: number;
 
-    @IsEnum(PaperType)
-    @IsOptional()
-    type?: PaperType;
+  @IsEnum(PaperType)
+  @IsOptional()
+  type?: PaperType;
+
+  @IsNumber()
+  @IsOptional()
+  reviewerSupport1Id?: number;
+
+  @IsNumber()
+  @IsOptional()
+  reviewerSupport2Id?: number;
+
+  @IsNumber()
+  @IsOptional()
+  reviewerSupport3Id?: number;
 }

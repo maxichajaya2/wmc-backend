@@ -364,7 +364,6 @@ export class MailService {
   }
 
   async sendPasswordGenerated({ email, password }) {
-   
     const template = `
       <div
         style="
@@ -451,60 +450,62 @@ export class MailService {
       <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
         <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
 
-          <!-- HEADER -->
           <tr>
             <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
               <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
             </td>
           </tr>
 
-          <!-- TITLE -->
           <tr>
             <td style="padding: 30px 40px 10px; text-align:center;">
               <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
-                Actualización de Estado
+                Status Update
               </h1>
             </td>
           </tr>
 
-          <!-- BODY TEXT -->
           <tr>
             <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
-              El estado de tu trabajo técnico
+              The status of your technical paper 
               <strong style="color:#004d58;">${title}</strong>
-              ha sido actualizado a:
+              has been updated to: REVISIONS REQUIRED – Preliminary Evaluation Phase
             </td>
           </tr>
 
-          <!-- STATUS BADGE -->
           <tr>
             <td style="padding: 10px 40px; text-align:center;">
               <span style="
                 display:inline-block;
                 color:white;
-                font-size:18px;
+                font-size:15px;
                 padding:10px 20px;
                 border-radius:6px;
                 font-weight:bold;
                 background:linear-gradient(90deg,#00b3dc,#0124e0,#00023f);
               ">
-                ${paperStateMap[state]}
+                PRESELECTED
               </span>
             </td>
           </tr>
 
-          <!-- CTA TEXT -->
           <tr>
-            <td style="padding: 20px 40px 30px; text-align:center; color:#666; font-size:14px;">
-              Para más detalles, por favor ingresa a tu cuenta en la plataforma.
+            <td style="padding: 20px 40px 5px; text-align:justify; color:#444; font-size:14px; line-height:1.6;">
+              Your paper has been reviewed. Please note that this is not a final approval. Authors are required to carefully review the evaluators’ comments, make the necessary corrections, and upload a revised version of the paper through the platform.
+              <br><br>
+              Final approval will be granted only after the revised submission has been reviewed and accepted.
             </td>
           </tr>
 
-          <!-- FOOTER -->
+          <tr>
+            <td style="padding: 20px 40px 30px; text-align:center; color:#666; font-size:14px;">
+              For more details, please log in to your account on the platform.
+            </td>
+          </tr>
+
           <tr>
             <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
-              © ${new Date().getFullYear() + 1} World Mining Congress. Todos los derechos reservados.<br>
-              Lima, Perú
+              © ${new Date().getFullYear()} World Mining Congress. All rights reserved.<br>
+              Lima, Peru
             </td>
           </tr>
 
@@ -513,7 +514,7 @@ export class MailService {
       `;
 
     if (state === PaperState.RECEIVED) {
-     template = `
+      template = `
         <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
           <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
 
@@ -576,7 +577,6 @@ export class MailService {
           </table>
         </div>
           `;
-
     }
 
     return this.sendMail({
@@ -592,6 +592,262 @@ export class MailService {
           `Error sending technical paper status update email to ${to}`,
         );
         console.error(error.message);
+      });
+  }
+
+  async sendPaperApprovedEmail({ to, paper }: { to: string; paper: Paper }) {
+    const { state, title } = paper;
+    let template = `
+      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+
+          <tr>
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 30px 40px 10px; text-align:center;">
+              <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
+                Status Update
+              </h1>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
+              The status of your technical paper 
+              <strong style="color:#004d58;">${title}</strong>
+              has been updated to: REVISIONS REQUIRED – Preliminary Evaluation Phase
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 10px 40px; text-align:center;">
+              <span style="
+                display:inline-block;
+                color:white;
+                font-size:15px;
+                padding:10px 20px;
+                border-radius:6px;
+                font-weight:bold;
+                background:linear-gradient(90deg,#00b3dc,#0124e0,#00023f);
+              ">
+                PRESELECTED
+              </span>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 20px 40px 5px; text-align:justify; color:#444; font-size:14px; line-height:1.6;">
+              Your paper has been reviewed. Please note that this is not a final approval. Authors are required to carefully review the evaluators’ comments, make the necessary corrections, and upload a revised version of the paper through the platform.
+              <br><br>
+              Final approval will be granted only after the revised submission has been reviewed and accepted.
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 20px 40px 30px; text-align:center; color:#666; font-size:14px;">
+              For more details, please log in to your account on the platform.
+            </td>
+          </tr>
+
+          <tr>
+            <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+              © ${new Date().getFullYear()} World Mining Congress. All rights reserved.<br>
+              Lima, Peru
+            </td>
+          </tr>
+
+        </table>
+      </div>
+      `;
+
+    template = `
+    <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+      <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+
+        <tr>
+          <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+            <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding: 30px 40px 10px; color:#444; font-size:15px; line-height:1.6; text-align:center;">
+            <h1 style="margin:0 0 10px; color:#004d58; font-size:22px; font-weight:bold;">
+              Congratulations!
+            </h1>
+            <p style="margin:0;">
+              The status of your technical paper 
+              <strong style="color:#004d58;">"${title}"</strong>
+              has been updated to:
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding: 10px 40px; text-align:center;">
+            <span style="
+              display:inline-block;
+              color:white;
+              font-size:15px;
+              padding:10px 25px;
+              border-radius:6px;
+              font-weight:bold;
+              text-transform: uppercase;
+              background:linear-gradient(90deg,#00b3dc,#0124e0,#00023f);
+            ">
+              SELECTED
+            </span>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding: 20px 40px; color:#444; font-size:15px; line-height:1.6; text-align:left;">
+            <p style="margin:0 0 18px;">
+              Dear participant, we are pleased to inform you that your submission was selected based on its technical quality and relevance to the global mining industry. We are excited to have your contribution at this world-class event in Lima, Peru.
+            </p>
+
+            <div style="background:#f9f9f9; border-left:4px solid #00b3dc; padding:15px; margin-bottom:20px;">
+              <p style="margin:0; font-weight:bold; color:#333;">Next Steps:</p>
+              <ul style="margin:10px 0 0; padding-left:20px;">
+                <li>Log in to the platform to review any final remarks.</li>
+                <li>Stay tuned for upcoming emails regarding presentation schedules and final formats.</li>
+              </ul>
+            </div>
+
+            <p style="margin:0 0 24px;">
+              Thank you for your valuable contribution and commitment to the global mining community.
+            </p>
+
+            <p style="margin:0;">
+              <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
+              Program Chair, WMC 2026<br>
+              <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+            © ${new Date().getFullYear()} World Mining Congress. All rights reserved.<br>
+            Lima, Peru
+          </td>
+        </tr>
+
+      </table>
+    </div>
+  `;
+
+    // Definimos el asunto por defecto
+    let subject = '[WORLD MINING CONGRESS 26] - Technical Paper Status Update';
+
+    // Si el estado es aprobado, personalizamos el asunto para que sea más impactante
+    if (state === PaperState.APPROVED) {
+      subject =
+        '[WORLD MINING CONGRESS 26] - Congratulations! Your technical paper has been approved - WMC 2026';
+    }
+    return this.sendMail({
+      to,
+      template,
+      subject, // Usamos la variable dinámica
+    })
+      .then(() => {
+        // Log personalizado si es aprobado
+        const logMsg =
+          state === PaperState.APPROVED
+            ? `CONGRATULATIONS email sent to ${to}`
+            : `Technical paper status update email sent to ${to}`;
+        console.log(logMsg);
+      })
+      .catch((error) => {
+        console.error(
+          `Error sending technical paper status update email to ${to}`,
+        );
+        console.error(error.message);
+      });
+  }
+
+  async sendPaperObservedEmail({ to, paper }: { to: string; paper: Paper }) {
+    const { title } = paper;
+    const year = new Date().getFullYear();
+
+    // El texto de estado que pediste específicamente
+    const statusText = 'REVISIONS REQUIRED – Preliminary Evaluation Phase';
+    const subject = `[WORLD MINING CONGRESS 26] - Observation: Your technical paper requires revisions - WMC 2026`;
+    const platformUrl = 'https://papers.wmc2026.org/login';
+
+    const template = `
+  <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+    <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      
+      <tr>
+        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+          <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WMC 2026" style="max-width:160px;">
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding: 30px 40px;">
+          <h1 style="margin:0 0 15px; color:#004d58; font-size:22px; font-weight:bold; text-align:center;">
+            Status Update
+          </h1>
+          
+          <p style="color:#444; font-size:15px; line-height:1.6; margin:0 0 20px;">
+            Dear author, we inform you that the status of your technical paper titled <strong style="color:#004d58;">"${title}"</strong> has been updated to:
+          </p>
+
+        
+
+          <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 20px;">
+            Your paper has been reviewed and has observations that must be addressed to continue with the selection process.
+          </p>
+
+          <div style="background:#f9f9f9; border-left:4px solid #00b3dc; padding:20px; margin-bottom:25px;">
+            <p style="margin:0 0 10px; font-weight:bold; color:#333; font-size:15px;">Instructions for Subsanated Process:</p>
+            <p style="margin:0 0 10px; color:#555; font-size:14px; line-height:1.6;">
+              You must log in to the platform, carefully review the comments from the assigned evaluator, and make the necessary corrections to your document. 
+              <strong>Once you have addressed all observations, you must upload the revised version of your paper</strong> through your dashboard to proceed with a new evaluation.
+            </p>
+          </div>
+
+          <p style="color:#666; font-size:13px; font-style:italic; margin-bottom:25px; text-align:center;">
+            Please note that final approval is subject to the validation of these corrections by the evaluation committee.
+          </p>
+
+          <div style="text-align:center; margin-bottom:30px;">
+            <a href="${platformUrl}" style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); color:white; padding:12px 30px; text-decoration:none; border-radius:5px; font-weight:bold; font-size:15px; display:inline-block;">
+              Log in to the platform
+            </a>
+          </div>
+
+          <div style="border-top:1px solid #eee; padding-top:20px; color:#444; font-size:14px;">
+            <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
+            Program Chair, WMC 2026<br>
+            <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+          © ${year} World Mining Congress. All rights reserved.<br>
+          Lima, Peru
+        </td>
+      </tr>
+
+    </table>
+  </div>
+  `;
+
+    return this.sendMail({ to, template, subject })
+      .then(() => {
+        console.log(`Email de observación (OBSERVED) enviado a: ${to}`);
+      })
+      .catch((error) => {
+        console.error(`Error enviando email a ${to}: ${error.message}`);
       });
   }
 }

@@ -25,6 +25,8 @@ export enum PaperState {
   UNDER_REVIEW = 4,
   APPROVED = 5,
   DISMISSED = 6,
+  OBSERVED = 7,
+  SUBSANATED = 8,
 }
 
 export const paperStateMap = {
@@ -35,18 +37,28 @@ export const paperStateMap = {
   4: 'EN REVISIÓN',
   5: 'APROBADO',
   6: 'RECHAZADO',
+  7: 'OBSERVADO',
+  8: 'SUBSANADO',
 };
 
 export enum PaperType {
   ORAL = 'O',
   POSTER = 'P',
   PRESENTACION_INTERACTIVA = 'PI',
+  PRESENTACION_ORAL = 'PO',
+}
+
+// Define un Enum para mayor seguridad
+export enum ReviewerType {
+  PRINCIPAL = 'principal',
+  APOYO = 'apoyo',
 }
 
 export const paperTypeMap = {
   O: 'ORAL',
   P: 'POSTER',
   PI: 'PRESENTACIÓN INTERACTIVA',
+  PO: 'PRESENTACIÓN ORAL',
 };
 
 export enum Process {
@@ -133,6 +145,8 @@ export class Paper {
   @Column({ type: 'int', nullable: true })
   webUserId?: number | null;
 
+  // En tu entidad de asignación
+
   @ManyToOne(() => WebUser, (user) => user.papers, {
     nullable: true,
     onDelete: 'CASCADE',
@@ -144,6 +158,15 @@ export class Paper {
   @Column({ type: 'int', nullable: true })
   reviewerUserId?: number | null;
 
+  @Column({ type: 'int', nullable: true })
+  reviewerSupport1Id?: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  reviewerSupport2Id?: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  reviewerSupport3Id?: number | null;
+
   @ManyToOne(() => User, (user) => user.reviewedPapers, {
     nullable: true,
     onDelete: 'CASCADE',
@@ -151,6 +174,18 @@ export class Paper {
   })
   @JoinColumn({ name: 'reviewerUserId' })
   reviewerUser?: User | null;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'reviewerSupport1Id' })
+  reviewerSupport1?: User;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'reviewerSupport2Id' })
+  reviewerSupport2?: User;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'reviewerSupport3Id' })
+  reviewerSupport3?: User;
 
   // @Column({ type: 'int' })
   // registeredById: number;
