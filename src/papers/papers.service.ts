@@ -430,15 +430,11 @@ export class PapersService {
         paper.leader = leader;
         break;
       case PaperState.ASSIGNED:
-        const isAdmin = loggedUser.role.id === RoleCodes.ADMIN;
         if (
           loginOrigin === LoginOrigin.BACKOFFICE &&
-          loggedUser.id !== paper.leaderId &&
-          !isAdmin
+          loggedUser.id !== paper.leaderId
         ) {
-          throw new UnauthorizedException(
-            'Only leader or admin can assign a paper',
-          );
+          throw new UnauthorizedException('Only leader can assign a paper');
         }
         if (
           loginOrigin === LoginOrigin.FRONTEND &&
