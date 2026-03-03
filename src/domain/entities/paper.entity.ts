@@ -101,6 +101,12 @@ export class Paper {
   file?: string | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
+  fileVersion1?: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  fileVersion2?: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
   copyrightForm?: string | null;
 
   @Column({ type: 'int' })
@@ -239,6 +245,12 @@ export class Paper {
 
   @Column({ type: 'text', nullable: true })
   fullFileUrl?: string;
+
+  @Column({ type: 'text', nullable: true })
+  fullFileUrlVersion1?: string;
+
+  @Column({ type: 'text', nullable: true })
+  fullFileUrlVersion2?: string;
 
   // @Column({ type: 'boolean', default: true })
   // isActive?: boolean;

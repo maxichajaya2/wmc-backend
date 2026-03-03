@@ -273,6 +273,26 @@ export class PapersService {
       }
     }
     const { authors, ...updatePaperDto } = body;
+    // LÓGICA DE HISTORIAL PARA FASE 1
+    // Verificamos si el paper está observado y si se está subiendo un archivo nuevo
+    if (
+      paper.state === PaperState.OBSERVED &&
+      updatePaperDto.file &&
+      paper.file !== updatePaperDto.file
+    ) {
+      // CASO A: Es la primera vez que se corrige.
+      // Movemos el original a version1.
+      if (!paper.fileVersion1) {
+        paper.fileVersion1 = paper.file;
+      }
+      // CASO B: Ya hubo una corrección previa (version1 llena).
+      // Movemos el archivo que estaba a version2 antes de recibir el nuevo.
+      else if (!paper.fileVersion2) {
+        paper.fileVersion2 = paper.file;
+      }
+      // Si necesitas más versiones (v3, v4...), seguirías el mismo patrón aquí.
+    }
+
     const { topicId, categoryId } = updatePaperDto;
     if (topicId && paper.topic.id !== topicId) {
       const topic = await this.topicsRepository.repository.findOne({
@@ -748,6 +768,22 @@ export class PapersService {
       throw new NotFoundException('Paper not found');
     }
 
+    // LÓGICA DE HISTORIAL PARA FASE 2 (Full File)
+    if (
+      previousState === PaperState.OBSERVED &&
+      fullFileUrl &&
+      paper.fullFileUrl !== fullFileUrl
+    ) {
+      // Si es la primera corrección de la Fase 2
+      if (!paper.fullFileUrlVersion1) {
+        paper.fullFileUrlVersion1 = paper.fullFileUrl;
+      }
+      // Si es la segunda corrección de la Fase 2
+      else if (!paper.fullFileUrlVersion2) {
+        paper.fullFileUrlVersion2 = paper.fullFileUrl;
+      }
+    }
+
     if (previousState === PaperState.OBSERVED) {
       // Si estaba observado, al subir el nuevo archivo pasa a SUBSANATED
       await this.changeStatus(id, {
@@ -768,85 +804,6 @@ export class PapersService {
     const updtPaper = await this.findOne(id);
     return paperMapper(updtPaper);
   }
-
-  // async uploadFullFile(id: number, uploadFullFileDto: UploadFullFileDto) {
-  //   const { fullFileUrl } = uploadFullFileDto;
-
-  //   // 1. Buscamos el paper con sus relaciones
-  //   const paper = await this.papersRepository.repository.findOne({
-  //     where: { id },
-  //     relations: ['webUser'],
-  //   });
-
-  //   if (!paper) throw new NotFoundException('Paper not found');
-
-  //   console.log('Estado actual antes de subir:', paper.state);
-
-  //   // 2. LÓGICA CRÍTICA: Cambiar el estado
-  //   // Si está observado, forzamos el cambio a SUBSANATED
-  //   if (paper.state === PaperState.OBSERVED) {
-  //     paper.state = PaperState.SUBSANATED;
-  //   } else {
-  //     // Si es la primera subida o cualquier otro estado, pasa a RECEIVED
-  //     paper.state = PaperState.RECEIVED;
-  //     if (paper.process === Process.PRESELECCIONADO) {
-  //       paper.receivedDate = new Date();
-  //     } else {
-  //       paper.selectedReceivedDate = new Date();
-  //     }
-  //   }
-
-  //   // 3. Guardamos la URL del archivo y la fecha
-  //   paper.fullFileUrl = fullFileUrl;
-  //   paper.updatedAt = new Date();
-
-  //   // 4. Guardamos todo en un SOLO save (esto evita que el estado se pierda)
-  //   const savedPaper = await this.papersRepository.repository.save(paper);
-  //   console.log('Nuevo estado guardado:', savedPaper.state);
-
-  //   // 5. Notificar por email si es necesario
-  //   if (paper.webUser?.email) {
-  //     await this.mailService.sendPaperUpdateStatusEmail({
-  //       paper: savedPaper,
-  //       to: paper.webUser.email,
-  //     });
-  //   }
-
-  //   return paperMapper(savedPaper);
-  // }
-
-  // async rate(id: number, rateDto: RateDto) {
-  //   const paper = await this.papersRepository.repository.findOne({
-  //     where: { id },
-  //   });
-  //   if (!paper) {
-  //     throw new NotFoundException('Paper not found');
-  //   }
-  //   const { score1, score2, score3 } = rateDto;
-  //   const { process: phase, state } = paper;
-  //   if (
-  //     phase === Process.PRESELECCIONADO &&
-  //     state === PaperState.UNDER_REVIEW
-  //   ) {
-  //     paper.phase1Score1 = score1;
-  //     paper.phase1Score2 = score2;
-  //     paper.phase1Score3 = score3;
-  //     paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
-  //   } else if (
-  //     phase === Process.SELECCIONADO &&
-  //     state === PaperState.UNDER_REVIEW &&
-  //     state === PaperState.SUBSANATED &&
-  //   ) {
-  //     paper.phase2Score1 = score1;
-  //     paper.phase2Score2 = score2;
-  //     paper.phase2Score3 = score3;
-  //     paper.phase2Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
-  //   } else {
-  //     throw new BadRequestException('Invalid phase or state');
-  //   }
-  //   paper.updatedAt = new Date();
-  //   return this.papersRepository.repository.save(paper);
-  // }
 
   async rate(id: number, rateDto: RateDto) {
     const paper = await this.papersRepository.repository.findOne({

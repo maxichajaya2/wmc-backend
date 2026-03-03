@@ -32,6 +32,15 @@ export function paperMapper(p: Paper, { withAuthors = false } = {}): any {
         ...paperMapped,
         author,
         // Aseguramos que los IDs de revisores se envíen explícitamente
+
+        // --- COLUMNAS DE ARCHIVOS Y VERSIONES ---
+        file: p.file,                   // Fase 1 actual
+        fileVersion1: p.fileVersion1,   // Fase 1 Historial 1
+        fileVersion2: p.fileVersion2,   // Fase 1 Historial 2
+        
+        fullFileUrl: p.fullFileUrl,           // Fase 2 actual
+        fullFileVersion1: p.fullFileUrlVersion1, // Fase 2 Historial 1
+        fullFileVersion2: p.fullFileUrlVersion2, // Fase 2 Historial 2
         reviewerUserId: p.reviewerUserId,
         reviewerSupport1Id: p.reviewerSupport1Id,
         reviewerSupport2Id: p.reviewerSupport2Id,

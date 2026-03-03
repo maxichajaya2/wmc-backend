@@ -30,6 +30,9 @@ export class PaperComentary{
     @Column({ type: 'int', nullable: true })
     blockId?: number;
 
+    @Column({ type: 'varchar', length: 50  , nullable: true})
+    documentVersion: string;
+
     @CreateDateColumn()
     createdAt: Date;
 
