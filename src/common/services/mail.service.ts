@@ -850,4 +850,81 @@ export class MailService {
         console.error(`Error enviando email a ${to}: ${error.message}`);
       });
   }
+
+  async sendPaperDismissEmail({ to, paper }: { to: string; paper: Paper }) {
+    const { title } = paper;
+    const template = `
+      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+          <tr>
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 40px 10px; color:#444; font-size:15px; line-height:1.6; text-align:center;">
+              <h1 style="margin:0 0 10px; color:#d9534f; font-size:22px; font-weight:bold;">
+                Status Update
+              </h1>
+              <p style="margin:0;">
+                The status of your technical paper 
+                <strong style="color:#004d58;">"${title}"</strong>
+                has been updated to:
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 40px; text-align:center;">
+              <span style="
+                display:inline-block;
+                color:white;
+                font-size:15px;
+                padding:10px 25px;
+                border-radius:6px;
+                font-weight:bold;
+                text-transform: uppercase;
+                background:#d9534f;
+              ">
+                DISMISSED
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 40px; color:#444; font-size:15px; line-height:1.6; text-align:left;">
+              <p style="margin:0 0 18px;">
+                Dear participant, we inform you that after a thorough review by our evaluation committee, your submission has been dismissed for this edition of the World Mining Congress.
+              </p>
+              <p style="margin:0 0 24px;">
+                We appreciate your interest and the effort put into your submission. We encourage you to continue participating in future events.
+              </p>
+              <p style="margin:0;">
+                <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
+                Program Chair, WMC 2026<br>
+                <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+              © ${new Date().getFullYear()} World Mining Congress. All rights reserved.<br>
+              Lima, Peru
+            </td>
+          </tr>
+        </table>
+      </div>
+    `;
+
+    return this.sendMail({
+      to,
+      template,
+      subject: '[WORLD MINING CONGRESS 26] - Technical Paper Status Update',
+    })
+      .then(() => {
+        console.log(`Dismissal email sent to ${to}`);
+      })
+      .catch((error) => {
+        console.error(`Error sending dismissal email to ${to}`);
+        console.error(error.message);
+      });
+  }
 }

@@ -243,6 +243,8 @@ export class PapersService {
       reviewerSupport1Id: null, // Inicializar
       reviewerSupport2Id: null, // Inicializar
       reviewerSupport3Id: null, // Inicializar
+      phase1_general_rate: 0,
+      phase2_general_rate: 0,
     };
     if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
@@ -912,15 +914,21 @@ export class PapersService {
     ];
 
     const assignedSlots = reviewerSlots.filter((s) => s.id !== null);
-    const assignedCount = assignedSlots.length;
 
-    if (assignedCount > 0) {
-      const sumRates = assignedSlots.reduce((acc, s) => {
-        const val = paper[`${phasePrefix}_${s.slot}_rate`];
-        return acc + Number(val || 0);
-      }, 0);
+    if (assignedSlots.length > 0) {
+      let sumRates = 0;
+      let scoredCount = 0;
 
-      const generalRate = Number((sumRates / assignedCount).toFixed(2));
+      assignedSlots.forEach((s) => {
+        const val = Number(paper[`${phasePrefix}_${s.slot}_rate`] || 0);
+        if (val > 0) {
+          sumRates += val;
+          scoredCount++;
+        }
+      });
+
+      const generalRate =
+        scoredCount > 0 ? Number((sumRates / scoredCount).toFixed(2)) : 0;
 
       if (processPhase === Process.PRESELECCIONADO) {
         paper.phase1_general_rate = generalRate;
@@ -936,6 +944,8 @@ export class PapersService {
     }
 
     paper.updatedAt = new Date();
-    return this.papersRepository.repository.save(paper);
+    await this.papersRepository.repository.save(paper);
+    const updatedPaper = await this.findOne(id);
+    return paperMapper(updatedPaper);
   }
 }
