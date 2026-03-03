@@ -29,7 +29,17 @@ import { LoginOrigin } from '../auth/auth.service';
 import { In, Not } from 'typeorm';
 import { UploadFullFileDto } from './dto/upload-full-file.dto';
 import { paperMapper } from './mappers/paper.mapper';
+import { Category } from '../domain/entities/category.entity';
 import { RateDto } from './dto/rate.dto';
+
+export class ColumnNumericTransformer {
+  to(data: number): number {
+    return data;
+  }
+  from(data: string): number {
+    return parseFloat(data);
+  }
+}
 
 @Injectable()
 export class PapersService {
@@ -92,12 +102,20 @@ export class PapersService {
       where['state'] = Not(In([PaperState.REGISTERED, PaperState.RECEIVED]));
     }
     if (user.role.id === RoleCodes.REVISOR) {
-      if (!viewAll) {
-        where['reviewerUserId'] = user.id;
-      }
-      where['state'] = Not(
+      const stateFilter = Not(
         In([PaperState.REGISTERED, PaperState.RECEIVED, PaperState.SENT]),
       );
+      if (!viewAll) {
+        const baseWhere = onlyActive ? { isActive: true } : {};
+        where = [
+          { ...baseWhere, reviewerUserId: user.id, state: stateFilter },
+          { ...baseWhere, reviewerSupport1Id: user.id, state: stateFilter },
+          { ...baseWhere, reviewerSupport2Id: user.id, state: stateFilter },
+          { ...baseWhere, reviewerSupport3Id: user.id, state: stateFilter },
+        ];
+      } else {
+        where['state'] = stateFilter;
+      }
     }
     //
     const papers = await this.papersRepository.repository.find({
@@ -225,6 +243,8 @@ export class PapersService {
       reviewerSupport1Id: null, // Inicializar
       reviewerSupport2Id: null, // Inicializar
       reviewerSupport3Id: null, // Inicializar
+      phase1_general_rate: 0,
+      phase2_general_rate: 0,
     };
     if (isBackOffice) {
       paper.state = PaperState.RECEIVED;
@@ -814,35 +834,75 @@ export class PapersService {
       throw new NotFoundException('Paper not found');
     }
 
-    const { score1, score2, score3 } = rateDto;
-    const { process: phase, state } = paper;
-
-    // Lógica para Fase 1
-    if (
-      phase === Process.PRESELECCIONADO &&
-      (state === PaperState.UNDER_REVIEW ||
-        state === PaperState.SUBSANATED ||
-        state === PaperState.OBSERVED)
-    ) {
-      paper.phase1Score1 = score1;
-      paper.phase1Score2 = score2;
-      paper.phase1Score3 = score3;
-      paper.phase1Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+    const user = await this.usersService.getLoggedUser();
+    if (!user) {
+      throw new UnauthorizedException('User not authenticated');
     }
-    // Lógica para Fase 2
-    else if (
-      phase === Process.SELECCIONADO &&
-      (state === PaperState.UNDER_REVIEW || state === PaperState.SUBSANATED) // Usar || en lugar de &&
-    ) {
-      paper.phase2Score1 = score1;
-      paper.phase2Score2 = score2;
-      paper.phase2Score3 = score3;
-      paper.phase2Score = Number(((score1 + score2 + score3) / 3).toFixed(2));
+
+    const { score1, score2, score3 } = rateDto;
+    const { process: processPhase } = paper; // P (FASE 1) or S (FASE 2)
+    const phasePrefix = processPhase === Process.PRESELECCIONADO ? 'p1' : 'p2';
+
+    // Identify which slot the logged user belongs to
+    let reviewerSlot: 'm' | 's1' | 's2' | 's3' | null = null;
+    if (paper.reviewerUserId === user.id) reviewerSlot = 'm';
+    else if (paper.reviewerSupport1Id === user.id) reviewerSlot = 's1';
+    else if (paper.reviewerSupport2Id === user.id) reviewerSlot = 's2';
+    else if (paper.reviewerSupport3Id === user.id) reviewerSlot = 's3';
+
+    if (!reviewerSlot) {
+      throw new BadRequestException('User is not assigned as a reviewer');
+    }
+
+    // Update specific columns for this reviewer
+    const rowRate = Number(((score1 + score2 + score3) / 3).toFixed(2));
+    paper[`${phasePrefix}_${reviewerSlot}_impact`] = score1;
+    paper[`${phasePrefix}_${reviewerSlot}_quality`] = score2;
+    paper[`${phasePrefix}_${reviewerSlot}_innovation`] = score3;
+    paper[`${phasePrefix}_${reviewerSlot}_rate`] = rowRate;
+
+    // --- Recalculate General Rate for the current process phase ---
+    // Average of ALL ASSIGNED reviewers (m, s1, s2, s3)
+    const reviewerSlots = [
+      { id: paper.reviewerUserId, slot: 'm' },
+      { id: paper.reviewerSupport1Id, slot: 's1' },
+      { id: paper.reviewerSupport2Id, slot: 's2' },
+      { id: paper.reviewerSupport3Id, slot: 's3' },
+    ];
+
+    const assignedSlots = reviewerSlots.filter((s) => s.id !== null);
+
+    if (assignedSlots.length > 0) {
+      let sumRates = 0;
+      let scoredCount = 0;
+
+      assignedSlots.forEach((s) => {
+        const val = Number(paper[`${phasePrefix}_${s.slot}_rate`] || 0);
+        if (val > 0) {
+          sumRates += val;
+          scoredCount++;
+        }
+      });
+
+      const generalRate =
+        scoredCount > 0 ? Number((sumRates / scoredCount).toFixed(2)) : 0;
+
+      if (processPhase === Process.PRESELECCIONADO) {
+        paper.phase1_general_rate = generalRate;
+      } else {
+        paper.phase2_general_rate = generalRate;
+      }
     } else {
-      throw new BadRequestException('Invalid phase or state');
+      if (processPhase === Process.PRESELECCIONADO) {
+        paper.phase1_general_rate = null;
+      } else {
+        paper.phase2_general_rate = null;
+      }
     }
 
     paper.updatedAt = new Date();
-    return this.papersRepository.repository.save(paper);
+    await this.papersRepository.repository.save(paper);
+    const updatedPaper = await this.findOne(id);
+    return paperMapper(updatedPaper);
   }
 }

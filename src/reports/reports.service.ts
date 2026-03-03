@@ -15,7 +15,6 @@ import {
 } from '../domain/entities/paper-author.entity';
 import { MoreThanOrEqual, Raw } from 'typeorm';
 
-
 @Injectable()
 export class ReportsService {
   constructor(private readonly papersRepository: PapersRepository) {}
@@ -74,16 +73,15 @@ export class ReportsService {
           process,
           type,
           state,
-          agreeTerms, 
+          agreeTerms,
           authors,
           receivedDate,
           approvedDate,
           selectedApprovedDate,
-          phase1Score,
-          phase2Score,
+          phase1_general_rate,
+          phase2_general_rate,
           leader,
           reviewerUser,
-          
         } = paper;
         const { name: categoryName } = category ?? { name: 'Sin Categoria' };
         const { name: topicName } = topic ?? { name: 'Sin Tema' };
@@ -112,8 +110,8 @@ export class ReportsService {
           leader: leader ? `${leader.name}` : '--',
           reviewer: reviewerUser ? `${reviewerUser.name}` : '--',
           state: stateName,
-          phase1Score: phase1Score ?? '--',
-          phase2Score: phase2Score ?? '--',
+          phase1Score: phase1_general_rate ?? '--',
+          phase2Score: phase2_general_rate ?? '--',
           fileUrl: file ?? '', // si `file` ya viene como URL completa
           authors: authors
             .sort((a, b) => {
