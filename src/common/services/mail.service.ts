@@ -850,4 +850,85 @@ export class MailService {
         console.error(`Error enviando email a ${to}: ${error.message}`);
       });
   }
+
+  async sendPaperDismissEmail({ to, paper }: { to: string; paper: Paper }) {
+    const { title } = paper;
+    const year = new Date().getFullYear();
+
+    // Configuración de textos para el rechazo
+    const statusText = 'REJECTED';
+    const subject = `[WORLD MINING CONGRESS 26] - Status Update: Technical Paper - WMC 2026`;
+    const platformUrl = 'https://papers.wmc2026.org/login';
+
+    const template = `
+  <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+    <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      
+      <tr>
+        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+          <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WMC 2026" style="max-width:160px;">
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding: 30px 40px;">
+          <h1 style="margin:0 0 15px; color:#004d58; font-size:22px; font-weight:bold; text-align:center;">
+            Status Update
+          </h1>
+          
+          <p style="color:#444; font-size:15px; line-height:1.6; margin:0 0 20px;">
+            Dear author, we inform you that the status of your technical paper titled <strong style="color:#004d58;">"${title}"</strong> has been updated to:
+          </p>
+
+          <div style="text-align:center; margin: 30px 0;">
+            <span style="background-color: #ffebee; color: #c62828; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 18px; border: 1px solid #ef9a9a;">
+              ${statusText}
+            </span>
+          </div>
+
+          <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 20px;">
+            After careful review, the evaluation committee has determined that the paper does not meet the requirements for acceptance at this stage of the process.
+          </p>
+
+          <div style="background:#f9f9f9; border-left:4px solid #c62828; padding:20px; margin-bottom:25px;">
+            <p style="margin:0; color:#555; font-size:14px; line-height:1.6;">
+              We encourage you to review the evaluators’ comments available on the platform for detailed feedback. For more information, please log in to your account.
+            </p>
+          </div>
+
+          <div style="text-align:center; margin-bottom:30px;">
+            <a href="${platformUrl}" style="color:#0124e0; font-weight:bold; font-size:15px; text-decoration:underline;">
+              Log in to the platform
+            </a>
+          </div>
+
+          <div style="border-top:1px solid #eee; padding-top:20px; color:#444; font-size:14px;">
+            <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
+            Program Chair, WMC 2026<br>
+            <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+          © ${year} World Mining Congress. All rights reserved.<br>
+          Lima, Peru
+        </td>
+      </tr>
+
+    </table>
+  </div>
+  `;
+
+    return this.sendMail({ to, template, subject })
+      .then(() => {
+        console.log(`Email de rechazo (REJECTED) enviado a: ${to}`);
+      })
+      .catch((error) => {
+        console.error(
+          `Error enviando email de rechazo a ${to}: ${error.message}`,
+        );
+      });
+  }
 }
