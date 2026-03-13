@@ -54,7 +54,7 @@ export class PapersService {
     private readonly paperAuthorsRepository: PaperAuthorsRepository,
     private readonly countriesService: CountriesService,
     private readonly mailService: MailService,
-  ) { }
+  ) {}
 
   async assignReviewers(paperId: number, reviewerIds: number[]) {
     const paper = await this.papersRepository.repository.findOne({
@@ -513,8 +513,8 @@ export class PapersService {
         if (changeStateDto.reviewerSupport1Id !== undefined) {
           const support1 = changeStateDto.reviewerSupport1Id
             ? await this.usersRepository.findById(
-              changeStateDto.reviewerSupport1Id,
-            )
+                changeStateDto.reviewerSupport1Id,
+              )
             : null;
           paper.reviewerSupport1 = support1;
           paper.reviewerSupport1Id = support1 ? support1.id : null;
@@ -523,8 +523,8 @@ export class PapersService {
         if (changeStateDto.reviewerSupport2Id !== undefined) {
           const support2 = changeStateDto.reviewerSupport2Id
             ? await this.usersRepository.findById(
-              changeStateDto.reviewerSupport2Id,
-            )
+                changeStateDto.reviewerSupport2Id,
+              )
             : null;
           paper.reviewerSupport2 = support2;
           paper.reviewerSupport2Id = support2 ? support2.id : null;
@@ -533,8 +533,8 @@ export class PapersService {
         if (changeStateDto.reviewerSupport3Id !== undefined) {
           const support3 = changeStateDto.reviewerSupport3Id
             ? await this.usersRepository.findById(
-              changeStateDto.reviewerSupport3Id,
-            )
+                changeStateDto.reviewerSupport3Id,
+              )
             : null;
           paper.reviewerSupport3 = support3;
           paper.reviewerSupport3Id = support3 ? support3.id : null;
@@ -633,12 +633,12 @@ export class PapersService {
         if (!webUser) {
           throw new NotFoundException('Web User not found');
         }
-        if (paper.process === Process.PRESELECCIONADO) {
-          /* await this.mailService.sendPaperDismissEmail({
-             paper,
-             to: paper.webUser.email,
-           });*/
-        }
+        // if (paper.process === Process.PRESELECCIONADO) {
+        await this.mailService.sendPaperDismissEmail({
+          paper,
+          to: paper.webUser.email,
+        });
+        // }
         webUser.isActive = false;
         await this.webUsersRepository.repository.save(webUser);
         break;

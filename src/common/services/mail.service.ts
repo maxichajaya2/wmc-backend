@@ -447,71 +447,73 @@ export class MailService {
   }) {
     const { state, title } = paper;
     let template = `
-      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
-        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden;">
+        <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+          <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden; border: 1px solid #eeeeee;">
 
-          <tr>
-            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
-              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
-            </td>
-          </tr>
+            <tr>
+              <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+                <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WORLD MINING CONGRESS" style="max-width:160px;">
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 30px 40px 10px; text-align:center;">
-              <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
-                Status Update
-              </h1>
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 30px 40px 10px; text-align:center;">
+                <h1 style="margin:0; color:#004d58; font-size:22px; font-weight:bold;">
+                  Status Update
+                </h1>
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
-              The status of your technical paper 
-              <strong style="color:#004d58;">${title}</strong>
-              has been updated to: REVISIONS REQUIRED – Preliminary Evaluation Phase
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 10px 40px; text-align:center; color:#444; font-size:15px; line-height:1.5;">
+                The status of your technical paper 
+                <br>
+                <strong style="color:#004d58;">${title}</strong>
+                <br>
+                has been updated to:
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 10px 40px; text-align:center;">
-              <span style="
-                display:inline-block;
-                color:white;
-                font-size:15px;
-                padding:10px 20px;
-                border-radius:6px;
-                font-weight:bold;
-                background:linear-gradient(90deg,#00b3dc,#0124e0,#00023f);
-              ">
-                PRESELECTED
-              </span>
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 10px 40px; text-align:center;">
+                <span style="
+                  display:inline-block;
+                  color:white;
+                  font-size:15px;
+                  padding:10px 25px;
+                  border-radius:6px;
+                  font-weight:bold;
+                  background-color: #28a745;
+                ">
+                  ACCEPTED
+                </span>
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 20px 40px 5px; text-align:justify; color:#444; font-size:14px; line-height:1.6;">
-              Your paper has been reviewed. Please note that this is not a final approval. Authors are required to carefully review the evaluators’ comments, make the necessary corrections, and upload a revised version of the paper through the platform.
-              <br><br>
-              Final approval will be granted only after the revised submission has been reviewed and accepted.
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 20px 40px 5px; text-align:justify; color:#444; font-size:14px; line-height:1.6;">
+                After careful review, the evaluation committee has determined that the paper meets the requirements for acceptance and will be included in the technical program.
+                <br><br>
+                Please review the evaluators’ comments if available on the platform. Further information regarding the next steps will be communicated in due course.
+              </td>
+            </tr>
 
-          <tr>
-            <td style="padding: 20px 40px 30px; text-align:center; color:#666; font-size:14px;">
-              For more details, please log in to your account on the platform.
-            </td>
-          </tr>
+            <tr>
+              <td style="padding: 20px 40px 30px; text-align:center; color:#666; font-size:14px;">
+                For more information, please log in to your account on the platform.
+              </td>
+            </tr>
 
-          <tr>
-            <td style=" background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
-              © ${new Date().getFullYear()} World Mining Congress. All rights reserved.<br>
-              Lima, Peru
-            </td>
-          </tr>
+            <tr>
+              <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+                © 2026 World Mining Congress. All rights reserved.<br>
+                Lima, Peru
+              </td>
+            </tr>
 
-        </table>
-      </div>
-      `;
+          </table>
+        </div>
+        `;
 
     if (state === PaperState.RECEIVED) {
       template = `
@@ -852,74 +854,60 @@ export class MailService {
   }
 
   async sendPaperDismissEmail({ to, paper }: { to: string; paper: Paper }) {
-    const { title } = paper;
-    const year = new Date().getFullYear();
-
     // Configuración de textos para el rechazo
-    const statusText = 'REJECTED';
+    const { title } = paper;
     const subject = `[WORLD MINING CONGRESS 26] - Status Update: Technical Paper - WMC 2026`;
-    const platformUrl = 'https://papers.wmc2026.org/login';
 
     const template = `
-  <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
-    <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-      
-      <tr>
-        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
-          <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WMC 2026" style="max-width:160px;">
-        </td>
-      </tr>
-
-      <tr>
-        <td style="padding: 30px 40px;">
-          <h1 style="margin:0 0 15px; color:#004d58; font-size:22px; font-weight:bold; text-align:center;">
-            Status Update
-          </h1>
+      <div style="width:100%; background:#f4f4f4; padding:30px 0; font-family:Arial, sans-serif;">
+        <table align="center" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:white; border-radius:10px; overflow:hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
           
-          <p style="color:#444; font-size:15px; line-height:1.6; margin:0 0 20px;">
-            Dear author, we inform you that the status of your technical paper titled <strong style="color:#004d58;">"${title}"</strong> has been updated to:
-          </p>
+          <tr>
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); padding:25px 0; text-align:center;">
+              <img src="https://papers.wmc2026.org/logo-wmc.png" alt="WMC 2026" style="max-width:160px;">
+            </td>
+          </tr>
 
-          <div style="text-align:center; margin: 30px 0;">
-            <span style="background-color: #ffebee; color: #c62828; padding: 10px 20px; border-radius: 5px; font-weight: bold; font-size: 18px; border: 1px solid #ef9a9a;">
-              ${statusText}
-            </span>
-          </div>
+          <tr>
+            <td style="padding: 30px 40px;">
+              <h1 style="margin:0 0 15px; color:#004d58; font-size:22px; font-weight:bold; text-align:center;">
+                Status Update
+              </h1>
+              
+              <p style="color:#444; font-size:15px; line-height:1.6; margin:0 0 20px; text-align:center;">
+                The status of your technical paper <strong style="color:#004d58;">"${title}"</strong> has been updated to:
+              </p>
 
-          <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 20px;">
-            After careful review, the evaluation committee has determined that the paper does not meet the requirements for acceptance at this stage of the process.
-          </p>
+              <div style="text-align:center; margin: 30px 0;">
+                <span style="background-color: #ffebee; color: #c62828; padding: 10px 25px; border-radius: 5px; font-weight: bold; font-size: 18px; border: 1px solid #ef9a9a; display: inline-block;">
+                  REJECTED
+                </span>
+              </div>
 
-          <div style="background:#f9f9f9; border-left:4px solid #c62828; padding:20px; margin-bottom:25px;">
-            <p style="margin:0; color:#555; font-size:14px; line-height:1.6;">
-              We encourage you to review the evaluators’ comments available on the platform for detailed feedback. For more information, please log in to your account.
-            </p>
-          </div>
+              <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 20px; text-align: justify;">
+                After careful review, the evaluation committee has determined that the paper does not meet the requirements for acceptance at this stage of the process.
+              </p>
 
-          <div style="text-align:center; margin-bottom:30px;">
-            <a href="${platformUrl}" style="color:#0124e0; font-weight:bold; font-size:15px; text-decoration:underline;">
-              Log in to the platform
-            </a>
-          </div>
+              <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 20px; text-align: justify;">
+                We encourage you to review the evaluators’ comments available on the platform for detailed feedback.
+              </p>
 
-          <div style="border-top:1px solid #eee; padding-top:20px; color:#444; font-size:14px;">
-            <strong style="color:#000;">Doris Hiam-Galvez</strong><br>
-            Program Chair, WMC 2026<br>
-            <span style="color:#004d58; font-weight:bold;">WORLD MINING CONGRESS 2026 – WMC</span>
-          </div>
-        </td>
-      </tr>
+              <p style="color:#444; font-size:14px; line-height:1.6; margin:0 0 30px; text-align: center;">
+                For more information, please log in to your account on the platform.
+              </p>
+            </td>
+          </tr>
 
-      <tr>
-        <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
-          © ${year} World Mining Congress. All rights reserved.<br>
-          Lima, Peru
-        </td>
-      </tr>
+          <tr>
+            <td style="background: linear-gradient(90deg, #00b3dc, #0124e0, #00023f); text-align:center; padding:18px; font-size:12px; color:#FFFFFF;">
+              © 2026 World Mining Congress. All rights reserved.<br>
+              Lima, Peru
+            </td>
+          </tr>
 
-    </table>
-  </div>
-  `;
+        </table>
+      </div>
+      `;
 
     return this.sendMail({ to, template, subject })
       .then(() => {
