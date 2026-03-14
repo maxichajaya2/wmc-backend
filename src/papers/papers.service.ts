@@ -580,8 +580,7 @@ export class PapersService {
           );
         }
         if (
-          paper.state !== PaperState.UNDER_REVIEW &&
-          paper.state !== PaperState.SUBSANATED
+          paper.state !== PaperState.UNDER_REVIEW 
         ) {
           throw new BadRequestException({
             code: invalidStateCode,
