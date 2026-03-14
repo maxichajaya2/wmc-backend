@@ -1,28 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Speaker } from './speaker.entity';
 
 @Entity()
 export class SpeakerType {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({ type: 'varchar', length: 100 })
-    nameEn: string;
-    
-    @Column({ type: 'varchar', length: 100 })
-    nameEs: string;
+  @Column({ type: 'varchar', length: 100 })
+  nameEn: string;
 
-    @Column({ type: 'boolean', default: true })
-    isActive?: boolean;
+  @Column({ type: 'varchar', length: 100 })
+  nameEs: string;
 
-    speakers?: Speaker[];
+  @Column({ type: 'boolean', default: true })
+  isActive?: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  speakers?: Speaker[];
 
-    @UpdateDateColumn()
-    updatedAt?: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt?: Date;
+  @UpdateDateColumn()
+  updatedAt?: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

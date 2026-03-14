@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -14,7 +23,9 @@ export class PermissionsController {
 
   @Get()
   findAll(@Query('onlyActive') onlyActive: string) {
-    return this.permissionsService.findAll({ onlyActive: onlyActive === 'true' });
+    return this.permissionsService.findAll({
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Get(':id')
@@ -23,7 +34,10 @@ export class PermissionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePermissionDto: UpdatePermissionDto,
+  ) {
     return this.permissionsService.update(+id, updatePermissionDto);
   }
 

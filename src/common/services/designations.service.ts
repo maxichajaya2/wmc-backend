@@ -9,11 +9,9 @@ export interface Designation {
 @Injectable()
 export class DesignationsService {
   // private readonly map = DESIGNATIONS_MAP;
-
   // findAll(): Designation[] {
   //   return Object.entries(this.map).map(([code, name]) => ({ code, name }));
   // }
-
   // getOne(code: string): Designation | null {
   //   const name = this.map[code];
   //   return name ? { code, name } : null;

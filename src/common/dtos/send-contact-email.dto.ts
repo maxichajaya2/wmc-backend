@@ -1,19 +1,19 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
-export class SendContactEmailDto{
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+export class SendContactEmailDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    phone: string;
+  @IsString()
+  @IsNotEmpty()
+  phone: string;
 
-    @IsString()
-    @IsNotEmpty()
-    email: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
-    @IsString()
-    @IsNotEmpty()
-    message: string;
+  @IsString()
+  @IsNotEmpty()
+  message: string;
 }

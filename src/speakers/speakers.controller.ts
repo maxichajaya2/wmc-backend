@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { SpeakersService } from './speakers.service';
 import { CreateSpeakerDto } from './dto/create-speaker.dto';
 import { UpdateSpeakerDto } from './dto/update-speaker.dto';
@@ -14,12 +25,14 @@ export class SpeakersController {
 
   @Get()
   findAll(@Query('onlyActive') onlyActive: string) {
-    return this.speakersService.findAll({onlyActive: onlyActive === 'true'});
+    return this.speakersService.findAll({ onlyActive: onlyActive === 'true' });
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.speakersService.findOne(+id, {onlyActive: onlyActive === 'true'});
+    return this.speakersService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Patch(':id')

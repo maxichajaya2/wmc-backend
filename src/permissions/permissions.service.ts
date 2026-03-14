@@ -5,10 +5,7 @@ import { PermissionsRepository } from '../domain/repositories/permissions.reposi
 
 @Injectable()
 export class PermissionsService {
-
-  constructor(
-    private readonly permissionsRepository: PermissionsRepository,
-  ) { }
+  constructor(private readonly permissionsRepository: PermissionsRepository) {}
 
   create(createPermissionDto: CreatePermissionDto) {
     return this.permissionsRepository.create(createPermissionDto);
@@ -20,7 +17,7 @@ export class PermissionsService {
       where['isActive'] = true;
     }
     return this.permissionsRepository.repository.find({
-      where
+      where,
     });
   }
 

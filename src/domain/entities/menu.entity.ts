@@ -1,7 +1,17 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  OneToOne,
+} from 'typeorm';
 import { Page } from './page.entity';
 
-@Entity() 
+@Entity()
 export class Menu {
   @PrimaryGeneratedColumn()
   id?: number;
@@ -20,7 +30,7 @@ export class Menu {
 
   @Column({ type: 'boolean', default: false })
   isExternalUrl: boolean;
-  
+
   @Column({ type: 'varchar', length: 255, default: '#', nullable: true })
   url: string;
 
@@ -49,12 +59,18 @@ export class Menu {
   deletedAt?: Date | null;
 
   // Relación con el padre (Menús jerárquicos)
-  @ManyToOne(() => Menu, (menu) => menu.children, { nullable: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Menu, (menu) => menu.children, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'parentId' })
   parent?: Menu;
 
   // Relación con Page (uno a uno, opcional)
-  @ManyToOne(() => Page, (page) => page.menus, { nullable: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Page, (page) => page.menus, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'pageId' })
   page?: Page | null;
 

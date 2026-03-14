@@ -1,4 +1,11 @@
-import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException, Scope } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  Scope,
+} from '@nestjs/common';
 // import * as bcrypt from 'bcrypt';
 import { REQUEST } from '@nestjs/core';
 import { User } from '../domain/entities/user.entity';
@@ -13,14 +20,13 @@ import { LoginOrigin } from '../auth/auth.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
-
   constructor(
     // private readonly mailService: MailService,
     @Inject(REQUEST) private request: Request,
     private readonly usersRepository: UsersRepository,
     private readonly rolesRepository: RolesRepository,
     private readonly categoriesRepository: CategoriesRepository,
-  ) { }
+  ) {}
 
   async findAll({ onlyActive } = { onlyActive: false }) {
     const where = {};
@@ -28,7 +34,7 @@ export class UsersService {
       where['isActive'] = true;
     }
     return this.usersRepository.repository.find({
-      where
+      where,
     });
   }
 
@@ -41,13 +47,13 @@ export class UsersService {
     }
     const category = await this.categoriesRepository.repository.findOneOrFail({
       where: {
-        id: categoryId
-      }
+        id: categoryId,
+      },
     });
     const role = await this.rolesRepository.repository.findOne({
       where: {
-        id: createUserDto.roleId
-      }
+        id: createUserDto.roleId,
+      },
     });
     if (!role) {
       throw new BadRequestException('Role not found');
@@ -56,7 +62,7 @@ export class UsersService {
       ...createUserDto,
       role,
       category,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
     try {
       const newUser = await this.usersRepository.repository.save(user);
@@ -72,8 +78,8 @@ export class UsersService {
     console.log({ id, updateUserDto });
     const user = await this.usersRepository.repository.findOneOrFail({
       where: {
-        id
-      }
+        id,
+      },
     });
     console.log({ user });
     const { email, categoryId } = updateUserDto;
@@ -84,20 +90,25 @@ export class UsersService {
         throw new BadRequestException('Email already in use');
       }
     }
-    if( categoryId && categoryId !== user.categoryId) {
-      const category = await this.categoriesRepository.repository.findOneOrFail({
-        where: {
-          id: categoryId
-        }
-      });
+    if (categoryId && categoryId !== user.categoryId) {
+      const category = await this.categoriesRepository.repository.findOneOrFail(
+        {
+          where: {
+            id: categoryId,
+          },
+        },
+      );
       user.category = category;
     }
     const role = await this.rolesRepository.repository.findOneOrFail({
       where: {
-        id: updateUserDto.roleId
-      }
+        id: updateUserDto.roleId,
+      },
     });
-    const updatedUser = this.usersRepository.repository.merge(user, updateUserDto);
+    const updatedUser = this.usersRepository.repository.merge(
+      user,
+      updateUserDto,
+    );
     updatedUser.role = role;
     const newUser = await this.usersRepository.repository.save(updatedUser);
     console.log({ newUser });
@@ -110,7 +121,7 @@ export class UsersService {
       where['isActive'] = true;
     }
     const user = await this.usersRepository.repository.findOne({
-      where
+      where,
     });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -126,7 +137,7 @@ export class UsersService {
 
   getLoginOrigin(): LoginOrigin {
     const loginOrigin = this.request['loginOrigin'];
-    if(loginOrigin === undefined) {
+    if (loginOrigin === undefined) {
       throw new BadRequestException('LoginOrigin not found');
     }
     return loginOrigin;

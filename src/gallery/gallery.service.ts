@@ -4,38 +4,41 @@ import { GalleriesRepository } from '../domain/repositories/gallery.repository';
 // import { GalleryImagesRepository } from '../domain/repositories/gallery-image.repository';
 import { In } from 'typeorm';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
-import { Gallery, GalleryImage, GalleryType } from '../domain/entities/gallery.entity';
+import {
+  Gallery,
+  GalleryImage,
+  GalleryType,
+} from '../domain/entities/gallery.entity';
 import { GalleryImagesRepository } from '../domain/repositories/gallery-image.repository';
 import { UpdateGalleryDto } from './dto/update-gallery.dto';
 import axios from 'axios';
 
 @Injectable()
 export class GalleryService {
-
   constructor(
     private readonly galleriesRepository: GalleriesRepository,
     private readonly galleryImagesRepository: GalleryImagesRepository,
-  ) { }
+  ) {}
 
   async findAll(query: ContentFilters) {
     const { keys, onlyActive } = query;
     let where = {};
     if (onlyActive === 'true') {
       where = {
-        isActive: true
+        isActive: true,
       };
     }
     if (keys) {
       const keysArray = keys.split(',');
       where = {
-        urlKey: In(keysArray)
+        urlKey: In(keysArray),
       };
     }
     const galleries = await this.galleriesRepository.repository.find({
       where,
       relations: ['images'],
     });
-    return galleries.map(g => {
+    return galleries.map((g) => {
       const images = g.images.sort((a, b) => a.sort - b.sort);
       return {
         ...g,
@@ -65,7 +68,7 @@ export class GalleryService {
     const gallery: Gallery = {
       ...rest,
       createdAt: new Date(),
-    }
+    };
     if (gallery.type === GalleryType.BANNER && startDate && endDate) {
       console.log({ startDate, endDate });
       gallery.startDate = new Date(startDate);
@@ -80,7 +83,7 @@ export class GalleryService {
         galleryId: newGallery.id,
         gallery: newGallery,
         createdAt: new Date(),
-      }
+      };
       await this.galleryImagesRepository.repository.save(galleryImage);
     }
     const createdGallery = await this.findOne(newGallery.id);
@@ -107,7 +110,9 @@ export class GalleryService {
       ...galleryWithoutImages,
       ...rest,
     };
-    const deleteImages = currentImages.filter(image => !images.some(i => i.id === image.id));
+    const deleteImages = currentImages.filter(
+      (image) => !images.some((i) => i.id === image.id),
+    );
     console.log({ deleteImages });
     for (const image of deleteImages) {
       await this.galleryImagesRepository.repository.softDelete(image.id);
@@ -115,14 +120,17 @@ export class GalleryService {
     for (const imageDto of images) {
       const { id, ...rest } = imageDto;
       if (id) {
-        await this.galleryImagesRepository.repository.update(id, { ...rest, updatedAt: new Date() });
+        await this.galleryImagesRepository.repository.update(id, {
+          ...rest,
+          updatedAt: new Date(),
+        });
       } else {
         const galleryImage: GalleryImage = {
           ...rest,
           galleryId: gallery.id,
           gallery,
           createdAt: new Date(),
-        }
+        };
         await this.galleryImagesRepository.repository.save(galleryImage);
       }
     }

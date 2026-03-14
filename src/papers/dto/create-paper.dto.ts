@@ -38,7 +38,7 @@ export class CreateAuthorDto {
 
   @IsString()
   @IsOptional()
-  other?:string;
+  other?: string;
 
   @IsString()
   @IsOptional()
@@ -114,7 +114,7 @@ export class CreatePaperDto {
   @IsOptional()
   file: string | null;
 
- @IsString()
+  @IsString()
   @IsOptional()
   copyrightForm?: string | null;
 

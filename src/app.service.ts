@@ -4,10 +4,7 @@ import { MailService } from './common/services/mail.service';
 
 @Injectable()
 export class AppService {
-
-  constructor(
-    private readonly mailService: MailService,
-  ) { }
+  constructor(private readonly mailService: MailService) {}
 
   getHello(): string {
     return 'Hello World!';

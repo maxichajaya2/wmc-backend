@@ -1,14 +1,20 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class CreateTopicDto{
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+export class CreateTopicDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
 
-    @IsNumber()
-    categoryId: number;
+  @IsNumber()
+  categoryId: number;
 }

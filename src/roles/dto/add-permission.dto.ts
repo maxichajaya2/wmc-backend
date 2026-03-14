@@ -1,14 +1,14 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class AddPermissionDto{
-    @IsOptional()
-    id?: number;
+export class AddPermissionDto {
+  @IsOptional()
+  id?: number;
 
-    @IsString()
-    @IsNotEmpty()
-    action: string;
+  @IsString()
+  @IsNotEmpty()
+  action: string;
 
-    @IsString()
-    @IsNotEmpty()
-    module: string;
+  @IsString()
+  @IsNotEmpty()
+  module: string;
 }

@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpCode,
+} from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
@@ -19,7 +29,9 @@ export class RoomsController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.roomsService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.roomsService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Patch(':id')

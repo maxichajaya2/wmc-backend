@@ -8,49 +8,48 @@ import { CountriesService } from '../common/services/countries.service';
 
 @Injectable()
 export class SpeakersService {
-
   constructor(
     private readonly speakerRepository: SpeakersRepository,
     private readonly speakerTypeRepository: SpeakerTypesRepository,
     private readonly countriesService: CountriesService,
-  ) { }
+  ) {}
 
   async create(createSpeakerDto: CreateSpeakerDto) {
     const speakerType = await this.speakerTypeRepository.repository.findOne({
-      where: { id: createSpeakerDto.speakerTypeId }
-    })
+      where: { id: createSpeakerDto.speakerTypeId },
+    });
     if (!speakerType) {
-      throw new NotFoundException('Speaker Type not found')
+      throw new NotFoundException('Speaker Type not found');
     }
     const { countryCode } = createSpeakerDto;
-    if(countryCode){
+    if (countryCode) {
       const country = this.countriesService.getCountry(countryCode);
-      if(!country){
-        throw new NotFoundException('Country not found')
+      if (!country) {
+        throw new NotFoundException('Country not found');
       }
     }
     const speaker: Speaker = {
       ...createSpeakerDto,
       speakerType,
       createdAt: new Date(),
-    }
+    };
 
     const newSpeaker = await this.speakerRepository.repository.save(speaker);
     return this.toJson(newSpeaker);
   }
 
-  toJson(speaker: Speaker){
+  toJson(speaker: Speaker) {
     const { countryCode } = speaker;
     const country = this.countriesService.getCountry(countryCode);
     return {
       ...speaker,
-      country
-    }
+      country,
+    };
   }
 
-  async findAll({onlyActive = false} = {}) {
+  async findAll({ onlyActive = false } = {}) {
     const where = {};
-    if(onlyActive){
+    if (onlyActive) {
       where['isActive'] = true;
     }
     const speakers = await this.speakerRepository.repository.find({
@@ -59,35 +58,35 @@ export class SpeakersService {
     return speakers.map(this.toJson.bind(this));
   }
 
-  async findOne(id: number, {onlyActive = false} = {}) {
+  async findOne(id: number, { onlyActive = false } = {}) {
     const where = { id };
-    if(onlyActive){
+    if (onlyActive) {
       where['isActive'] = true;
     }
     const speaker = await this.speakerRepository.repository.findOne({
       where: where,
     });
     if (!speaker) {
-      throw new NotFoundException('Speaker not found')
+      throw new NotFoundException('Speaker not found');
     }
     return this.toJson(speaker);
   }
 
   async update(id: number, updateSpeakerDto: UpdateSpeakerDto) {
-    const speaker = await this.findOne(id); 
+    const speaker = await this.findOne(id);
     const { speakerTypeId, countryCode } = updateSpeakerDto;
-    if(countryCode && countryCode !== speaker.countryCode){
+    if (countryCode && countryCode !== speaker.countryCode) {
       const country = this.countriesService.getCountry(countryCode);
-      if(!country){
-        throw new NotFoundException('Country not found')
+      if (!country) {
+        throw new NotFoundException('Country not found');
       }
     }
-    if(speakerTypeId && speakerTypeId !== speaker.speakerTypeId){
+    if (speakerTypeId && speakerTypeId !== speaker.speakerTypeId) {
       const speakerType = await this.speakerTypeRepository.repository.findOne({
-        where: { id: speakerTypeId }
-      })
+        where: { id: speakerTypeId },
+      });
       if (!speakerType) {
-        throw new NotFoundException('Speaker Type not found')
+        throw new NotFoundException('Speaker Type not found');
       }
       speaker.speakerType = speakerType;
     }
@@ -95,7 +94,7 @@ export class SpeakersService {
       ...speaker,
       ...updateSpeakerDto,
       updatedAt: new Date(),
-    }
+    };
     const us = await this.speakerRepository.repository.save(updatedSpeaker);
     return this.toJson(us);
   }

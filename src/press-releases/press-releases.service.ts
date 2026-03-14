@@ -6,10 +6,9 @@ import { PressReleasesRepository } from '../domain/repositories/press-releases.r
 
 @Injectable()
 export class PressReleasesService {
-
   constructor(
-    private readonly pressReleasesRepository: PressReleasesRepository
-  ) { }
+    private readonly pressReleasesRepository: PressReleasesRepository,
+  ) {}
 
   async create(createPressReleaseDto: CreatePressReleaseDto) {
     const { date } = createPressReleaseDto;
@@ -17,18 +16,19 @@ export class PressReleasesService {
       ...createPressReleaseDto,
       date: date ? new Date(date) : null,
       createdAt: new Date(),
-    }
-    const createdRelease = await this.pressReleasesRepository.repository.save(pressRelease);
+    };
+    const createdRelease =
+      await this.pressReleasesRepository.repository.save(pressRelease);
     return createdRelease;
   }
 
-  async findAll({onlyActive} = {onlyActive: false}) {
+  async findAll({ onlyActive } = { onlyActive: false }) {
     let where = {};
-    if(onlyActive){
+    if (onlyActive) {
       where = { isActive: true };
     }
     const pressReleases = await this.pressReleasesRepository.repository.find({
-      where
+      where,
     });
     return pressReleases;
   }
@@ -36,8 +36,8 @@ export class PressReleasesService {
   async findOne(id: number) {
     const pressRelease = await this.pressReleasesRepository.repository.findOne({
       where: {
-        id
-      }
+        id,
+      },
     });
     if (!pressRelease) {
       throw new NotFoundException('Press release not found');
@@ -51,8 +51,11 @@ export class PressReleasesService {
       ...pressRelease,
       ...updatePressReleaseDto,
       updatedAt: new Date(),
-    }
-    await this.pressReleasesRepository.repository.update(id, updatedPressRelease);
+    };
+    await this.pressReleasesRepository.repository.update(
+      id,
+      updatedPressRelease,
+    );
     return updatedPressRelease;
   }
 

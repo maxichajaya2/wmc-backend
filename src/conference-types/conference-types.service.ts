@@ -7,14 +7,14 @@ import { ConferenceType } from '../domain/entities/conference-type.entity';
 @Injectable()
 export class ConferenceTypesService {
   constructor(
-    private readonly conferenceTypesRepository: ConferenceTypesRepository
-  ) { }
+    private readonly conferenceTypesRepository: ConferenceTypesRepository,
+  ) {}
 
   create(createConferenceTypeDto: CreateConferenceTypeDto) {
     const conferenceType: ConferenceType = {
       ...createConferenceTypeDto,
       createdAt: new Date(),
-    }
+    };
     return this.conferenceTypesRepository.repository.save(conferenceType);
   }
 
@@ -24,7 +24,7 @@ export class ConferenceTypesService {
       where['isActive'] = true;
     }
     return this.conferenceTypesRepository.repository.find({
-      where
+      where,
     });
   }
 
@@ -34,7 +34,7 @@ export class ConferenceTypesService {
       where['isActive'] = true;
     }
     const room = await this.conferenceTypesRepository.repository.findOne({
-      where
+      where,
     });
     if (!room) {
       throw new NotFoundException('Room not found');
@@ -50,8 +50,8 @@ export class ConferenceTypesService {
     const updatedRoom = {
       ...room,
       ...updateConferenceTypeDto,
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    };
     return this.conferenceTypesRepository.repository.save(updatedRoom);
   }
 

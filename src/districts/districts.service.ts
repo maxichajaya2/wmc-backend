@@ -3,20 +3,17 @@ import { DistrictsRepository } from '../domain/repositories/districts.repository
 
 @Injectable()
 export class DistrictsService {
-  
-  constructor(
-    private readonly districtsRepository: DistrictsRepository
-  ){}
+  constructor(private readonly districtsRepository: DistrictsRepository) {}
 
   findAll(query: any) {
     const { provinceId } = query;
-    if(!provinceId){
+    if (!provinceId) {
       throw new BadRequestException('departmentId is required');
     }
     return this.districtsRepository.repository.find({
       where: {
-        provinceId
-      }
-    })
+        provinceId,
+      },
+    });
   }
 }

@@ -7,9 +7,8 @@ export class FilesService {
   storagePath = process.env.STORAGE_PATH || 'static/multimedia';
 
   getStaticFile(imageName: string) {
-
     const path = join(__dirname, `../../${this.storagePath}`, imageName);
-    console.log({path});
+    console.log({ path });
     if (!existsSync(path))
       throw new BadRequestException(`No product found with image ${imageName}`);
 

@@ -57,7 +57,7 @@ import { AbstractsModule } from './abstracts/abstracts.module';
     FilesModule,
     CategoriesModule,
     ParametersModule,
-    ReportsModule
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

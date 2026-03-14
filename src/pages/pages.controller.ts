@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  Query,
+} from '@nestjs/common';
 import { PagesService } from './pages.service';
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
@@ -13,13 +23,23 @@ export class PagesController {
   }
 
   @Get()
-  findAll(@Query('short') short: string, @Query('onlyActive') onlyActive: string, @Query('keys') keys: string) {
-    return this.pagesService.findAll({short: short === 'true', onlyActive: onlyActive === 'true', keys});
+  findAll(
+    @Query('short') short: string,
+    @Query('onlyActive') onlyActive: string,
+    @Query('keys') keys: string,
+  ) {
+    return this.pagesService.findAll({
+      short: short === 'true',
+      onlyActive: onlyActive === 'true',
+      keys,
+    });
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.pagesService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.pagesService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Patch(':id')

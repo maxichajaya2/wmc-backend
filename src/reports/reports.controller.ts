@@ -32,8 +32,14 @@ export class ReportsController {
     });
 
     // Configurar headers para la descarga
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=trabajos-tecnicos.xlsx');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=trabajos-tecnicos.xlsx',
+    );
 
     res.send(buffer);
   }

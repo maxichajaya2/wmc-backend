@@ -15,7 +15,7 @@ export class AppController {
     private readonly countriesService: CountriesService,
     private readonly categoriesRepository: CategoriesRepository,
     private readonly topicsRepository: TopicsRepository,
-  ) { }
+  ) {}
 
   @Get()
   getHello(): string {
@@ -41,14 +41,15 @@ export class AppController {
         name: categoryName,
         createdAt: new Date(),
       };
-      const categoryCreated = await this.categoriesRepository.repository.save(category);
+      const categoryCreated =
+        await this.categoriesRepository.repository.save(category);
       for (const topicName of topicNames) {
         console.log(`Inserting ${topicName}`);
         const topic: Topic = {
           name: topicName,
           category: categoryCreated,
           createdAt: new Date(),
-        }
+        };
         await this.topicsRepository.repository.save(topic);
       }
     }

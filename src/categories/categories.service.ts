@@ -6,54 +6,51 @@ import { Category } from './entities/category.entity';
 
 @Injectable()
 export class CategoriesService {
-
-  constructor(
-    private readonly categoriesRepository: CategoriesRepository,
-  ) {}
+  constructor(private readonly categoriesRepository: CategoriesRepository) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
-      const category: Category = {
-        ...createCategoryDto,
-      }
-      return this.categoriesRepository.repository.save(category);
+    const category: Category = {
+      ...createCategoryDto,
+    };
+    return this.categoriesRepository.repository.save(category);
+  }
+
+  async findAll({ onlyActive } = { onlyActive: false }) {
+    let where = {};
+    if (onlyActive) {
+      where = { isActive: true };
     }
-  
-    async findAll({onlyActive} = {onlyActive: false}) {
-      let where = {};
-      if(onlyActive){
-        where = { isActive: true };
-      }
-      return this.categoriesRepository.repository.find({
-        where,
-      });
+    return this.categoriesRepository.repository.find({
+      where,
+    });
+  }
+
+  async findOne(id: number) {
+    const where = {
+      id,
+    };
+    const category = await this.categoriesRepository.repository.findOne({
+      where,
+    });
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
-  
-    async findOne(id: number) {
-      let where = {
-        id,
-      };
-      const category = await this.categoriesRepository.repository.findOne({
-        where,
-      });
-      if(!category){
-        throw new NotFoundException('Category not found');
-      }
-      return category;
-    }
-  
-    async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-        const category = await this.findOne(id);
-        const updatedCourse = {
-          ...category,
-          ...updateCategoryDto,
-          updatedAt: new Date(),
-        }
-        await this.categoriesRepository.repository.update(id, updatedCourse);
-        return updatedCourse;
-      }
-  
-      async remove(id: number){
-        this.categoriesRepository.repository.softDelete(id);
-        return null;
-      }
+    return category;
+  }
+
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.findOne(id);
+    const updatedCourse = {
+      ...category,
+      ...updateCategoryDto,
+      updatedAt: new Date(),
+    };
+    await this.categoriesRepository.repository.update(id, updatedCourse);
+    return updatedCourse;
+  }
+
+  async remove(id: number) {
+    this.categoriesRepository.repository.softDelete(id);
+    return null;
+  }
 }

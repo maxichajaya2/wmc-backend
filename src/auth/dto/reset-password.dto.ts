@@ -5,7 +5,8 @@ export class ResetPasswordDto {
   @IsNotEmpty()
   password: string;
 
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   email?: string;
 
   @IsOptional()

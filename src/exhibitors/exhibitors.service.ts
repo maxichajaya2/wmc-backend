@@ -9,18 +9,18 @@ import { In } from 'typeorm';
 
 @Injectable()
 export class ExhibitorsService {
-
   constructor(
     private readonly exhibitorsRepository: ExhibitorsRepository,
-    private readonly standsRepository: StandsRepository 
-  ) { }
+    private readonly standsRepository: StandsRepository,
+  ) {}
 
   async create(createExhibitorDto: CreateExhibitorDto) {
     const pressRelease: Exhibitor = {
       ...createExhibitorDto,
       createdAt: new Date(),
-    }
-    const createdRelease = await this.exhibitorsRepository.repository.save(pressRelease);
+    };
+    const createdRelease =
+      await this.exhibitorsRepository.repository.save(pressRelease);
     return createdRelease;
   }
 
@@ -31,7 +31,7 @@ export class ExhibitorsService {
     }
     const exhibitors = await this.exhibitorsRepository.repository.find({
       where,
-      relations: ['stands']
+      relations: ['stands'],
     });
     return exhibitors;
   }
@@ -39,9 +39,9 @@ export class ExhibitorsService {
   async findOne(id: number) {
     const exhibitor = await this.exhibitorsRepository.repository.findOne({
       where: {
-        id
+        id,
       },
-      relations: ['stands']
+      relations: ['stands'],
     });
     if (!exhibitor) {
       throw new NotFoundException('Press release not found');
@@ -51,13 +51,13 @@ export class ExhibitorsService {
 
   async update(id: number, updateExhibitorDto: UpdateExhibitorDto) {
     const exhibitor = await this.exhibitorsRepository.repository.findOneOrFail({
-      where: { id }
+      where: { id },
     });
     const updatedExhibitor: Exhibitor = {
       ...exhibitor,
       ...updateExhibitorDto,
       updatedAt: new Date(),
-    }
+    };
     await this.exhibitorsRepository.repository.update(id, updatedExhibitor);
     return updatedExhibitor;
   }
@@ -72,8 +72,8 @@ export class ExhibitorsService {
     const exhibitor = await this.findOne(id);
     const stands = await this.standsRepository.repository.find({
       where: {
-        id: In(standIds)
-      }
+        id: In(standIds),
+      },
     });
     exhibitor.stands = stands;
     await this.exhibitorsRepository.repository.save(exhibitor);

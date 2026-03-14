@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, JoinColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { Paper } from './paper.entity';
 import { Topic } from './topic.entity';
 
@@ -11,7 +20,7 @@ export enum DocumentType {
   CREDENCIAL_DIPLOMATICA = 'A',
 }
 
-export enum WebUserType{
+export enum WebUserType {
   REVIEWER = 'reviewer',
   USER = 'user',
 }
@@ -34,7 +43,7 @@ export class WebUser {
     type: 'enum',
     enum: DocumentType,
     default: DocumentType.DNI, // Opcional: establece un valor por defecto
-    nullable: true, 
+    nullable: true,
   })
   documentType?: DocumentType;
 
@@ -75,7 +84,7 @@ export class WebUser {
   // @OneToMany(() => Enrollment, enrollment => enrollment.user)
   // enrollments?: Enrollment[];
 
-  @OneToMany(() => Paper, paper => paper.webUser)
+  @OneToMany(() => Paper, (paper) => paper.webUser)
   papers?: Paper[];
 
   topics?: Topic[];

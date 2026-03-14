@@ -7,17 +7,9 @@ import { CountriesService } from './services/countries.service';
 
 @Global()
 @Module({
-  providers: [
-    MailService,
-    CommonService,
-    OtpService,
-    CountriesService
-  ],
+  providers: [MailService, CommonService, OtpService, CountriesService],
   controllers: [CommonController],
   imports: [],
-  exports: [
-    MailService,
-    CountriesService
-  ],
+  exports: [MailService, CountriesService],
 })
-export class CommonModule { }
+export class CommonModule {}

@@ -136,7 +136,7 @@ export class PapersService {
   }
 
   async findOne(id: number, { onlyActive } = { onlyActive: false }) {
-    let where = { id };
+    const where = { id };
     if (onlyActive) {
       where['isActive'] = true;
     }
@@ -398,7 +398,13 @@ export class PapersService {
   }
 
   async changeStatus(id: number, changeStateDto: ChangeStateDto) {
-    const { state, reviewerUserId, leaderId, type } = changeStateDto;
+    const {
+      state,
+      reviewerUserId,
+      leaderId,
+      type,
+      process: processFromDto,
+    } = changeStateDto;
     const loggedUser = this.usersService.getLoggedUser();
     const loginOrigin = this.usersService.getLoginOrigin();
     // if (loginOrigin !== LoginOrigin.BACKOFFICE && state !== PaperState.RECEIVED) {
@@ -591,6 +597,9 @@ export class PapersService {
           );
         }
         paper.state = state;
+        if (processFromDto) {
+          paper.process = processFromDto as Process;
+        }
         if (isPreSelected) {
           paper.approvedDate = new Date();
         } else {

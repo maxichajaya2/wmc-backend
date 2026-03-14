@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
 import { EnrollmentsRepository } from '../domain/repositories/enrollments.repository';
@@ -6,7 +10,12 @@ import { DepartmentsRepository } from '../domain/repositories/departments.reposi
 import { DistrictsRepository } from '../domain/repositories/districts.repository';
 import { ProvincesRepository } from '../domain/repositories/provinces.repository';
 import { FeesRepository } from '../domain/repositories/fees.repository';
-import { Enrollment, PaymentMethod, PaymentStatus, RegistrationStatus } from '../domain/entities/enrollment.entity';
+import {
+  Enrollment,
+  PaymentMethod,
+  PaymentStatus,
+  RegistrationStatus,
+} from '../domain/entities/enrollment.entity';
 import { WebUsersRepository } from '../domain/repositories/web-users.repository';
 import { CountriesService } from '../common/services/countries.service';
 import { ChangeRegistrationStatusDto } from './dto/change-registration-status.dto';
@@ -14,7 +23,6 @@ import { ChangePaymentStatusDto } from './dto/change-payment-status.dto';
 
 @Injectable()
 export class EnrollmentsService {
-
   constructor(
     private readonly enrollmentsRepository: EnrollmentsRepository,
     private readonly departmentRepository: DepartmentsRepository,
@@ -23,10 +31,19 @@ export class EnrollmentsService {
     private readonly feeRepository: FeesRepository,
     private readonly webUsersRepository: WebUsersRepository,
     private readonly countriesService: CountriesService,
-  ) { }
+  ) {}
 
   async create(createEnrollmentDto: CreateEnrollmentDto) {
-    const { departmentId, districtId, provinceId, feeId, userId, countryCode, paymentMethod, paymentFile } = createEnrollmentDto;
+    const {
+      departmentId,
+      districtId,
+      provinceId,
+      feeId,
+      userId,
+      countryCode,
+      paymentMethod,
+      paymentFile,
+    } = createEnrollmentDto;
     if (countryCode) {
       const country = this.countriesService.getCountry(countryCode);
       if (!country) {
@@ -39,7 +56,7 @@ export class EnrollmentsService {
     console.log({ departmentId, districtId, provinceId, feeId, userId });
     if (countryCode === 'PE' && (!departmentId || !provinceId || !districtId)) {
       throw new BadRequestException({
-        code: 'MISSING_REQUIRED_FIELDS'
+        code: 'MISSING_REQUIRED_FIELDS',
       });
     }
     const [fee, webUser] = await Promise.all([
@@ -82,7 +99,7 @@ export class EnrollmentsService {
       registrationStatus: RegistrationStatus.REGISTERED,
       user: webUser,
       registrationNumber: null,
-    }
+    };
     if (department) {
       enrollment.department = department;
     }
@@ -107,13 +124,21 @@ export class EnrollmentsService {
 
   // async findOne(id: number, {onlyActive} = {onlyActive: false}) {
   async findOne(id: number) {
-    let where = { id };
+    const where = { id };
     // if(onlyActive){
     //   where['isActive'] = true;
     // }
     const enrollment = await this.enrollmentsRepository.repository.findOne({
       where,
-      relations: ['department', 'district', 'province', 'fee', 'user', 'fee.course', 'fee.course.conferenceType'],
+      relations: [
+        'department',
+        'district',
+        'province',
+        'fee',
+        'user',
+        'fee.course',
+        'fee.course.conferenceType',
+      ],
     });
     if (!enrollment) {
       throw new NotFoundException('Enrollment not found');
@@ -123,7 +148,16 @@ export class EnrollmentsService {
 
   async update(id: number, updateEnrollmentDto: UpdateEnrollmentDto) {
     const enrollment = await this.findOne(id);
-    const { departmentId, provinceId, districtId, userId, feeId, countryCode, paymentMethod, paymentFile } = updateEnrollmentDto;
+    const {
+      departmentId,
+      provinceId,
+      districtId,
+      userId,
+      feeId,
+      countryCode,
+      paymentMethod,
+      paymentFile,
+    } = updateEnrollmentDto;
     if (paymentMethod === PaymentMethod.DEPOSIT && !paymentFile) {
       throw new NotFoundException('Payment file is required');
     }
@@ -182,7 +216,7 @@ export class EnrollmentsService {
       ...enrollment,
       ...updateEnrollmentDto,
       updatedAt: new Date(),
-    }
+    };
     await this.enrollmentsRepository.repository.update(id, updatedEnrollment);
     return updatedEnrollment;
   }
@@ -192,7 +226,10 @@ export class EnrollmentsService {
     return null;
   }
 
-  async changeRegistrationStatus(id: number, changeStatusDto: ChangeRegistrationStatusDto) {
+  async changeRegistrationStatus(
+    id: number,
+    changeStatusDto: ChangeRegistrationStatusDto,
+  ) {
     const { status } = changeStatusDto;
     const enrollment = await this.findOne(id);
     console.log(enrollment);
@@ -201,12 +238,15 @@ export class EnrollmentsService {
     return enrollment;
   }
 
-  async changePaymentStatus(id: number, changeStatusDto: ChangePaymentStatusDto) {
+  async changePaymentStatus(
+    id: number,
+    changeStatusDto: ChangePaymentStatusDto,
+  ) {
     const { status } = changeStatusDto;
     const enrollment = await this.findOne(id);
     if (enrollment.paymentMethod !== PaymentMethod.DEPOSIT) {
       throw new BadRequestException({
-        code: 'NOT_ALLOWED'
+        code: 'NOT_ALLOWED',
       });
     }
     enrollment.paymentStatus = status;

@@ -1,37 +1,43 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class CreateMenuDto{
-    @IsString()
-    @IsNotEmpty()
-    titleEs: string;
+export class CreateMenuDto {
+  @IsString()
+  @IsNotEmpty()
+  titleEs: string;
 
-    @IsString()
-    @IsNotEmpty()
-    titleEn: string;
+  @IsString()
+  @IsNotEmpty()
+  titleEn: string;
 
-    @IsNumber()
-    @IsOptional()
-    parentId: number;
+  @IsNumber()
+  @IsOptional()
+  parentId: number;
 
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
+  @IsBoolean()
+  @IsOptional()
+  isActive: boolean;
 
-    @IsNumber()
-    sort: number;
+  @IsNumber()
+  sort: number;
 
-    @IsBoolean()
-    isExternalUrl: boolean;
+  @IsBoolean()
+  isExternalUrl: boolean;
 
-    @IsString()
-    @IsOptional()
-    url: string;
+  @IsString()
+  @IsOptional()
+  url: string;
 
-    @IsNumber()
-    @IsOptional()
-    pageId: number;
+  @IsNumber()
+  @IsOptional()
+  pageId: number;
 
-    @IsString()
-    @IsOptional()
-    icon: string;
+  @IsString()
+  @IsOptional()
+  icon: string;
 }

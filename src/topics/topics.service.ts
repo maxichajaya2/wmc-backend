@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TopicsRepository } from '../domain/repositories/topics.repository';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { Topic } from '../domain/entities/topic.entity';
@@ -9,12 +13,11 @@ import { CategoriesRepository } from '../domain/repositories/categories.reposito
 
 @Injectable()
 export class TopicsService {
-
   constructor(
     private readonly topicsRepository: TopicsRepository,
     private readonly webUsersRepository: WebUsersRepository,
     private readonly categoriesRepository: CategoriesRepository,
-  ) { }
+  ) {}
 
   findAll({ onlyActive } = { onlyActive: false }) {
     const where = {};
@@ -22,7 +25,7 @@ export class TopicsService {
       where['isActive'] = true;
     }
     return this.topicsRepository.repository.find({
-      where
+      where,
     });
   }
 
@@ -32,7 +35,7 @@ export class TopicsService {
       where['isActive'] = true;
     }
     const topic = await this.topicsRepository.repository.findOne({
-      where
+      where,
     });
     if (!topic) {
       throw new NotFoundException(`Topic #${id} not found`);
@@ -43,7 +46,7 @@ export class TopicsService {
   async create(createTopicDto: CreateTopicDto) {
     const { categoryId } = createTopicDto;
     const category = await this.categoriesRepository.repository.findOne({
-      where: { id: categoryId }
+      where: { id: categoryId },
     });
     if (!category) {
       throw new NotFoundException(`Category #${categoryId} not found`);
@@ -51,8 +54,8 @@ export class TopicsService {
     const topic: Topic = {
       ...createTopicDto,
       category,
-      createdAt: new Date()
-    }
+      createdAt: new Date(),
+    };
     return this.topicsRepository.repository.save(topic);
   }
 
@@ -62,11 +65,11 @@ export class TopicsService {
     const updatedTopic: Topic = {
       ...topic,
       ...updateTopicDto,
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    };
     if (categoryId && categoryId !== topic.categoryId) {
       const category = await this.categoriesRepository.repository.findOne({
-        where: { id: categoryId }
+        where: { id: categoryId },
       });
       if (!category) {
         throw new NotFoundException(`Category #${categoryId} not found`);
@@ -84,22 +87,22 @@ export class TopicsService {
   async addUser(id: number, userId: number) {
     const topic = await this.topicsRepository.repository.findOne({
       where: { id },
-      relations: ['users']
+      relations: ['users'],
     });
     if (!topic) {
       throw new NotFoundException(`Topic #${id} not found`);
     }
     const user = await this.webUsersRepository.findById(userId);
-    if (topic.users.some(u => u.id === user.id)) {
+    if (topic.users.some((u) => u.id === user.id)) {
       throw new BadRequestException({
         code: 'USER_ALREADY_ADDED',
-        message: 'User is already added to the topic'
+        message: 'User is already added to the topic',
       });
     }
     if (user.type !== WebUserType.REVIEWER) {
       throw new BadRequestException({
         code: 'INVALID_USER_TYPE',
-        message: 'Only reviewers can be added to topics'
+        message: 'Only reviewers can be added to topics',
       });
     }
     if (!user) {
@@ -112,7 +115,7 @@ export class TopicsService {
   async removeUser(id: number, userId: number) {
     const topic = await this.topicsRepository.repository.findOne({
       where: { id },
-      relations: ['users']
+      relations: ['users'],
     });
     if (!topic) {
       throw new NotFoundException(`Topic #${id} not found`);
@@ -121,14 +124,14 @@ export class TopicsService {
     if (!user) {
       throw new NotFoundException(`User #${userId} not found`);
     }
-    topic.users = topic.users.filter(u => u.id !== user.id);
+    topic.users = topic.users.filter((u) => u.id !== user.id);
     return this.topicsRepository.repository.save(topic);
   }
 
   async getUsers(id: number) {
     const topic = await this.topicsRepository.repository.findOne({
       where: { id },
-      relations: ['users']
+      relations: ['users'],
     });
     if (!topic) {
       throw new NotFoundException(`Topic #${id} not found`);

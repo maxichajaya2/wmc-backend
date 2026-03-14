@@ -10,7 +10,14 @@ import { OtpService } from '../common/services/otp.service';
 @Global()
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, JwtService, ConfigService, OtpService, AuthGuard, UserTokensService],
+  providers: [
+    AuthService,
+    JwtService,
+    ConfigService,
+    OtpService,
+    AuthGuard,
+    UserTokensService,
+  ],
   imports: [
     ConfigModule,
     JwtModule.registerAsync({
@@ -20,15 +27,11 @@ import { OtpService } from '../common/services/otp.service';
           global: true,
           secret: configService.get<string>('JWT_SECRET'),
           signOptions: { expiresIn: '180d' },
-        }
+        };
       },
       inject: [ConfigService],
     }),
   ],
-  exports: [
-    JwtModule,
-    JwtService,
-    AuthGuard
-  ]
+  exports: [JwtModule, JwtService, AuthGuard],
 })
 export class AuthModule {}

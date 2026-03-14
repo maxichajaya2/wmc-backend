@@ -5,8 +5,8 @@ import { SpeakerType } from '../entities/speaker-type.entity';
 
 @Injectable()
 export class SpeakerTypesRepository {
-    constructor(
-        @InjectRepository(SpeakerType)
-        public readonly repository: Repository<SpeakerType>
-    ) { }
+  constructor(
+    @InjectRepository(SpeakerType)
+    public readonly repository: Repository<SpeakerType>,
+  ) {}
 }

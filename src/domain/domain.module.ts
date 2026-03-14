@@ -112,4 +112,4 @@ export const APP_ENTITIES = [
     TypeOrmModule.forFeature(APP_ENTITIES),
   ],
 })
-export class DomainModule { }
+export class DomainModule {}

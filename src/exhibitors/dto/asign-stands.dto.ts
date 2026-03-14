@@ -1,6 +1,6 @@
-import { IsArray } from "class-validator";
+import { IsArray } from 'class-validator';
 
 export class AssignStandsDto {
-    @IsArray()
-    standIds: number[];
+  @IsArray()
+  standIds: number[];
 }

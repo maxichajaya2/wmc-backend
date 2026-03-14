@@ -1,35 +1,44 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
-import { DocumentType, WebUserType } from "../../domain/entities/web-user.entity";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
+import {
+  DocumentType,
+  WebUserType,
+} from '../../domain/entities/web-user.entity';
 
 export class CreateWebUserDto {
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    lastName: string;
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
 
-    @IsString()
-    @IsOptional()
-    maternalLastName: string;
+  @IsString()
+  @IsOptional()
+  maternalLastName: string;
 
-    @IsEnum(DocumentType)
-    documentType: DocumentType;
+  @IsEnum(DocumentType)
+  documentType: DocumentType;
 
-    @IsEnum(WebUserType)
-    @IsOptional()
-    webUserType: WebUserType;
+  @IsEnum(WebUserType)
+  @IsOptional()
+  webUserType: WebUserType;
 
-    @IsString()
-    @IsNotEmpty()
-    documentNumber: string;
+  @IsString()
+  @IsNotEmpty()
+  documentNumber: string;
 
-    @IsString()
-    @IsNotEmpty()
-    email: string;
+  @IsString()
+  @IsNotEmpty()
+  email: string;
 
-    @IsString()
-    @IsOptional()
-    password?: string;
+  @IsString()
+  @IsOptional()
+  password?: string;
 }

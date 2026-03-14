@@ -5,13 +5,12 @@ import { Category } from '../entities/category.entity';
 
 @Injectable()
 export class CategoriesRepository {
+  constructor(
+    @InjectRepository(Category)
+    public readonly repository: Repository<Category>,
+  ) {}
 
-    constructor(
-        @InjectRepository(Category)
-        public readonly repository: Repository<Category>
-    ) { }
-
-    async findAll(){
-        return this.repository.find();
-    }
+  async findAll() {
+    return this.repository.find();
+  }
 }

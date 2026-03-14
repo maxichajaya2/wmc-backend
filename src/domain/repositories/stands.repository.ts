@@ -5,9 +5,8 @@ import { Stand } from '../entities/stand.entity';
 
 @Injectable()
 export class StandsRepository {
-
-    constructor(
-        @InjectRepository(Stand)
-        public readonly repository: Repository<Stand>,
-    ) { }
+  constructor(
+    @InjectRepository(Stand)
+    public readonly repository: Repository<Stand>,
+  ) {}
 }

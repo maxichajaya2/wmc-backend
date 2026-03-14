@@ -1,11 +1,21 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) { }
+  constructor(private readonly userService: UsersService) {}
 
   @Get()
   async findAll(@Query('onlyActive') onlyActive: string) {
@@ -20,8 +30,11 @@ export class UsersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.userService.findOne(+id, {onlyActive: onlyActive === 'true'});
+  async findOne(
+    @Param('id') id: string,
+    @Query('onlyActive') onlyActive: string,
+  ) {
+    return this.userService.findOne(+id, { onlyActive: onlyActive === 'true' });
   }
 
   @Patch(':id')

@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TopicsService } from './topics.service';
 import { CreateTopicDto } from './dto/create-topic.dto';
 import { UpdateTopicDto } from './dto/update-topic.dto';
@@ -14,7 +24,9 @@ export class TopicsController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.topicsService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.topicsService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Post()
@@ -47,5 +59,4 @@ export class TopicsController {
   findUsers(@Param('id') id: string) {
     return this.topicsService.getUsers(+id);
   }
-
 }

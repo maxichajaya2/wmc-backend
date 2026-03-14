@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { EnrollmentsService } from './enrollments.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 import { UpdateEnrollmentDto } from './dto/update-enrollment.dto';
@@ -25,7 +35,10 @@ export class EnrollmentsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEnrollmentDto: UpdateEnrollmentDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateEnrollmentDto: UpdateEnrollmentDto,
+  ) {
     return this.enrollmentsService.update(+id, updateEnrollmentDto);
   }
 
@@ -36,13 +49,25 @@ export class EnrollmentsController {
 
   @HttpCode(200)
   @Post(':id/registration-status')
-  changeRegistrationStatus(@Param('id') id: string, @Body() changeRegistrationStatusDto: ChangeRegistrationStatusDto) {
-    return this.enrollmentsService.changeRegistrationStatus(+id, changeRegistrationStatusDto);
+  changeRegistrationStatus(
+    @Param('id') id: string,
+    @Body() changeRegistrationStatusDto: ChangeRegistrationStatusDto,
+  ) {
+    return this.enrollmentsService.changeRegistrationStatus(
+      +id,
+      changeRegistrationStatusDto,
+    );
   }
-  
+
   @HttpCode(200)
   @Post(':id/payment-status')
-  changePaymentStatus(@Param('id') id: string, @Body() changePaymentStatusDto: ChangePaymentStatusDto) {
-    return this.enrollmentsService.changePaymentStatus(+id, changePaymentStatusDto);
+  changePaymentStatus(
+    @Param('id') id: string,
+    @Body() changePaymentStatusDto: ChangePaymentStatusDto,
+  ) {
+    return this.enrollmentsService.changePaymentStatus(
+      +id,
+      changePaymentStatusDto,
+    );
   }
 }

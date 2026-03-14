@@ -8,11 +8,10 @@ import { AddPermissionDto } from './dto/add-permission.dto';
 
 @Injectable()
 export class RolesService {
-
   constructor(
     private readonly rolesRepository: RolesRepository,
     private readonly permissionsRepository: PermissionsRepository,
-  ) { }
+  ) {}
 
   findAll({ onlyActive } = { onlyActive: false }) {
     const where = {};
@@ -20,7 +19,7 @@ export class RolesService {
       where['isActive'] = true;
     }
     return this.rolesRepository.repository.find({
-      where
+      where,
     });
   }
 
@@ -30,7 +29,7 @@ export class RolesService {
       where['isActive'] = true;
     }
     const role = await this.rolesRepository.repository.find({
-      where
+      where,
     });
     if (!role) {
       throw new NotFoundException('Role not found');
@@ -42,8 +41,8 @@ export class RolesService {
     const { name, permissionIds } = createRoleDto;
 
     let permissions = [];
-    
-    if(permissionIds && permissionIds.length > 0){
+
+    if (permissionIds && permissionIds.length > 0) {
       permissions = await this.permissionsRepository.findByIds(permissionIds);
     }
 
@@ -51,8 +50,8 @@ export class RolesService {
       name,
       createdAt: new Date(),
       users: [],
-      permissions
-    }
+      permissions,
+    };
     return this.rolesRepository.create(role);
   }
 
@@ -65,11 +64,12 @@ export class RolesService {
     }
     if (permissionId) {
       console.debug('Permission id exists in request: ' + permissionId);
-      const permission = await this.permissionsRepository.findById(permissionId);
+      const permission =
+        await this.permissionsRepository.findById(permissionId);
       if (!permission) {
         throw new NotFoundException('Permission not found');
       }
-      if (role.permissions.find(p => p.id === permission.id)) {
+      if (role.permissions.find((p) => p.id === permission.id)) {
         console.debug('Permission id already exists in role');
         return role;
       }
@@ -79,7 +79,10 @@ export class RolesService {
       return this.rolesRepository.update(role);
     }
     console.debug('Permission id does not exist in request');
-    const permission = await this.permissionsRepository.create({ action, module });
+    const permission = await this.permissionsRepository.create({
+      action,
+      module,
+    });
     console.log('Permission created: ' + permission.id);
     role.permissions.push(permission);
     console.log('new permissions: ' + role.permissions);
@@ -93,8 +96,8 @@ export class RolesService {
     }
     const payload = {
       ...role,
-      ...updateRoleDto
-    }
+      ...updateRoleDto,
+    };
     return this.rolesRepository.update(payload);
   }
 
@@ -103,7 +106,7 @@ export class RolesService {
     if (!role) {
       throw new NotFoundException('Role not found');
     }
-    role.permissions = role.permissions.filter(p => p.id !== permissionId);
+    role.permissions = role.permissions.filter((p) => p.id !== permissionId);
     this.rolesRepository.update(role);
   }
 

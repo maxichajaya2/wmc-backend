@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, HttpCode, UseGuards, Put, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Body,
+  Param,
+  HttpCode,
+  UseGuards,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { PapersService } from './papers.service';
 import { CreatePaperDto } from './dto/create-paper.dto';
 import { DashboardAuthGuard } from '../auth/guards/dashboard-auth.guard';
@@ -23,14 +35,22 @@ export class PapersController {
   //TODO: Implementar el guard
   @UseGuards(DashboardAuthGuard)
   @Get()
-  findAll(@Query('onlyActive') onlyActive: string, @Query('viewAll') viewAll: string) {
-    return this.papersService.findAll({ onlyActive: onlyActive === 'true', viewAll: viewAll === 'true' });
+  findAll(
+    @Query('onlyActive') onlyActive: string,
+    @Query('viewAll') viewAll: string,
+  ) {
+    return this.papersService.findAll({
+      onlyActive: onlyActive === 'true',
+      viewAll: viewAll === 'true',
+    });
   }
 
   //TODO: Implementar el guard
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.papersService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.papersService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @UseGuards(GlobalGuard)
@@ -67,7 +87,11 @@ export class PapersController {
 
   @UseGuards(DashboardAuthGuard)
   @Patch(':id/comments/:commentId')
-  updateComment(@Param('id') id: string, @Param('commentId') commentId: string, @Body() addCommentDto: AddCommentDto) {
+  updateComment(
+    @Param('id') id: string,
+    @Param('commentId') commentId: string,
+    @Body() addCommentDto: AddCommentDto,
+  ) {
     console.log('updateComment');
     return this.papersService.updateComment(+id, +commentId, addCommentDto);
   }
@@ -75,7 +99,10 @@ export class PapersController {
   @UseGuards(DashboardAuthGuard)
   @HttpCode(204)
   @Delete(':id/comments/:commentId')
-  removeComment(@Param('id') id: string, @Param('commentId') commentId: string) {
+  removeComment(
+    @Param('id') id: string,
+    @Param('commentId') commentId: string,
+  ) {
     return this.papersService.deleteComment(+id, +commentId);
   }
 
@@ -87,7 +114,10 @@ export class PapersController {
 
   @Post(':id/upload-full-file')
   @UseGuards(AuthGuard)
-  uploadFullFile(@Param('id') id: string, @Body() uploadFullFileDto: UploadFullFileDto) {
+  uploadFullFile(
+    @Param('id') id: string,
+    @Body() uploadFullFileDto: UploadFullFileDto,
+  ) {
     return this.papersService.uploadFullFile(+id, uploadFullFileDto);
   }
 

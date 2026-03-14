@@ -1,44 +1,61 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Paper } from "./paper.entity";
-import { User } from "./user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Paper } from './paper.entity';
+import { User } from './user.entity';
 
 @Entity()
-export class PaperComentary{
-    @PrimaryGeneratedColumn()
-    id?: number;
+export class PaperComentary {
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({ type: 'text', nullable: true })
-    comentary?: string;
+  @Column({ type: 'text', nullable: true })
+  comentary?: string;
 
-    @Column({ type: 'text', nullable: true })
-    fileUrl?: string;
+  @Column({ type: 'text', nullable: true })
+  fileUrl?: string;
 
-    @Column({ type: 'int' })
-    userId?: number;
+  @Column({ type: 'int' })
+  userId?: number;
 
-    @ManyToOne(() => User, (user) => user.paperComentaries, { onDelete: 'CASCADE', nullable: false, eager: true })
-    @JoinColumn({ name: 'userId' })
-    user?: User;
+  @ManyToOne(() => User, (user) => user.paperComentaries, {
+    onDelete: 'CASCADE',
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'userId' })
+  user?: User;
 
-    @Column({ type: 'int' })
-    paperId?: number;
+  @Column({ type: 'int' })
+  paperId?: number;
 
-    @ManyToOne(() => Paper, (paper) => paper.comentaries, { onDelete: 'CASCADE', nullable: false, eager: true })
-    @JoinColumn({ name: 'paperId' })
-    paper?: Paper;
+  @ManyToOne(() => Paper, (paper) => paper.comentaries, {
+    onDelete: 'CASCADE',
+    nullable: false,
+    eager: true,
+  })
+  @JoinColumn({ name: 'paperId' })
+  paper?: Paper;
 
-    @Column({ type: 'int', nullable: true })
-    blockId?: number;
+  @Column({ type: 'int', nullable: true })
+  blockId?: number;
 
-    @Column({ type: 'varchar', length: 50  , nullable: true})
-    documentVersion: string;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  documentVersion: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt?: Date;
+  @UpdateDateColumn()
+  updatedAt?: Date;
 
-    @DeleteDateColumn()
-    deletedAt?: Date;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

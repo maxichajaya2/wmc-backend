@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { GalleryService } from './gallery.service';
 import { ContentFilters } from '../domain/repositories/blocks.repository';
 import { CreateGalleryDto } from './dto/create-gallery.dto';
@@ -6,7 +17,7 @@ import { UpdateGalleryDto } from './dto/update-gallery.dto';
 
 @Controller('gallery')
 export class GalleryController {
-  constructor(private readonly galleryService: GalleryService) { }
+  constructor(private readonly galleryService: GalleryService) {}
 
   @Get()
   findAll(@Query() query: ContentFilters) {
@@ -15,7 +26,9 @@ export class GalleryController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.galleryService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.galleryService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Post()

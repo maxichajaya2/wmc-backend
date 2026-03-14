@@ -1,25 +1,32 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class ConferenceType {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({ type: 'text', nullable: true })
-    nameEn: string;
-    
-    @Column({ type: 'text', nullable: true })
-    nameEs: string;
+  @Column({ type: 'text', nullable: true })
+  nameEn: string;
 
-    @Column({ type: 'boolean', default: true })
-    isActive?: boolean;
+  @Column({ type: 'text', nullable: true })
+  nameEs: string;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column({ type: 'boolean', default: true })
+  isActive?: boolean;
 
-    @UpdateDateColumn()
-    updatedAt?: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt?: Date;
+  @UpdateDateColumn()
+  updatedAt?: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

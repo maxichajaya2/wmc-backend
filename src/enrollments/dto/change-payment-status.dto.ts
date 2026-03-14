@@ -1,7 +1,7 @@
-import { IsEnum } from "class-validator";
-import { PaymentStatus } from "../../domain/entities/enrollment.entity";
+import { IsEnum } from 'class-validator';
+import { PaymentStatus } from '../../domain/entities/enrollment.entity';
 
-export class ChangePaymentStatusDto{
-    @IsEnum(PaymentStatus)
-    status: PaymentStatus;
+export class ChangePaymentStatusDto {
+  @IsEnum(PaymentStatus)
+  status: PaymentStatus;
 }

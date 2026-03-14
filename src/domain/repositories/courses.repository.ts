@@ -5,8 +5,8 @@ import { Course } from '../entities/course.entity';
 
 @Injectable()
 export class CoursesRepository {
-    constructor(
-        @InjectRepository(Course)
-        public readonly repository: Repository<Course>
-    ) { }
+  constructor(
+    @InjectRepository(Course)
+    public readonly repository: Repository<Course>,
+  ) {}
 }

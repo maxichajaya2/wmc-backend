@@ -5,9 +5,8 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class GalleriesRepository {
-
-    constructor(
-        @InjectRepository(Gallery)
-        public readonly repository: Repository<Gallery>
-    ) { }
+  constructor(
+    @InjectRepository(Gallery)
+    public readonly repository: Repository<Gallery>,
+  ) {}
 }

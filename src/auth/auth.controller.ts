@@ -69,7 +69,7 @@ export class AuthController {
   ) {
     return this.authService.sendResetPasswordOtp(sendResetPasswordOtpDto.email);
   }
-//  RESETEAR CONTRASEÑA
+  //  RESETEAR CONTRASEÑA
   // ===========================
   @HttpCode(HttpStatus.OK)
   @Post('reset-password')

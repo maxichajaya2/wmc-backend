@@ -5,9 +5,8 @@ import { Page } from '../entities/page.entity';
 
 @Injectable()
 export class PagesRepository {
-
-    constructor(
-        @InjectRepository(Page)
-        public readonly repository: Repository<Page>,
-    ) { }
+  constructor(
+    @InjectRepository(Page)
+    public readonly repository: Repository<Page>,
+  ) {}
 }

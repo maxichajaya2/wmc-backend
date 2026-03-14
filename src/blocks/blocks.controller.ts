@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { BlocksService } from './blocks.service';
 import { ContentFilters } from '../domain/repositories/blocks.repository';
 import { CreateBlockDto } from './dto/create-block.dto';
@@ -15,7 +26,9 @@ export class BlocksController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @Query('onlyActive') onlyActive: string) {
-    return this.blocksService.findOne(+id, { onlyActive: onlyActive === 'true' });
+    return this.blocksService.findOne(+id, {
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Post()

@@ -5,9 +5,8 @@ import { PressRelease } from '../entities/press-release.entity';
 
 @Injectable()
 export class PressReleasesRepository {
-
-    constructor(
-        @InjectRepository(PressRelease)
-        public readonly repository: Repository<PressRelease>,
-    ) { }
+  constructor(
+    @InjectRepository(PressRelease)
+    public readonly repository: Repository<PressRelease>,
+  ) {}
 }

@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { MenusService } from './menus.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -8,13 +18,19 @@ export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 
   @Get()
-  findAll(@Query('onlyParents') onlyParents: string, @Query('onlyActive') onlyActive: string) {
-    return this.menusService.findAll({onlyParents: onlyParents === 'true', onlyActive: onlyActive === 'true'});
+  findAll(
+    @Query('onlyParents') onlyParents: string,
+    @Query('onlyActive') onlyActive: string,
+  ) {
+    return this.menusService.findAll({
+      onlyParents: onlyParents === 'true',
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Get(':id')
   findOne(@Param('id') id: number, @Query('onlyActive') onlyActive: string) {
-    return this.menusService.findOne(id, {onlyActive: onlyActive === 'true'});
+    return this.menusService.findOne(id, { onlyActive: onlyActive === 'true' });
   }
 
   @Post()

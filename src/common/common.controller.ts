@@ -4,12 +4,10 @@ import { OtpService } from './services/otp.service';
 
 @Controller('common')
 export class CommonController {
-    constructor(
-        private readonly otpService: OtpService,
-    ) {}
+  constructor(private readonly otpService: OtpService) {}
 
-    @Post('send-otp')
-    sendOtp(@Body() sendOtpDto: SendOTPDto){
-        return this.otpService.sendOtp(sendOtpDto);
-    }
+  @Post('send-otp')
+  sendOtp(@Body() sendOtpDto: SendOTPDto) {
+    return this.otpService.sendOtp(sendOtpDto);
+  }
 }

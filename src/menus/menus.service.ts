@@ -8,47 +8,45 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Injectable()
 export class MenusService {
-
   constructor(
     private readonly menusRepository: MenusRepository,
     private readonly pagesRepository: PagesRepository,
-  ) { }
+  ) {}
 
-  async findAll({
-    onlyParents = false,
-    onlyActive
-  }) {
+  async findAll({ onlyParents = false, onlyActive }) {
     console.log({ onlyParents });
     let where = {};
     if (onlyActive) {
       where = {
-        isActive: true
+        isActive: true,
       };
     }
     if (onlyParents) {
       where = {
         ...where,
-        parentId: IsNull()
+        parentId: IsNull(),
       };
       const menus = await this.menusRepository.repository.find({
         select: ['id', 'titleEs', 'titleEn'],
         where,
-        relations: ['page'] // Agregamos la relación page
+        relations: ['page'], // Agregamos la relación page
       });
       return menus;
     }
     const menus = await this.menusRepository.repository.find({
       where,
-      relations: ['page'] // Agregamos la relación page
+      relations: ['page'], // Agregamos la relación page
     });
-    const parents = menus.filter(menu => menu.parentId === null);
-    return parents.map(parent => {
-      const children = menus.filter(menu => menu.parentId === parent.id);
-      return {
-        ...parent,
-        children
-      };
-    }).map(m => this.getWithI18n(m));
+    const parents = menus.filter((menu) => menu.parentId === null);
+    return parents
+      .map((parent) => {
+        const children = menus.filter((menu) => menu.parentId === parent.id);
+        return {
+          ...parent,
+          children,
+        };
+      })
+      .map((m) => this.getWithI18n(m));
   }
 
   private getWithI18n(menu: Menu) {
@@ -56,32 +54,35 @@ export class MenusService {
       ...menu,
       i18n: {
         es: menu.titleEs,
-        en: menu.titleEn
+        en: menu.titleEn,
       },
-      children: (menu.children?.length > 0) ? menu.children.map(child => this.getWithI18n(child)) : undefined
-    }
+      children:
+        menu.children?.length > 0
+          ? menu.children.map((child) => this.getWithI18n(child))
+          : undefined,
+    };
   }
 
   async findOne(id: number, { onlyActive }) {
     console.log('searching for menu', id);
-    let where: any = { 
+    let where: any = {
       id,
     };
     if (onlyActive) {
       where = {
         ...where,
-        isActive: true
+        isActive: true,
       };
     }
     const menu = await this.menusRepository.repository.findOne({
       where,
-      relations: ['page']
+      relations: ['page'],
     });
     if (!menu) {
       throw new NotFoundException('Menu not found');
     }
     const children = await this.menusRepository.repository.find({
-      where: { parentId: id }
+      where: { parentId: id },
     });
     menu.children = children;
     return menu;
@@ -94,16 +95,16 @@ export class MenusService {
       //TODO: Implementar el usuario logueado
       createdUserId: 1,
       createdAt: new Date(),
-    }
+    };
     if (pageId) {
       const page = await this.pagesRepository.repository.findOneOrFail({
-        where: { id: pageId }
+        where: { id: pageId },
       });
       menu.page = page;
     }
     if (parentId) {
       const parent = await this.menusRepository.repository.findOneOrFail({
-        where: { id: parentId }
+        where: { id: parentId },
       });
       menu.parent = parent;
     }
@@ -113,18 +114,18 @@ export class MenusService {
 
   async update(id: number, updateMenuDto: UpdateMenuDto) {
     const menu = await this.menusRepository.repository.findOneOrFail({
-      where: { id }
+      where: { id },
     });
     const { pageId, parentId } = updateMenuDto;
     if (pageId && pageId !== menu.pageId) {
       const page = await this.pagesRepository.repository.findOneOrFail({
-        where: { id: pageId }
+        where: { id: pageId },
       });
       menu.page = page;
     }
     if (parentId && parentId !== menu.parentId) {
       const parent = await this.menusRepository.repository.findOneOrFail({
-        where: { id: parentId }
+        where: { id: parentId },
       });
       menu.parent = parent;
     }
@@ -133,7 +134,7 @@ export class MenusService {
       ...updateMenuDto,
       updatedAt: new Date(),
       //TODO: Implementar el usuario logueado
-      updatedUserId: 1
+      updatedUserId: 1,
     });
     return updatedMenu;
   }

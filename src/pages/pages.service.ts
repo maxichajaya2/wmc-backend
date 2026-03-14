@@ -8,50 +8,55 @@ import { In } from 'typeorm';
 
 @Injectable()
 export class PagesService {
-
-  constructor(
-    private readonly pagesRepository: PagesRepository,
-  ) { }
+  constructor(private readonly pagesRepository: PagesRepository) {}
 
   create(createPageDto: CreatePageDto) {
     const page: Page = {
       ...createPageDto,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
     return this.pagesRepository.repository.save(page);
   }
 
-  findAll({short, onlyActive, keys}: {short: boolean, onlyActive: boolean, keys: string}) {
+  findAll({
+    short,
+    onlyActive,
+    keys,
+  }: {
+    short: boolean;
+    onlyActive: boolean;
+    keys: string;
+  }) {
     let where = {};
-    
-    if(onlyActive){
+
+    if (onlyActive) {
       where = {
-        isActive: true
+        isActive: true,
       };
     }
-    if(short){
+    if (short) {
       return this.pagesRepository.repository.find({
         select: ['id', 'titleEs', 'titleEn'],
-        where
+        where,
       });
     }
-    if(keys){
+    if (keys) {
       const keyArray = keys.split(',');
       where = [
         { urlKeyEs: In(keyArray), ...where },
-        { urlKeyEn: In(keyArray), ...where }
-      ]
+        { urlKeyEn: In(keyArray), ...where },
+      ];
     }
-    console.log({where})
+    console.log({ where });
     return this.pagesRepository.repository.find({
-      where
+      where,
     });
   }
 
   async findOne(id: number, { onlyActive } = { onlyActive: false }) {
-    let where = { id };
-    if(onlyActive){
+    const where = { id };
+    if (onlyActive) {
       where['isActive'] = true;
     }
     const page = await this.pagesRepository.repository.findOne({
@@ -69,7 +74,7 @@ export class PagesService {
       ...page,
       ...updatePageDto,
       updatedAt: new Date(),
-    }
+    };
     return this.pagesRepository.repository.save(updatedPage);
   }
 

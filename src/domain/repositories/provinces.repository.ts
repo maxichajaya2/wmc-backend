@@ -5,8 +5,8 @@ import { Province } from '../entities/province.entity';
 
 @Injectable()
 export class ProvincesRepository {
-    constructor(
-        @InjectRepository(Province)
-        public readonly repository: Repository<Province>
-    ) { }
+  constructor(
+    @InjectRepository(Province)
+    public readonly repository: Repository<Province>,
+  ) {}
 }

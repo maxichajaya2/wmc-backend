@@ -3,9 +3,7 @@ import { DepartmentsRepository } from '../domain/repositories/departments.reposi
 
 @Injectable()
 export class DepartmentsService {
-  constructor(
-    private readonly departmentsRepository: DepartmentsRepository
-  ) {}
+  constructor(private readonly departmentsRepository: DepartmentsRepository) {}
 
   findAll() {
     return this.departmentsRepository.repository.find();

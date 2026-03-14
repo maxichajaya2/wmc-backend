@@ -5,22 +5,19 @@ import { ParametersRepository } from '../domain/repositories/parameters.reposito
 
 @Injectable()
 export class ParametersService {
-
-  constructor(
-    private readonly parametersRepository: ParametersRepository,
-  ) { }
+  constructor(private readonly parametersRepository: ParametersRepository) {}
 
   async create(createParameterDto: CreateParameterDto) {
     const { code, value } = createParameterDto;
-    const row = await this.parametersRepository.repository.findOne({ 
-      where: { code }
-     }); 
-     if(!row){
+    const row = await this.parametersRepository.repository.findOne({
+      where: { code },
+    });
+    if (!row) {
       return this.parametersRepository.repository.save({ code, value });
-     } else {
+    } else {
       row.value = value;
       return this.parametersRepository.repository.save(row);
-     }
+    }
   }
 
   findAll() {

@@ -1,5 +1,9 @@
 import { IsEnum, IsNumber, IsOptional } from 'class-validator';
-import { PaperState, PaperType } from '../../domain/entities/paper.entity';
+import {
+  PaperState,
+  PaperType,
+  Process,
+} from '../../domain/entities/paper.entity';
 
 export class ChangeStateDto {
   @IsEnum(PaperState)
@@ -27,4 +31,8 @@ export class ChangeStateDto {
   @IsNumber()
   @IsOptional()
   reviewerSupport3Id?: number;
+
+  @IsEnum(Process)
+  @IsOptional()
+  process?: Process;
 }

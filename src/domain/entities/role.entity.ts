@@ -1,45 +1,55 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { User } from './user.entity';
 import { Permission } from './permission.entity';
 
 export enum RoleName {
-    ADMIN = 'Admin',
-    USER = 'User',
+  ADMIN = 'Admin',
+  USER = 'User',
 }
 
 export enum RoleCodes {
-    ADMIN = 1,
-    REVISOR = 2,
-    LIDER = 3,
+  ADMIN = 1,
+  REVISOR = 2,
+  LIDER = 3,
 }
 
 @Entity()
 export class Role {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({ unique: true })
-    name: string;
+  @Column({ unique: true })
+  name: string;
 
-    @OneToMany(() => User, (user) => user.role)
-    users: User[];
+  @OneToMany(() => User, (user) => user.role)
+  users: User[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt?: Date;
+  @UpdateDateColumn()
+  updatedAt?: Date;
 
-    @DeleteDateColumn()
-    deletedAt?: Date;
+  @DeleteDateColumn()
+  deletedAt?: Date;
 
-    @ManyToMany(() => Permission, (permission) => permission.roles, {
-        eager: true,
-    })
-    @JoinTable({
-        name: 'role_permissions', // Nombre de la tabla intermedia
-        joinColumn: { name: 'roleId', referencedColumnName: 'id' },
-        inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
-    })
-    permissions: Permission[];
+  @ManyToMany(() => Permission, (permission) => permission.roles, {
+    eager: true,
+  })
+  @JoinTable({
+    name: 'role_permissions', // Nombre de la tabla intermedia
+    joinColumn: { name: 'roleId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'permissionId', referencedColumnName: 'id' },
+  })
+  permissions: Permission[];
 }

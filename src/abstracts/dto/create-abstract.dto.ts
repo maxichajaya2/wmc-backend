@@ -1,26 +1,29 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class CreateAbstractDto{
+export class CreateAbstractDto {
+  @IsString()
+  @IsNotEmpty()
+  codigo: string;
 
-    
-    @IsString()
-    @IsNotEmpty()
-    codigo: string;
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    name: string;
+  @IsString()
+  @IsOptional()
+  lastname: string;
 
-    @IsString()
-    @IsOptional()
-    lastname: string;
+  @IsString()
+  @IsOptional()
+  email: string;
 
-    @IsString()
-    @IsOptional()
-    email: string;
-
-    @IsString()
-    @IsOptional()
-    title: string;
-
+  @IsString()
+  @IsOptional()
+  title: string;
 }

@@ -1,28 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
 import { Conference } from './conference.entity';
 
 @Entity()
 export class Room {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({ type: 'varchar', length: 100 })
-    nameEn: string;
-    
-    @Column({ type: 'varchar', length: 100 })
-    nameEs: string;
+  @Column({ type: 'varchar', length: 100 })
+  nameEn: string;
 
-    @Column({ type: 'boolean', default: true })
-    isActive?: boolean;
+  @Column({ type: 'varchar', length: 100 })
+  nameEs: string;
 
-    conferences?: Conference[];
+  @Column({ type: 'boolean', default: true })
+  isActive?: boolean;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  conferences?: Conference[];
 
-    @UpdateDateColumn()
-    updatedAt?: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @DeleteDateColumn()
-    deletedAt?: Date;
+  @UpdateDateColumn()
+  updatedAt?: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

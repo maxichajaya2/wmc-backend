@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  HttpCode,
+} from '@nestjs/common';
 import { PressReleasesService } from './press-releases.service';
 import { CreatePressReleaseDto } from './dto/create-press-release.dto';
 import { UpdatePressReleaseDto } from './dto/update-press-release.dto';
@@ -14,7 +24,9 @@ export class PressReleasesController {
 
   @Get()
   findAll(@Query('onlyActive') onlyActive: string) {
-    return this.pressReleasesService.findAll({ onlyActive: onlyActive === 'true' });
+    return this.pressReleasesService.findAll({
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Get(':id')
@@ -23,7 +35,10 @@ export class PressReleasesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePressReleaseDto: UpdatePressReleaseDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePressReleaseDto: UpdatePressReleaseDto,
+  ) {
     return this.pressReleasesService.update(+id, updatePressReleaseDto);
   }
 

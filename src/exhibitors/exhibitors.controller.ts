@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  Query,
+} from '@nestjs/common';
 import { ExhibitorsService } from './exhibitors.service';
 import { CreateExhibitorDto } from './dto/create-exhibitor.dto';
 import { UpdateExhibitorDto } from './dto/update-exhibitor.dto';
@@ -15,7 +25,9 @@ export class ExhibitorsController {
 
   @Get()
   findAll(@Query('onlyActive') onlyActive: string) {
-    return this.exhibitorsService.findAll({ onlyActive: onlyActive === 'true' });
+    return this.exhibitorsService.findAll({
+      onlyActive: onlyActive === 'true',
+    });
   }
 
   @Get(':id')
@@ -24,7 +36,10 @@ export class ExhibitorsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExhibitorDto: UpdateExhibitorDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateExhibitorDto: UpdateExhibitorDto,
+  ) {
     return this.exhibitorsService.update(+id, updateExhibitorDto);
   }
 

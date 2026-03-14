@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpCode,
+  Query,
+} from '@nestjs/common';
 import { PavilionsService } from './pavilions.service';
 import { CreatePavilionDto } from './dto/create-pavilion.dto';
 import { UpdatePavilionDto } from './dto/update-pavilion.dto';
@@ -23,7 +33,10 @@ export class PavilionsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePavilionDto: UpdatePavilionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePavilionDto: UpdatePavilionDto,
+  ) {
     return this.pavilionsService.update(+id, updatePavilionDto);
   }
 
